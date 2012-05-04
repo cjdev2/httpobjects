@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011, 2012 Stuart Penrose
+ * Copyright (C) 2011, 2012 Commission Junction Inc.
  *
  * This file is part of httpobjects.
  *
