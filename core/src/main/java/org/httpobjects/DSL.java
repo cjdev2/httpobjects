@@ -65,6 +65,9 @@ public class DSL {
         return new Response(ResponseCode.NO_CONTENT, null);
     }
 
+	public static final Response BAD_REQUEST(Representation r){
+		return new Response(ResponseCode.BAD_REQUEST, r);
+	}
 	public static final Response BAD_REQUEST(){
 		return new Response(ResponseCode.BAD_REQUEST, null);
 	}
@@ -95,6 +98,10 @@ public class DSL {
 	}
 	public static final Response SEE_OTHER(LocationField location, Representation representation, HeaderField ... header){
 		return new Response(ResponseCode.SEE_OTHER, representation, makeHeader(location, header));
+	}
+
+	public static final Response INTERNAL_SERVER_ERROR(Representation r){
+		return new Response(ResponseCode.INTERNAL_SERVER_ERROR, r);
 	}
 	
 	public static final Response INTERNAL_SERVER_ERROR(Throwable t){
