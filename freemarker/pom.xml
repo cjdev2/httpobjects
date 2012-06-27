@@ -1,0 +1,28 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>httpobjects-pom</artifactId>
+		<groupId>org.httpobjects.pom</groupId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+
+	<groupId>org.httpobjects.freemarker</groupId>
+	<artifactId>httpobjects-freemarker</artifactId>
+
+	<name>${artifactId}</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.httpobjects</groupId>
+			<artifactId>httpobjects</artifactId>
+			<version>${pom.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.freemarker</groupId>
+			<artifactId>freemarker</artifactId>
+			<version>2.3.16</version>
+		</dependency>
+	</dependencies>
+
+</project>

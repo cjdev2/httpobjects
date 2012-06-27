@@ -35,38 +35,29 @@
  * obligated to do so.  If you do not wish to do so, delete this
  * exception statement from your version.
  */
-package org.httpobjects.demo.freemarker;
+package org.httpobjects.util;
 
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import org.httpobjects.HttpObject;
+import org.httpobjects.Request;
+import org.httpobjects.Response;
 
-import org.httpobjects.Representation;
+public class ClasspathResourceObject extends HttpObject {
+	private final Class<?> clazz;
+	private final String contentType, resourceName;
 
-import freemarker.template.Configuration;
-import freemarker.template.Template;
+	public ClasspathResourceObject(String pathPattern, String resourceName, Class<?> clazz) {
+		this(pathPattern, new MimeTypeTool().guessMimeTypeFromName(resourceName), resourceName, clazz);
+	}
+	
+	public ClasspathResourceObject(String pathPattern, String contentType, String resourceName, Class<?> clazz) {
+		super(pathPattern, null);
+		this.clazz = clazz;
+		this.contentType = contentType;
+		this.resourceName = resourceName;
+	}
 
-public final class FreemarkerDSL {
-	public static Representation FreemarkerTemplate(final String template, final Object model, final Configuration config){
-		return new Representation() {
-			
-			@Override
-			public void write(OutputStream out) {
-				try {
-					Template t = config.getTemplate(template);
-					Writer w = new OutputStreamWriter(out, t.getEncoding());
-					config.getTemplate(template).process(model, w);
-					w.close();
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-				
-			}
-			
-			@Override
-			public String contentType() {
-				return null;
-			}
-		};
+	@Override
+	public Response get(Request req) {
+		return OK(FromClasspath(contentType, resourceName, clazz));
 	}
 }

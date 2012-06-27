@@ -72,6 +72,8 @@
 		<module>servlet</module>
                 <module>jetty</module>
 		<module>demo</module>
+                <module>freemarker</module>
+                <module>jackson</module>
 	</modules>
 	
 	<dependencies>

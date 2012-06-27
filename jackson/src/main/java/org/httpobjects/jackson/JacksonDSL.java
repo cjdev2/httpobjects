@@ -35,52 +35,34 @@
  * obligated to do so.  If you do not wish to do so, delete this
  * exception statement from your version.
  */
-package org.httpobjects.util;
+package org.httpobjects.jackson;
 
-import java.io.InputStream;
+import java.io.OutputStream;
 
-import org.httpobjects.HttpObject;
-import org.httpobjects.Request;
-import org.httpobjects.Response;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.httpobjects.Representation;
 
-public class ClasspathResourcesObject  extends HttpObject {
-	private final Class<?> relativeTo;
-	private final String prefix;
-	
-	public ClasspathResourcesObject(String pathPattern, Class<?> relativeTo) {
-		this(pathPattern, relativeTo, "");
-	}
+public class JacksonDSL {
 
-	public ClasspathResourcesObject(String pathPattern, Class<?> relativeTo, String prefix) {
-		super(pathPattern, null);
-		this.prefix = (!prefix.equals("") && !prefix.endsWith("/"))? prefix + "/" : prefix;
-		this.relativeTo = relativeTo;
-	}
-
-	@Override
-	public Response get(Request req) {
-		final String resource = req.pathVars().valueFor("resource");
-		if(isNullOrEmpty(resource) ||  resource.endsWith("/")) return null;
-
-		InputStream data = relativeTo.getResourceAsStream(prefix + resource);
-		System.out.println(resource);
-		
-		if(data!=null){
-			return OK(Bytes(mimeTypeFor(resource), data));
-		}else{
-			return null;
-		}
-	}
-
-	private static String mimeTypeFor(String resource){
-		return ieCompat(new MimeTypeTool().guessMimeTypeFromName(resource));
-	}
-
-	private static String ieCompat(String t) {
-		return t.equals("text/html")?"text/html;charset=utf-8":t;
-	}
-
-	private boolean isNullOrEmpty(String t){
-		return t==null || t.trim().isEmpty();
-	}
+    public static Representation JacksonJson(final Object object, final ObjectMapper jackson) {
+    	return new Representation() {
+			
+			@Override
+			public void write(OutputStream out) {
+				try {
+					jackson.writeValue(out, object);
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+			
+			@Override
+			public String contentType() {
+				return "application/json";
+			}
+    	};
+    }
+    public static Representation JacksonJson(final Object object) {
+    	return JacksonJson(object, new ObjectMapper());
+    }
 }

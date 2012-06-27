@@ -35,52 +35,40 @@
  * obligated to do so.  If you do not wish to do so, delete this
  * exception statement from your version.
  */
-package org.httpobjects.util;
+package org.httpobjects.freemarker;
 
-import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 
-import org.httpobjects.HttpObject;
-import org.httpobjects.Request;
-import org.httpobjects.Response;
+import org.httpobjects.Representation;
 
-public class ClasspathResourcesObject  extends HttpObject {
-	private final Class<?> relativeTo;
-	private final String prefix;
-	
-	public ClasspathResourcesObject(String pathPattern, Class<?> relativeTo) {
-		this(pathPattern, relativeTo, "");
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+
+public final class FreemarkerDSL {
+	public static Representation FreemarkerTemplate(final String template, final Object model, final Configuration config){
+		return FreemarkerTemplate(null, template, model, config);
 	}
-
-	public ClasspathResourcesObject(String pathPattern, Class<?> relativeTo, String prefix) {
-		super(pathPattern, null);
-		this.prefix = (!prefix.equals("") && !prefix.endsWith("/"))? prefix + "/" : prefix;
-		this.relativeTo = relativeTo;
-	}
-
-	@Override
-	public Response get(Request req) {
-		final String resource = req.pathVars().valueFor("resource");
-		if(isNullOrEmpty(resource) ||  resource.endsWith("/")) return null;
-
-		InputStream data = relativeTo.getResourceAsStream(prefix + resource);
-		System.out.println(resource);
-		
-		if(data!=null){
-			return OK(Bytes(mimeTypeFor(resource), data));
-		}else{
-			return null;
-		}
-	}
-
-	private static String mimeTypeFor(String resource){
-		return ieCompat(new MimeTypeTool().guessMimeTypeFromName(resource));
-	}
-
-	private static String ieCompat(String t) {
-		return t.equals("text/html")?"text/html;charset=utf-8":t;
-	}
-
-	private boolean isNullOrEmpty(String t){
-		return t==null || t.trim().isEmpty();
+	public static Representation FreemarkerTemplate(final String contentType, final String template, final Object model, final Configuration config){
+		return new Representation() {
+			
+			@Override
+			public void write(OutputStream out) {
+				try {
+					Template t = config.getTemplate(template);
+					Writer w = new OutputStreamWriter(out, t.getEncoding());
+					config.getTemplate(template).process(model, w);
+					w.close();
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+			
+			@Override
+			public String contentType() {
+				return contentType;
+			}
+		};
 	}
 }

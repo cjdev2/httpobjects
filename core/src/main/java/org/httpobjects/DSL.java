@@ -77,6 +77,14 @@ public class DSL {
 		
 	}
 	
+	public static final Response UNAUTHORIZED(Representation r){
+		return new Response(ResponseCode.UNAUTHORIZED, r);
+	}
+	
+	public static final Response UNAUTHORIZED(){
+		return new Response(ResponseCode.UNAUTHORIZED, null);
+	}
+	
 	public static final Response NOT_FOUND(Representation r){
 		return new Response(ResponseCode.NOT_FOUND, r);
 	}
@@ -152,12 +160,20 @@ public class DSL {
 	}
 	
 	public static final Representation HtmlFromClasspath(String name, Object context){
-		return Bytes("text/html", context.getClass().getResourceAsStream(name));
+		return HtmlFromClasspath(name, context.getClass());
+	}
+	
+	public static final Representation HtmlFromClasspath(String name, Class<?> clazz){
+		return FromClasspath("text/html", name, clazz);
 	}
 	
 
+	public static final Representation FromClasspath(String contentType, String name, Class<?> clazz){
+		return Bytes(contentType, clazz.getResourceAsStream(name));
+	}
+	
 	public static final Representation FromClasspath(String contentType, String name, Object context){
-		return Bytes(contentType, context.getClass().getResourceAsStream(name));
+		return FromClasspath(contentType, name, context.getClass());
 	}
 	
 	public static final Representation Bytes(String contentType, byte[] data){

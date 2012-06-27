@@ -39,10 +39,6 @@ package org.httpobjects.demo;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.Locale;
-import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -60,15 +56,10 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.FilterHolder;
 import org.mortbay.jetty.servlet.ServletHandler;
 
-import freemarker.cache.TemplateLoader;
-import freemarker.template.Configuration;
-import freemarker.template.DefaultObjectWrapper;
-
 public class Demo {
 	public static void main(String[] args) throws Exception {
 		BasicConfigurator.configure();
 		Logger.getRootLogger().setLevel(Level.INFO);
-		final Configuration freemarker = freemarkerConfig();
 		final boolean useJetty = true;
 		
 		HttpObject[] objects = {
@@ -82,36 +73,6 @@ public class Demo {
 		}else{
 			serveViaServletFilter(objects);
 		}
-	}
-	
-	private static Configuration freemarkerConfig(){
-		final Configuration cfg = new Configuration();
-		cfg.setTemplateLoader(new TemplateLoader() {
-			
-			@Override
-			public Reader getReader(Object source, String encoding) throws IOException {
-				return new InputStreamReader(getClass().getClassLoader().getResourceAsStream(source.toString()), encoding);
-			}
-			
-			@Override
-			public long getLastModified(Object arg0) {
-				return System.currentTimeMillis();
-			}
-			
-			@Override
-			public Object findTemplateSource(String name) throws IOException {
-				return name.replaceAll(Pattern.quote("_en_US"), "");
-			}
-			
-			@Override
-			public void closeTemplateSource(Object arg0) throws IOException {
-				
-			}
-		});
-		cfg.setEncoding(Locale.US, "UTF8");
-		cfg.setObjectWrapper(new DefaultObjectWrapper()); 
-//		cfg.setTagSyntax(Configuration.SQUARE_BRACKET_TAG_SYNTAX);
-		return cfg;
 	}
 	
 	

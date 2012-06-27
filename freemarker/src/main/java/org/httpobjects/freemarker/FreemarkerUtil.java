@@ -35,52 +35,48 @@
  * obligated to do so.  If you do not wish to do so, delete this
  * exception statement from your version.
  */
-package org.httpobjects.util;
+package org.httpobjects.freemarker;
 
-import java.io.InputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.Locale;
+import java.util.regex.Pattern;
 
-import org.httpobjects.HttpObject;
-import org.httpobjects.Request;
-import org.httpobjects.Response;
+import freemarker.cache.TemplateLoader;
+import freemarker.template.Configuration;
+import freemarker.template.DefaultObjectWrapper;
 
-public class ClasspathResourcesObject  extends HttpObject {
-	private final Class<?> relativeTo;
-	private final String prefix;
-	
-	public ClasspathResourcesObject(String pathPattern, Class<?> relativeTo) {
-		this(pathPattern, relativeTo, "");
-	}
+public class FreemarkerUtil {
 
-	public ClasspathResourcesObject(String pathPattern, Class<?> relativeTo, String prefix) {
-		super(pathPattern, null);
-		this.prefix = (!prefix.equals("") && !prefix.endsWith("/"))? prefix + "/" : prefix;
-		this.relativeTo = relativeTo;
-	}
-
-	@Override
-	public Response get(Request req) {
-		final String resource = req.pathVars().valueFor("resource");
-		if(isNullOrEmpty(resource) ||  resource.endsWith("/")) return null;
-
-		InputStream data = relativeTo.getResourceAsStream(prefix + resource);
-		System.out.println(resource);
-		
-		if(data!=null){
-			return OK(Bytes(mimeTypeFor(resource), data));
-		}else{
-			return null;
-		}
-	}
-
-	private static String mimeTypeFor(String resource){
-		return ieCompat(new MimeTypeTool().guessMimeTypeFromName(resource));
-	}
-
-	private static String ieCompat(String t) {
-		return t.equals("text/html")?"text/html;charset=utf-8":t;
-	}
-
-	private boolean isNullOrEmpty(String t){
-		return t==null || t.trim().isEmpty();
+	public static Configuration basicConfig(final Class<?> relativeTo){
+		final Configuration cfg = new Configuration();
+		cfg.setTemplateLoader(new TemplateLoader() {
+			
+			@Override
+			public Reader getReader(Object source, String encoding) throws IOException {
+				final String classpathResource = source.toString();
+				return new InputStreamReader(relativeTo.getResourceAsStream(classpathResource), encoding);
+			}
+			
+			@Override
+			public long getLastModified(Object arg0) {
+				return System.currentTimeMillis();
+			}
+			
+			@Override
+			public Object findTemplateSource(String name) throws IOException {
+				return name.replaceAll(Pattern.quote("_en_US"), "");
+			}
+			
+			@Override
+			public void closeTemplateSource(Object arg0) throws IOException {
+				
+			}
+		});
+		cfg.setEncoding(Locale.US, "UTF8");
+		cfg.setObjectWrapper(new DefaultObjectWrapper()); 
+//		cfg.setTagSyntax(Configuration.SQUARE_BRACKET_TAG_SYNTAX);
+		return cfg;
 	}
 }

@@ -28,13 +28,16 @@
 			<artifactId>httpobjects-servlet</artifactId>
 			<version>${pom.version}</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.httpobjects.freemarker</groupId>
+			<artifactId>httpobjects-freemarker</artifactId>
+			<version>${pom.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.mortbay.jetty</groupId>
 			<artifactId>jetty</artifactId>
 			<version>6.1.25</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
@@ -44,11 +47,6 @@
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 			<version>1.2.16</version>
-		</dependency>
-		<dependency>
-			<groupId>org.freemarker</groupId>
-			<artifactId>freemarker</artifactId>
-			<version>2.3.16</version>
 		</dependency>
 	</dependencies>
 </project>
