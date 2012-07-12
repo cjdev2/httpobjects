@@ -52,6 +52,7 @@ import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
+import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -91,6 +92,11 @@ public class Proxy extends HttpObject {
 	public Response get(Request req) {
 		return proxyRequest(req, new GetMethod());
 	}
+
+    @Override
+	public Response delete(Request req){
+		return proxyRequest(req, new DeleteMethod());
+    }
 
 	@Override
 	public Response put(Request req) {
