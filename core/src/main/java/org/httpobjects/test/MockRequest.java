@@ -37,6 +37,8 @@
  */
 package org.httpobjects.test;
 
+import static org.httpobjects.DSL.Bytes;
+
 import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.List;
@@ -56,9 +58,13 @@ public class MockRequest implements Request {
 	private final String query;
     private final Map<String, String> parameters;
 	
+    private static Representation nullRepresentation(){
+    	return Bytes(null, new byte[]{});
+    }
+    
 	public MockRequest(HttpObject object, String path, String query) {
 		super();
-		this.representation = null;
+		this.representation = nullRepresentation();
 		this.query = query.startsWith("?")?query.substring(1):query;
         try {
             this.parameters = Collections.unmodifiableMap(RequestQueryUtil.getUrlParameters(query));
@@ -70,7 +76,7 @@ public class MockRequest implements Request {
 	
 	public MockRequest(HttpObject object, String path) {
 		super();
-		this.representation = null;
+		this.representation = nullRepresentation();
 		this.query = null;
         this.parameters = null;
 		vars = object.pattern().match(path);

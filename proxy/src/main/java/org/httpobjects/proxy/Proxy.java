@@ -141,10 +141,10 @@ public class Proxy extends HttpObject {
 		}
 
         addRequestHeaders(req, method);
-
-        if(req.representation()!=null){
-			method.addRequestHeader("Content-Type", req.representation().contentType());
-		}
+        
+        if(req.representation().contentType()!=null){
+        	method.addRequestHeader("Content-Type", req.representation().contentType());
+        }
 		
 		for(Header next : method.getRequestHeaders()){
 			log.debug("Sending header: " + next);

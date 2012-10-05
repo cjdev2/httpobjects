@@ -67,6 +67,10 @@ import org.mortbay.jetty.Server;
 public class TestThatProxy {
 	Server jetty;
 	
+	public static void main(String[] args) {
+		new TestThatProxy().launch();
+	}
+	
 	@Before
 	public void launch(){
 		jetty = HttpObjectsJettyHandler.launchServer(8080, new HttpObject[]{
@@ -161,6 +165,13 @@ public class TestThatProxy {
 					public Response get(Request req) {
 						return OK(Text(req.query()));
 					};
+				},
+				new HttpObject("/contentTypeEcho"){
+					public Response get(Request req) {
+						String requestContentType = req.representation().contentType();
+						
+						return OK(Text(requestContentType == null ? "null" : requestContentType));
+					};
 				}
 				
 		});
@@ -202,6 +213,20 @@ public class TestThatProxy {
 		// then
 		responseCodeOf(output).assertIs(ResponseCode.OK);
 		contentTypeOf(output).assertIs("image/png");
+	}
+	
+	@Test
+	public void doesntSendBlankContentTypes(){
+
+		// given
+		HttpObject subject = new Proxy("http://localhost:8080", "http://me.com");
+		Request input = new MockRequest(subject, "/contentTypeEcho");
+		
+		// when
+		Response output = subject.get(input);
+		
+		// then
+		assertEquals("null", bodyOf(output).asString());
 	}
 	
 	@Test
