@@ -35,66 +35,26 @@
  * obligated to do so.  If you do not wish to do so, delete this
  * exception statement from your version.
  */
-package org.httpobjects.header.request;
 
-import java.util.StringTokenizer;
+package org.httpobjects.netty;
 
-import org.httpobjects.header.HeaderField;
-import org.httpobjects.header.HeaderFieldVisitor;
-import org.httpobjects.header.request.credentials.BasicCredentials;
-import org.httpobjects.header.response.WWWAuthenticateField;
-import org.httpobjects.header.response.WWWAuthenticateField.Method;
-import org.httpobjects.impl.Base64;
+import java.util.Arrays;
 
-public class AuthorizationField extends HeaderField {
+import org.httpobjects.HttpObject;
+import org.httpobjects.jetty.IntegrationTest;
+import org.jboss.netty.bootstrap.ServerBootstrap;
+import org.jboss.netty.channel.Channel;
 
-	public static AuthorizationField parse(String s) {
-		String fValue = s.trim();
-		StringTokenizer tokens = new StringTokenizer(fValue);
-		AuthorizationField f = new AuthorizationField(Method.valueOf(tokens.nextToken()), tokens.nextToken());
-		return f;
-	}
+public class NettyIntegrationTest extends IntegrationTest {
+	Channel server;
 	
-	private final WWWAuthenticateField.Method method;
-	private final String rawCredentials;
-	
-	public AuthorizationField(Method method, String rawCredentials) {
-		super();
-		this.method = method;
-		this.rawCredentials = rawCredentials;
-	}
-
 	@Override
-	public <T> T accept(HeaderFieldVisitor<T> visitor) {
-		return visitor.visit(this);
+	protected void serve(int port, HttpObject... objects) {
+		server = HttpobjectsNettySupport.serve(port, Arrays.asList(objects));
 	}
 	
-	public WWWAuthenticateField.Method method() {
-		return method;
+	@Override
+	protected void stopServing() {
+		server.unbind().awaitUninterruptibly();
 	}
-	public String rawCredentials() {
-		return rawCredentials;
-	}
-	
-	public String credentialsString(){
-		return new String(Base64.decode(rawCredentials));
-	}
-	
-	public BasicCredentials basicCredentials(){
-		if(this.method == Method.Basic){
-			return BasicCredentials.parse(credentialsString());
-		}else{
-			return null;
-		}
-	}
-
-    @Override
-    public String name() {
-        return "Authorization";
-    }
-
-    @Override
-    public String value() {
-        return method + " " + rawCredentials;
-    }
 }

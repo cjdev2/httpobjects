@@ -52,7 +52,7 @@ public class WWWAuthenticateFieldTest {
         String value = field.value();
 
        // THEN
-       Assert.assertEquals("Basic realm=\"Secure Area\"", value);
+       Assert.assertEquals("Basic realm=Secure Area", value);
     }
 
 }

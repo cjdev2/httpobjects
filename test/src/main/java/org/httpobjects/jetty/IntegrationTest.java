@@ -49,7 +49,6 @@ import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.log4j.BasicConfigurator;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
@@ -60,20 +59,20 @@ import org.httpobjects.header.request.Cookie;
 import org.httpobjects.header.request.CookieField;
 import org.httpobjects.header.request.credentials.BasicCredentials;
 import org.httpobjects.header.response.WWWAuthenticateField.Method;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-import org.mortbay.jetty.Server;
 
-public class IntegrationTest {
-	private static Server jetty;
-
-	@BeforeClass
-	public static void setup(){
+public abstract class IntegrationTest {
+	
+	protected abstract void serve(int port, HttpObject ... objects);
+	protected abstract void stopServing();
+	
+	@Before
+	public void setup(){
 		
-		BasicConfigurator.configure();
 		
-		jetty = HttpObjectsJettyHandler.launchServer(8080,
+		serve(8080,
 				new HttpObject("/app/inbox"){
 					public Response post(Request req) {
 						return OK(Text("Message Received"));
@@ -142,7 +141,10 @@ public class IntegrationTest {
 	
 	@Test
 	public void basicAuthentication(){
+		// without authorization header
 		assertResource(new GetMethod("http://localhost:8080/secure"), "You must first log-in", 401, new HeaderSpec("WWW-Authenticate", "Basic realm=secure area"));
+		
+		// with authorization header
 		GetMethod get = new GetMethod("http://localhost:8080/secure");
 		get.setRequestHeader("Authorization", "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==");
 		assertResource(get, "You're In!", 200);
@@ -231,8 +233,8 @@ public class IntegrationTest {
 		
 	}
 	
-	@AfterClass
-	public static void tearDown() throws Exception {
-		jetty.stop();
+	@After
+	public void tearDown() throws Exception {
+		stopServing();
 	}
 }

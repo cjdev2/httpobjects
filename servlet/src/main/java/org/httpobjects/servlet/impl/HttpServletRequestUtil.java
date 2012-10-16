@@ -41,7 +41,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -51,7 +50,6 @@ import org.httpobjects.header.request.AuthorizationField;
 import org.httpobjects.header.request.CookieField;
 import org.httpobjects.header.request.RequestHeader;
 import org.httpobjects.header.response.SetCookieField;
-import org.httpobjects.header.response.WWWAuthenticateField.Method;
 
 public class HttpServletRequestUtil {
 
@@ -88,11 +86,9 @@ public class HttpServletRequestUtil {
 		while(names.hasMoreElements()){
 			String name = names.nextElement();
 			if(name.equals("Authorization")){
-				String fValue = request.getHeader(name);
-				fValue = fValue.trim();
-				StringTokenizer tokens = new StringTokenizer(fValue);
-				
-				fields.add(new AuthorizationField(Method.valueOf(tokens.nextToken()), tokens.nextToken()));
+				String s = request.getHeader(name);
+				AuthorizationField f = AuthorizationField.parse(s); 
+				fields.add(f);
 			}else if(name.equals("Cookie")){
 				String fValue = request.getHeader(name);
 				fields.add(new CookieField(fValue));
