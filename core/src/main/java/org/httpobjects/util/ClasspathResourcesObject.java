@@ -63,7 +63,6 @@ public class ClasspathResourcesObject  extends HttpObject {
 		if(isNullOrEmpty(resource) ||  resource.endsWith("/")) return null;
 
 		InputStream data = relativeTo.getResourceAsStream(prefix + resource);
-		System.out.println(resource);
 		
 		if(data!=null){
 			return OK(Bytes(mimeTypeFor(resource), data));
