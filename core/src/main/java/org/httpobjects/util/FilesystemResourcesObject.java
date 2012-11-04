@@ -60,7 +60,6 @@ public class FilesystemResourcesObject  extends HttpObject {
 		if(isNullOrEmpty(resource) ||  resource.endsWith("/")) return null;
 		
 		File path = new File(relativeTo, resource);
-		System.out.println(path.getAbsolutePath());
 		
 		if(path.exists() && path.isFile()){
 			return OK(Bytes(mimeTypeFor(resource), openStream(path)));
