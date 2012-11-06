@@ -37,36 +37,51 @@
  */
 package org.httpobjects.util;
 
-public class MimeTypeTool {
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
-	public String guessMimeTypeFromName(String r) {
-		if(endsWith(r, ".html", ".htm")){
-			return "text/html";
-		}
-		if(endsWith(r, ".js")){
-			return "text/javascript";
-		}
-		if(endsWith(r, ".css")){
-			return "text/css";
-		}
-		if(endsWith(r, ".png")){
-			return "image/png";
-		}
-		if(endsWith(r, ".jpg", ".jpeg")){
-			return "image/jpeg";
-		}
+import org.junit.Test;
+
+import junit.framework.Assert;
+
+
+public class MimeTypeToolTest {
+	@Test
+	public void detectsCommonFilenames(){
+		final Mapping[] mappings = {
+				map("text/html", ".html", ".htm"),
+				map("text/javascript", ".js"),
+				map("text/css", ".css"),
+				map("image/png", ".png"),
+				map("image/jpeg", ".jpg", ".jpeg"),
+				map("image/gif", ".gif")
+		};
 		
-		if(endsWith(r, ".gif")){
-			return "image/gif";
-		}
+		MimeTypeTool tool = new MimeTypeTool();
 		
-		return "";
+		for(Mapping mapping : mappings){
+			for(String extension:mapping.extensions){
+				String result = tool.guessMimeTypeFromName("xyz123" + extension);
+				Assert.assertEquals(mapping.mimeType, result);
+			}
+		}
 	}
-	private boolean endsWith(String value, String ... suffixes){
-		for(String suffix:suffixes){
-			if(value.endsWith(suffix))
-				return true;
+	
+	
+	private Mapping map(String mimeType, String ... extensions){
+		return new Mapping(mimeType, extensions);
+	}
+	
+	static class Mapping {
+		final String mimeType;
+		final List<String> extensions;
+		public Mapping(String mimeType, String ... extensions) {
+			super();
+			this.mimeType = mimeType;
+			this.extensions = Collections.unmodifiableList(Arrays.asList(extensions));
 		}
-		return false;
+		
+		
 	}
 }
