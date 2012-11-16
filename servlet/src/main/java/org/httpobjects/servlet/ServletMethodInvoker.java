@@ -39,6 +39,9 @@ package org.httpobjects.servlet;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -62,14 +65,19 @@ import org.httpobjects.util.Method;
 public class ServletMethodInvoker {
 	private final HttpObject[] objects;
 	private final Response notFoundResponse;
-
+	private final List<? extends HeaderField> defaultResponseHeaders;
+	
 	public ServletMethodInvoker(HttpObject[] objects) {
 		this(HttpObject.NOT_FOUND(HttpObject.Text("Error: NOT_FOUND")), objects);
 	}
-	public ServletMethodInvoker(Response notFoundResponse, HttpObject[] objects) {
+  public ServletMethodInvoker(Response notFoundResponse, HttpObject[] objects) {
+    this(Collections.<HeaderField>emptyList(), notFoundResponse, objects);
+  }
+	public ServletMethodInvoker(List<? extends HeaderField> defaultResponseHeader, Response notFoundResponse, HttpObject[] objects) {
 		super();
 		this.notFoundResponse = notFoundResponse;
 		this.objects = objects;
+		this.defaultResponseHeaders = defaultResponseHeader;
 	}
 
 	public boolean invokeFirstPathMatchIfAble(String path, HttpServletRequest r, HttpServletResponse httpResponse){
@@ -107,6 +115,7 @@ public class ServletMethodInvoker {
 
 		try {
 			resp.setStatus(r.code().value());
+			
 			for(HeaderField next : r.header()){
 				next.accept(new HeaderFieldVisitor<Void>() {
 					
@@ -147,6 +156,8 @@ public class ServletMethodInvoker {
 				});
 			}
 			
+      addDefaultHeadersAsApplicable(r, resp);
+			
 			if(r.hasRepresentation()){
 				resp.setContentType(r.representation().contentType());
 				OutputStream out = resp.getOutputStream();
@@ -158,6 +169,22 @@ public class ServletMethodInvoker {
 			throw new RuntimeException(e);
 		}
 	}
+	
+  private void addDefaultHeadersAsApplicable(final Response r, final HttpServletResponse resp) {
+    for(HeaderField defaultHeader : defaultResponseHeaders){
+      boolean exists = false;
+      for(HeaderField header : r.header()){
+          if(header.name().equals(defaultHeader.name())){
+            exists = true;
+          }
+      }
+      
+      if(!exists){
+          resp.setHeader(defaultHeader.name(), defaultHeader.value());
+      }
+    }
+  }
+  
 	private Cookie translate(SetCookieField cookie) {
 		return new Cookie(cookie.name, cookie.value);
 	}

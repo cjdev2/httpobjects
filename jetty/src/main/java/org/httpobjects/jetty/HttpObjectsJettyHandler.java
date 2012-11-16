@@ -38,12 +38,16 @@
 package org.httpobjects.jetty;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.httpobjects.HttpObject;
+import org.httpobjects.header.HeaderField;
+import org.httpobjects.header.OtherHeaderField;
 import org.httpobjects.servlet.ServletMethodInvoker;
 import org.mortbay.jetty.HttpConnection;
 import org.mortbay.jetty.Request;
@@ -54,11 +58,15 @@ import org.mortbay.jetty.handler.AbstractHandler;
 public class HttpObjectsJettyHandler extends AbstractHandler {
 	private final ServletMethodInvoker invoker;
 	
-	
 	public HttpObjectsJettyHandler(HttpObject ... objects) {
-		invoker = new ServletMethodInvoker(objects);
+		this(Collections.<HeaderField>emptyList(), objects);
 	}
 	
+	 
+  public HttpObjectsJettyHandler(List<? extends HeaderField> defaultResponseHeaders, HttpObject ... objects) {
+    invoker = new ServletMethodInvoker(defaultResponseHeaders, HttpObject.NOT_FOUND(HttpObject.Text("Error: NOT_FOUND")), objects);
+  }
+  
 	@Override
 	public void handle(String target, HttpServletRequest request, HttpServletResponse response, int dispatch) 
 			throws IOException, ServletException {
@@ -79,7 +87,7 @@ public class HttpObjectsJettyHandler extends AbstractHandler {
 	public static Server launchServer(int port, HttpObject ... objects) {
 		try {
 			Server s = new Server(port);
-			s.setHandler(new HttpObjectsJettyHandler(objects));
+			s.setHandler(new HttpObjectsJettyHandler(Collections.singletonList(new OtherHeaderField("Cache-Control", "no-cache")), objects));
 			
 			s.start();
 			

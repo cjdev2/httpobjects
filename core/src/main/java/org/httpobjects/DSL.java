@@ -61,9 +61,13 @@ public class DSL {
 		return new Response(ResponseCode.OK, r, header);
 	}
 
-    public static final Response NO_CONTENT(){
-        return new Response(ResponseCode.NO_CONTENT, null);
-    }
+  public static final Response CREATED(LocationField location){
+      return new Response(ResponseCode.CREATED, null, location);
+  }
+  
+  public static final Response NO_CONTENT(){
+      return new Response(ResponseCode.NO_CONTENT, null);
+  }
 
 	public static final Response BAD_REQUEST(Representation r){
 		return new Response(ResponseCode.BAD_REQUEST, r);

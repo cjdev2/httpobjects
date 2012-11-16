@@ -44,6 +44,7 @@ public class ResponseCode {
 	private static final List<ResponseCode> standardResponseCodes = new ArrayList<ResponseCode>();
 	public static final ResponseCode 
 			OK = new StandardResponseCode(200, "OK"), 
+      CREATED = new StandardResponseCode(201, "CREATED"), 
 			NO_CONTENT = new StandardResponseCode(204, "NO_CONTENT"),
 			FOUND = new StandardResponseCode(302, "FOUND"), 
 			SEE_OTHER = new StandardResponseCode(303, "SEE_OTHER"), 
