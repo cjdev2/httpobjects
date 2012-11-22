@@ -1,0 +1,39 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>httpobjects-pom</artifactId>
+		<groupId>org.httpobjects.pom</groupId>
+		<version>0.0.4-SNAPSHOT</version>
+	</parent>
+
+	<groupId>org.httpobjects.multipart</groupId>
+	<artifactId>httpobjects-multipart</artifactId>
+
+	<name>${artifactId}</name>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.mycila.maven-license-plugin</groupId>
+				<artifactId>maven-license-plugin</artifactId>
+				<configuration>
+					<header>${basedir}/../header.txt</header>
+					<strictCheck>false</strictCheck>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	<dependencies>
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.httpobjects</groupId>
+            <artifactId>httpobjects</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
+	</dependencies>
+
+</project>
