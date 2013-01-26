@@ -173,7 +173,9 @@ public class DSL {
 	
 
 	public static final Representation FromClasspath(String contentType, String name, Class<?> clazz){
-		return Bytes(contentType, clazz.getResourceAsStream(name));
+	    final InputStream stream = clazz.getResourceAsStream(name);
+	    if(stream==null) throw new RuntimeException("No such resource on classpath: " + name);
+	    return Bytes(contentType, stream);
 	}
 	
 	public static final Representation FromClasspath(String contentType, String name, Object context){

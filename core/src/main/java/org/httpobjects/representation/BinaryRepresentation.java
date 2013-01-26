@@ -50,6 +50,7 @@ public class BinaryRepresentation implements Representation {
 	public BinaryRepresentation(String contentType, InputStream data) {
 		super();
 		this.contentType = contentType;
+		if(data==null) throw new NullPointerException("Stream is null");
 		this.data = data;
 	}
 
