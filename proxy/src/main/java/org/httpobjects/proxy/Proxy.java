@@ -74,10 +74,14 @@ public class Proxy extends HttpObject {
 	private String base;
 	private final String me;
 	
+	public Proxy(final String localPath, final String base, final String me) {
+        super(localPath + "/{path*}", null);
+        setBase(base);
+        this.me = me;
+    }
+	
 	public Proxy(final String base, final String me) {
-		super("/{path*}", null);
-		setBase(base);
-		this.me = me;
+		this("", base, me);
 	}
 
     public void setBase(String base) {
