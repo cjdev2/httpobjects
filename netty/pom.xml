@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>httpobjects-pom</artifactId>
 		<groupId>org.httpobjects.pom</groupId>
-		<version>0.0.4-SNAPSHOT</version>
+		<version>0.0.5-SNAPSHOT</version>
 	</parent>
 
 	<groupId>org.httpobjects.netty</groupId>
