@@ -97,15 +97,6 @@
   	
 	</dependencies>
 
-<distributionManagement>
-  <snapshotRepository>
-    <id>the-deploy-plugin-makes-me-put-somethign-here-${project.artifactId}</id>
-    <name>the-deploy-plugin-makes-me-put-somethign-here-${project.artifactId}</name>
-    <url>scp://the/deploy/plugin/makes/me/put/something/here/${project.artifactId}</url>
-  </snapshotRepository>
-</distributionManagement>
-	
-
 	<!-- BEGIN: STUFF REQUIRED BY THE CENTRAL REPO -->
 	<description>simple http for the jvm</description>
         <url>https://github.com/cjdev/httpobjects</url>
