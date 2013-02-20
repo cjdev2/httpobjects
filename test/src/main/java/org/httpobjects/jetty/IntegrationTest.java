@@ -178,7 +178,7 @@ public abstract class IntegrationTest {
 	
 	@Test
 	public void methodNotAllowed(){
-		assertResource(new GetMethod("http://localhost:8080/app/inbox"), "Error: Method not allowed.", 405);
+		assertResource(new GetMethod("http://localhost:8080/app/inbox"), "405 Client Error: Method Not Allowed", 405);
 	}
 	
 	@Test

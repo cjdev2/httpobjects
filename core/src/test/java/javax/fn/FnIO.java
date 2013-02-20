@@ -35,73 +35,72 @@
  * obligated to do so.  If you do not wish to do so, delete this
  * exception statement from your version.
  */
-package org.httpobjects;
+package javax.fn;
 
-import static org.junit.Assert.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.URL;
+import java.util.Iterator;
 
-import org.httpobjects.ResponseCode;
-import org.junit.Test;
+import javax.fn.FunctionalJava.ImmutableItererator;
 
-public class ResponseCodeTest {
-    
-    @Test
-    public void toStringContainsTheNameAndNumber(){
-        // given:
-        final ResponseCode code = ResponseCode.OK;
-        
-        // when:
-        final String text = code.toString();
-        
-        // then:
-        assertEquals("OK(200)", text);
+public class FnIO {
+
+    public static Seq<String> readUrlAsLines(final String url) {
+        return new AbstractSeq<String>(){
+            @Override
+            public Iterator<String> iterator() {
+                try {
+                    return BufferIterator.forUrl(url);
+                }  catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        };
+
     }
-    
-	@Test
-	public void theFactoryMethodShouldNotReturnNullForNonStandardValues(){
-		// given:
-		int aNonStandardResponseCodeValue = 34343;
-		
-		// when: 
-		ResponseCode result = ResponseCode.forCode(aNonStandardResponseCodeValue);
-		
-		// then:
-		assertNotNull("The object should not be null", result);
-		assertEquals(result.value(), 34343);
-	}
-	
-	@Test
-	public void responseCodesFlyweightAllowsIdentityComparisons(){
-		// given: a non-standard response code value
-		int value = 34343;
-		
-		// when: obtain value object using the factory twice 
-		ResponseCode a = ResponseCode.forCode(value);
-		ResponseCode b = ResponseCode.forCode(value);
-		
-		// then: the same object should have been returned twice
-		assertTrue("We should have two handles on the same object", a == b);
-	}
-	
 
-	@Test
-	public void nonStandardResponseCodesAreDotEqual(){
-		// given: a non-standard response code value
-		int value = 34343;
-		
-		// when: obtain value object using the factory twice 
-		ResponseCode a = ResponseCode.forCode(value);
-		ResponseCode b = ResponseCode.forCode(value);
-		
-		// then:
-		assertTrue("They should be .equal()", a.equals(b));
-	}
+    private static class BufferIterator extends ImmutableItererator<String> {
+        static BufferIterator forUrl(String url){
+            try {
+                return new BufferIterator(new InputStreamReader(new URL(url).openStream()));
+            }  catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        private final BufferedReader reader;
+        private String line;
+        private boolean isStale = true;
 
-    @Test
-    public void nonStandardResponseCodeIsNot300Series() {
-        int value = 34343;
+        public BufferIterator(Reader reader) throws Exception {
+            super();
+            this.reader =  new BufferedReader(reader);
+        }
 
-        ResponseCode three = ResponseCode.forCode(value);
+        @Override
+        public boolean hasNext() {
+            freshen();
+            return line!=null;
+        }
 
-        assertFalse("34343 should not be 300 series", three.is300Series());
+        private void freshen(){
+            try{
+                if(isStale){
+                    line = reader.readLine();
+                    isStale = false;
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public String next() {
+            freshen();
+            isStale = true;
+            return line;
+        }
     }
+
 }

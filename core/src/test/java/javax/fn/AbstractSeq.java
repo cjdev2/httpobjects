@@ -35,73 +35,36 @@
  * obligated to do so.  If you do not wish to do so, delete this
  * exception statement from your version.
  */
-package org.httpobjects;
+package javax.fn;
 
-import static org.junit.Assert.*;
-
-import org.httpobjects.ResponseCode;
-import org.junit.Test;
-
-public class ResponseCodeTest {
-    
-    @Test
-    public void toStringContainsTheNameAndNumber(){
-        // given:
-        final ResponseCode code = ResponseCode.OK;
-        
-        // when:
-        final String text = code.toString();
-        
-        // then:
-        assertEquals("OK(200)", text);
+public abstract class AbstractSeq<T> implements Seq<T>{
+    public <O> Seq<O> map(Fn<T, O> fn){
+        return FunctionalJava.<T, O>map(this, fn);
+    }
+    public Seq<T> filter(Fn<T, Boolean> fn){
+        return FunctionalJava.filter(this, fn);
+    }
+    public void foreach(Fn<T, Void> fn){
+        FunctionalJava.foreach(this, fn);
     }
     
-	@Test
-	public void theFactoryMethodShouldNotReturnNullForNonStandardValues(){
-		// given:
-		int aNonStandardResponseCodeValue = 34343;
-		
-		// when: 
-		ResponseCode result = ResponseCode.forCode(aNonStandardResponseCodeValue);
-		
-		// then:
-		assertNotNull("The object should not be null", result);
-		assertEquals(result.value(), 34343);
-	}
-	
-	@Test
-	public void responseCodesFlyweightAllowsIdentityComparisons(){
-		// given: a non-standard response code value
-		int value = 34343;
-		
-		// when: obtain value object using the factory twice 
-		ResponseCode a = ResponseCode.forCode(value);
-		ResponseCode b = ResponseCode.forCode(value);
-		
-		// then: the same object should have been returned twice
-		assertTrue("We should have two handles on the same object", a == b);
-	}
-	
-
-	@Test
-	public void nonStandardResponseCodesAreDotEqual(){
-		// given: a non-standard response code value
-		int value = 34343;
-		
-		// when: obtain value object using the factory twice 
-		ResponseCode a = ResponseCode.forCode(value);
-		ResponseCode b = ResponseCode.forCode(value);
-		
-		// then:
-		assertTrue("They should be .equal()", a.equals(b));
-	}
-
-    @Test
-    public void nonStandardResponseCodeIsNot300Series() {
-        int value = 34343;
-
-        ResponseCode three = ResponseCode.forCode(value);
-
-        assertFalse("34343 should not be 300 series", three.is300Series());
+    @Override
+    public CharSequence mkstring(final String separator) {
+        final StringBuilder text = new StringBuilder();
+        
+        this.foreach(new Fn<T, Void>(){
+            boolean isFirst = true;
+            public Void exec(T in) {
+                if(isFirst){
+                    isFirst=false;
+                }else{
+                    text.append(separator);
+                }
+                text.append(in.toString());
+                return null;
+            };
+        });
+        
+        return text;
     }
 }
