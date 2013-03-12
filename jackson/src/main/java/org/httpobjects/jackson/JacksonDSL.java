@@ -37,12 +37,36 @@
  */
 package org.httpobjects.jackson;
 
-import java.io.OutputStream;
-
 import org.codehaus.jackson.map.ObjectMapper;
 import org.httpobjects.Representation;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+
 public class JacksonDSL {
+
+    public static class RepresentationConverter {
+        private final Representation representation;
+        private final ObjectMapper objectMapper;
+        private final ByteArrayOutputStream byteStream;
+
+        private RepresentationConverter(Representation representation) {
+            this.representation = representation;
+            this.objectMapper = new ObjectMapper();
+            this.byteStream = new ByteArrayOutputStream();
+        }
+
+        public <T> T to(Class<T> convertTo) throws IOException {
+            representation.write(byteStream);
+            return objectMapper.readValue(new ByteArrayInputStream(byteStream.toByteArray()), convertTo);
+        }
+    }
+
+    public static RepresentationConverter convertRepresentation(Representation representation) {
+        return new RepresentationConverter(representation);
+    }
 
     public static Representation JacksonJson(final Object object, final ObjectMapper jackson) {
     	return new Representation() {
