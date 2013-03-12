@@ -50,6 +50,9 @@ import org.httpobjects.header.response.LocationField;
 import org.httpobjects.header.response.SetCookieField;
 import org.httpobjects.header.response.WWWAuthenticateField;
 import org.httpobjects.representation.BinaryRepresentation;
+import org.httpobjects.util.impl.ClassResourceLoader;
+import org.httpobjects.util.impl.WrapperForInsecureClassloader;
+import org.httpobjects.util.impl.ResourceLoader;
 
 /**########################################################
  * ## DSL METHODS
@@ -125,8 +128,12 @@ public class DSL {
         return FromClasspath("text/html", name, clazz);
     }
 
-    public static final Representation FromClasspath(String contentType, String name, Class<?> clazz){
-        final InputStream stream = clazz.getResourceAsStream(name);
+    public static final Representation FromClasspath(String contentType, String name, final Class<?> clazz){
+        return FromClasspath(contentType, name, new WrapperForInsecureClassloader(new ClassResourceLoader(clazz)));
+    }
+    
+    private static final Representation FromClasspath(String contentType, String name, ResourceLoader loader){
+        final InputStream stream = loader.getResourceAsStream(name);
         if(stream==null) throw new RuntimeException("No such resource on classpath: " + name);
         return Bytes(contentType, stream);
     }

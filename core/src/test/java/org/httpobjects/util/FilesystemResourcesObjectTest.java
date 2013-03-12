@@ -35,68 +35,71 @@
  * obligated to do so.  If you do not wish to do so, delete this
  * exception statement from your version.
  */
-package org.httpobjects.jackson;
+package org.httpobjects.util;
 
-import static org.junit.Assert.assertEquals;
+import static org.httpobjects.util.FsTools.dir;
+import static org.httpobjects.util.FsTools.file;
+import static org.httpobjects.util.FsTools.tempDir;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.File;
+
+import junit.framework.Assert;
 
 import org.httpobjects.Representation;
+import org.httpobjects.Response;
+import org.httpobjects.test.MockRequest;
+import org.httpobjects.util.FsTools.DirSpec;
 import org.junit.Test;
 
-public class JacksonDSLTest {
-
+public class FilesystemResourcesObjectTest {
     @Test
-    public void writesJsonRepresentationsOfSimpleBeans() {
+    public void retrievesFiles() {
         // given
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        RandomBean input = new RandomBean("Hello");
-
+        DirSpec fs = dir("my-filesystem",
+                        dir("misc-files",
+                                file("stuff.txt", "some stuff")
+                                ));
+        File temp = fs.create(tempDir());
+        
+        
+        FilesystemResourcesObject testSubject = new FilesystemResourcesObject("/{resource*}", temp);
+        MockRequest req = new MockRequest(testSubject, "/misc-files/stuff.txt");
+        
         // when
-        JacksonDSL.JacksonJson(input).write(outputStream);
+        Response result = testSubject.get(req);
 
         // then
-        assertEquals(outputStream.toString(), "{\"message\":\"Hello\"}");
+        Assert.assertNotNull(result);
+        Assert.assertEquals("some stuff", toString(result.representation()));
     }
-
+    
     @Test
-    public void whatGoesInMustComeOut() throws IOException {
+    public void doesntServeFilesOutsideOfTheBaseDir() {
         // given
-        RandomBean origBean = new RandomBean("Hello");
-        Representation input = JacksonDSL.JacksonJson(origBean);
-
+        DirSpec fs = dir("my-filesystem" ,
+                        dir("public-data"),
+                        file("hidden.txt", "top secret data")
+                        );
+        File temp = fs.create(tempDir());
+        
+        File pathToPublicData = new File(temp, "public-data");
+        
+        FilesystemResourcesObject testSubject = new FilesystemResourcesObject("/{resource*}", pathToPublicData);
+        MockRequest req = new MockRequest(testSubject, "/../hidden.txt");
+        
         // when
-        RandomBean returnedBean = JacksonDSL.convertRepresentation(input).to(RandomBean.class);
+        Response result = testSubject.get(req);
 
         // then
-        assertEquals(origBean, returnedBean);
+        Assert.assertNull(result);
+
     }
+    
 
-
-    public static class RandomBean {
-        public String message;
-        
-        public RandomBean() {
-        }
-        
-        RandomBean(String message) {
-            this.message = message;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            return (o instanceof RandomBean) && ((RandomBean)o).toString().equals(this.toString());
-        }
-        
-        @Override
-        public String toString() {
-            return message==null?null:message;
-        }
-
-        @Override
-        public int hashCode() {
-            return message != null ? message.hashCode() : 0;
-        }
+    private static String toString(Representation representation) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        representation.write(out);
+        return new String(out.toByteArray());
     }
 }

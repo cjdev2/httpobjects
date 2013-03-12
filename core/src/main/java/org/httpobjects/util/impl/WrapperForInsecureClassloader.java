@@ -35,76 +35,24 @@
  * obligated to do so.  If you do not wish to do so, delete this
  * exception statement from your version.
  */
-package org.httpobjects.util;
+package org.httpobjects.util.impl;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 
-import org.httpobjects.HttpObject;
-import org.httpobjects.Request;
-import org.httpobjects.Response;
+public final class WrapperForInsecureClassloader implements ResourceLoader {
+    private final ResourceLoader loader;
+    
+    public WrapperForInsecureClassloader(ResourceLoader loader) {
+        super();
+        this.loader = loader;
+    }
 
-public class FilesystemResourcesObject  extends HttpObject {
-	private final File relativeTo;
-	
-	public FilesystemResourcesObject(String pathPattern, File relativeTo) {
-		super(pathPattern, null);
-		this.relativeTo = relativeTo;
-	}
-	
-	@Override
-	public Response get(Request req) {
-		final String resource = req.pathVars().valueFor("resource");
-		if(isNullOrEmpty(resource) ||  resource.endsWith("/")) return null;
-		
-		File path = new File(relativeTo, resource);
-		
-		if(!isBelow(path, relativeTo)){
-		    return null;
-		}
-		
-		if(path.exists() && path.isFile()){
-			return OK(Bytes(mimeTypeFor(resource), openStream(path)));
-		}else{
-			return null;
-		}
-	}
-	
-	private boolean isBelow(java.io.File path, java.io.File dir) {
-	    try {
-	        final File pdir = dir.getCanonicalFile();
-	        File n = path.getCanonicalFile();
-	        while((n = n.getParentFile())!=null){
-	            if(pdir.equals(n)){
-	                return true;
-	            }
-	        }
-	        return false;
-	    } catch (IOException e) {
-	        throw new RuntimeException(e);
-	    }
-	}
-
-    private InputStream openStream(File path){
-		try {
-			return new FileInputStream(path);
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	private static String mimeTypeFor(String resource){
-		return ieCompat(new MimeTypeTool().guessMimeTypeFromName(resource));
-	}
-
-	private static String ieCompat(String t) {
-		return t.equals("text/html")?"text/html;charset=utf-8":t;
-	}
-
-	private boolean isNullOrEmpty(String t){
-		return t==null || t.trim().isEmpty();
-	}
+    @Override
+    public InputStream getResourceAsStream(String name) {
+        if(name.contains("..")){
+            return null;
+        }else{
+            return loader.getResourceAsStream(name);
+        }
+    }
 }
