@@ -31,6 +31,10 @@
 	            <configuration>
 	                <header>header.txt</header>
 	                <strictCheck>true</strictCheck>
+                  <excludes>
+                    <exclude>**.iml</exclude>
+                    <exclude>.idea/**</exclude>
+                  </excludes>
 	            </configuration>
 	            <executions>
 	                <execution>
