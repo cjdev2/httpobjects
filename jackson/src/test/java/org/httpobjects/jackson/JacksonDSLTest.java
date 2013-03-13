@@ -35,76 +35,68 @@
  * obligated to do so.  If you do not wish to do so, delete this
  * exception statement from your version.
  */
-package org.httpobjects.util;
+package org.httpobjects.jackson;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import static org.junit.Assert.assertEquals;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
-import org.httpobjects.HttpObject;
-import org.httpobjects.Request;
-import org.httpobjects.Response;
+import org.httpobjects.Representation;
+import org.junit.Test;
 
-public class FilesystemResourcesObject  extends HttpObject {
-	private final File relativeTo;
-	
-	public FilesystemResourcesObject(String pathPattern, File relativeTo) {
-		super(pathPattern, null);
-		this.relativeTo = relativeTo;
-	}
-	
-	@Override
-	public Response get(Request req) {
-		final String resource = req.pathVars().valueFor("resource");
-		if(isNullOrEmpty(resource) ||  resource.endsWith("/")) return null;
-		
-		File path = new File(relativeTo, resource);
-		
-		if(!isBelow(path, relativeTo)){
-		    return null;
-		}
-		
-		if(path.exists() && path.isFile()){
-			return OK(Bytes(mimeTypeFor(resource), openStream(path)));
-		}else{
-			return null;
-		}
-	}
-	
-	private boolean isBelow(java.io.File path, java.io.File dir) {
-	    try {
-	        final File pdir = dir.getCanonicalFile();
-	        File n = path.getCanonicalFile();
-	        while((n = n.getParentFile())!=null){
-	            if(pdir.equals(n)){
-	                return true;
-	            }
-	        }
-	        return false;
-	    } catch (IOException e) {
-	        throw new RuntimeException(e);
-	    }
-	}
+public class JacksonDSLTest {
 
-    private InputStream openStream(File path){
-		try {
-			return new FileInputStream(path);
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		}
-	}
+    @Test
+    public void writesJsonRepresentationsOfSimpleBeans() {
+        // given
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        RandomBean input = new RandomBean("Hello");
 
-	private static String mimeTypeFor(String resource){
-		return ieCompat(new MimeTypeTool().guessMimeTypeFromName(resource));
-	}
+        // when
+        JacksonDSL.JacksonJson(input).write(outputStream);
 
-	private static String ieCompat(String t) {
-		return t.equals("text/html")?"text/html;charset=utf-8":t;
-	}
+        // then
+        assertEquals(outputStream.toString(), "{\"message\":\"Hello\"}");
+    }
 
-	private boolean isNullOrEmpty(String t){
-		return t==null || t.trim().isEmpty();
-	}
+    @Test
+    public void whatGoesInMustComeOut() throws IOException {
+        // given
+        RandomBean origBean = new RandomBean("Hello");
+        Representation input = JacksonDSL.JacksonJson(origBean);
+
+        // when
+        RandomBean returnedBean = JacksonDSL.convertRepresentation(input).to(RandomBean.class);
+
+        // then
+        assertEquals(origBean, returnedBean);
+    }
+
+
+    public static class RandomBean {
+        public String message;
+        
+        public RandomBean() {
+        }
+        
+        RandomBean(String message) {
+            this.message = message;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return (o instanceof RandomBean) && ((RandomBean)o).toString().equals(this.toString());
+        }
+        
+        @Override
+        public String toString() {
+            return message==null?null:message;
+        }
+
+        @Override
+        public int hashCode() {
+            return message != null ? message.hashCode() : 0;
+        }
+    }
 }

@@ -42,9 +42,12 @@ import java.io.InputStream;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
+import org.httpobjects.util.impl.ClassResourceLoader;
+import org.httpobjects.util.impl.WrapperForInsecureClassloader;
+import org.httpobjects.util.impl.ResourceLoader;
 
 public class ClasspathResourcesObject  extends HttpObject {
-	private final Class<?> relativeTo;
+	private final ResourceLoader loader;
 	private final String prefix;
 	
 	public ClasspathResourcesObject(String pathPattern, Class<?> relativeTo) {
@@ -54,15 +57,15 @@ public class ClasspathResourcesObject  extends HttpObject {
 	public ClasspathResourcesObject(String pathPattern, Class<?> relativeTo, String prefix) {
 		super(pathPattern, null);
 		this.prefix = (!prefix.equals("") && !prefix.endsWith("/"))? prefix + "/" : prefix;
-		this.relativeTo = relativeTo;
+		this.loader = new WrapperForInsecureClassloader(new ClassResourceLoader(relativeTo));
 	}
 
 	@Override
 	public Response get(Request req) {
 		final String resource = req.pathVars().valueFor("resource");
 		if(isNullOrEmpty(resource) ||  resource.endsWith("/")) return null;
-
-		InputStream data = relativeTo.getResourceAsStream(prefix + resource);
+		
+		final InputStream data = loader.getResourceAsStream(prefix + resource);
 		
 		if(data!=null){
 			return OK(Bytes(mimeTypeFor(resource), data));
