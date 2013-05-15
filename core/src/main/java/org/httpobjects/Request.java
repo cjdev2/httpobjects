@@ -49,8 +49,6 @@ public interface Request {
 	boolean hasRepresentation();
 	Representation representation();
 	 
-	@Deprecated
-	List<SetCookieField> cookies();
 	String getParameter(String string);
 	String query();
 	RequestHeader header();

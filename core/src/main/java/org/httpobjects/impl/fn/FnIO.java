@@ -35,73 +35,72 @@
  * obligated to do so.  If you do not wish to do so, delete this
  * exception statement from your version.
  */
-package org.httpobjects.header.request;
+package org.httpobjects.impl.fn;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.URL;
+import java.util.Iterator;
 
-import org.httpobjects.header.DefaultHeaderFieldVisitor;
-import org.httpobjects.header.Header;
-import org.httpobjects.header.HeaderField;
-import org.httpobjects.impl.fn.Fn;
-import org.httpobjects.impl.fn.FunctionalJava;
-import org.httpobjects.impl.fn.Seq;
+import org.httpobjects.impl.fn.FunctionalJava.ImmutableItererator;
 
-public class RequestHeader extends Header {
-	public RequestHeader(){
-		this(Arrays.asList(new HeaderField[]{}));
-	}
-	public RequestHeader(HeaderField ... fields) {
-		super(Arrays.asList(fields));
-	}
-	public RequestHeader(List<HeaderField> fields) {
-		super(fields);
-	}
+public class FnIO {
 
-	public AuthorizationField authorization() {
-		
-		for(HeaderField next: fields()){
-			AuthorizationField auth = next.accept(new DefaultHeaderFieldVisitor<AuthorizationField>() {
-				@Override
-				public AuthorizationField visit(
-						AuthorizationField authorizationField) {
-					return authorizationField;
-				}
-			});	
-			
-			if(auth!=null) return auth;
-		}
-		
-		return null;
-	}
-	
-    public List<Cookie> cookiesNamed(final String name) {
-        return allCookies().filter(new Fn<Cookie, Boolean>() {
+    public static Seq<String> readUrlAsLines(final String url) {
+        return new AbstractSeq<String>(){
             @Override
-            public Boolean exec(Cookie in) {
-                return in.name.equals(name);
-            }
-            
-        }).toList();
-    }
-    
-    public List<Cookie> cookies(){
-        return allCookies().toList();
-    }
-    
-    private Seq<Cookie> allCookies() {
-        Seq<Cookie> results = FunctionalJava.emptySeq();
-        for(HeaderField next: fields()){
-            results = results.plus(next.accept(new DefaultHeaderFieldVisitor<Seq<Cookie>>() {
-                @Override
-                public Seq<Cookie> visit(CookieField cookies) {
-                    return FunctionalJava.asSeq(cookies.cookies());
+            public Iterator<String> iterator() {
+                try {
+                    return BufferIterator.forUrl(url);
+                }  catch (Exception e) {
+                    throw new RuntimeException(e);
                 }
-            })); 
-        }
-        
-        return results;
+            }
+        };
+
     }
+
+    private static class BufferIterator extends ImmutableItererator<String> {
+        static BufferIterator forUrl(String url){
+            try {
+                return new BufferIterator(new InputStreamReader(new URL(url).openStream()));
+            }  catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        private final BufferedReader reader;
+        private String line;
+        private boolean isStale = true;
+
+        public BufferIterator(Reader reader) throws Exception {
+            super();
+            this.reader =  new BufferedReader(reader);
+        }
+
+        @Override
+        public boolean hasNext() {
+            freshen();
+            return line!=null;
+        }
+
+        private void freshen(){
+            try{
+                if(isStale){
+                    line = reader.readLine();
+                    isStale = false;
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public String next() {
+            freshen();
+            isStale = true;
+            return line;
+        }
+    }
+
 }

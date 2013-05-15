@@ -101,10 +101,6 @@ public class ImmutableRequestImpl implements Request {
 	public boolean hasRepresentation() {
 		return true;
 	}
-	@Override
-	public List<SetCookieField> cookies() {
-		return cookies;
-	}
 	
 	@Override
 	public String query(){

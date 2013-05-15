@@ -40,6 +40,8 @@ package org.httpobjects.header;
 import java.util.Collections;
 import java.util.List;
 
+import org.httpobjects.header.request.CookieField;
+
 public class Header {
 	private final List<HeaderField> fields;
 	

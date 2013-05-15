@@ -108,10 +108,6 @@ public class MockRequest implements Request {
 		return representation;
 	}
 	@Override
-	public List<SetCookieField> cookies() {
-		return Collections.emptyList();
-	}
-	@Override
 	public String getParameter(String string) {
 		return parameters.get(string);
 	}

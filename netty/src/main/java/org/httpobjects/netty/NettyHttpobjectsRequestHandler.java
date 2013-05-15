@@ -57,10 +57,6 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 	
 	private Request readRequest(final HttpRequest request, final HttpChunkTrailer lastChunk, final byte[] body) {
 		return new Request(){
-			@Override
-			public List<SetCookieField> cookies() {
-				throw notImplemented();
-			}
 			
 			@Override
 			public String getParameter(String string) {

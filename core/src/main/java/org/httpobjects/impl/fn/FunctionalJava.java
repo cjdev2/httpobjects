@@ -35,12 +35,25 @@
  * obligated to do so.  If you do not wish to do so, delete this
  * exception statement from your version.
  */
-package javax.fn;
+package org.httpobjects.impl.fn;
 
+import java.util.Collections;
 import java.util.Iterator;
 
 public class FunctionalJava {
 
+    public static <T> Seq<T> emptySeq(){
+        return asSeq(Collections.<T>emptyList());
+    }
+    public static <T> Seq<T> asSeq(final Iterable<T> iterable){
+        return new AbstractSeq<T>() {
+            @Override
+            public Iterator<T> iterator() {
+                return iterable.iterator();
+            }
+        };
+    }
+    
     public static <T> Seq<T> filter(final Iterable<T> strings, final Fn<T, Boolean> fn) {
         return new AbstractSeq<T>(){
             @Override

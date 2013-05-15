@@ -36,10 +36,10 @@
  * exception statement from your version.
  */
 
-import static javax.fn.FnIO.readUrlAsLines;
+import static org.httpobjects.impl.fn.FnIO.readUrlAsLines;
 
-import javax.fn.Fn;
-import javax.fn.Seq;
+import org.httpobjects.impl.fn.Fn;
+import org.httpobjects.impl.fn.Seq;
 
 public class GenerateCode {
     public static void main(String[] args) throws Exception {

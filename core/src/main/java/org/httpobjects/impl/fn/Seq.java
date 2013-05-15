@@ -35,72 +35,15 @@
  * obligated to do so.  If you do not wish to do so, delete this
  * exception statement from your version.
  */
-package javax.fn;
+package org.httpobjects.impl.fn;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URL;
-import java.util.Iterator;
+import java.util.List;
 
-import javax.fn.FunctionalJava.ImmutableItererator;
-
-public class FnIO {
-
-    public static Seq<String> readUrlAsLines(final String url) {
-        return new AbstractSeq<String>(){
-            @Override
-            public Iterator<String> iterator() {
-                try {
-                    return BufferIterator.forUrl(url);
-                }  catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        };
-
-    }
-
-    private static class BufferIterator extends ImmutableItererator<String> {
-        static BufferIterator forUrl(String url){
-            try {
-                return new BufferIterator(new InputStreamReader(new URL(url).openStream()));
-            }  catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-        private final BufferedReader reader;
-        private String line;
-        private boolean isStale = true;
-
-        public BufferIterator(Reader reader) throws Exception {
-            super();
-            this.reader =  new BufferedReader(reader);
-        }
-
-        @Override
-        public boolean hasNext() {
-            freshen();
-            return line!=null;
-        }
-
-        private void freshen(){
-            try{
-                if(isStale){
-                    line = reader.readLine();
-                    isStale = false;
-                }
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        @Override
-        public String next() {
-            freshen();
-            isStale = true;
-            return line;
-        }
-    }
-
+public interface Seq<T> extends Iterable<T> {
+    <O> Seq<O> map(Fn<T, O> fn);
+    Seq<T> filter(Fn<T, Boolean> fn);
+    void foreach(Fn<T, Void> fn);
+    CharSequence mkstring(String separator);
+    Seq<T> plus(Seq<? extends T> other);
+    List<T> toList();
 }

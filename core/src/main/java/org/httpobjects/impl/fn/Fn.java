@@ -35,11 +35,8 @@
  * obligated to do so.  If you do not wish to do so, delete this
  * exception statement from your version.
  */
-package javax.fn;
+package org.httpobjects.impl.fn;
 
-public interface Seq<T> extends Iterable<T> {
-    <O> Seq<O> map(Fn<T, O> fn);
-    Seq<T> filter(Fn<T, Boolean> fn);
-    void foreach(Fn<T, Void> fn);
-    CharSequence mkstring(String separator);
+public interface Fn<I,O>{
+    O exec(I in);
 }

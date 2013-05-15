@@ -35,36 +35,57 @@
  * obligated to do so.  If you do not wish to do so, delete this
  * exception statement from your version.
  */
-package javax.fn;
+package org.httpobjects.header.request;
 
-public abstract class AbstractSeq<T> implements Seq<T>{
-    public <O> Seq<O> map(Fn<T, O> fn){
-        return FunctionalJava.<T, O>map(this, fn);
-    }
-    public Seq<T> filter(Fn<T, Boolean> fn){
-        return FunctionalJava.filter(this, fn);
-    }
-    public void foreach(Fn<T, Void> fn){
-        FunctionalJava.foreach(this, fn);
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.List;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+public class RequestHeaderTest {
+    
+    @Test
+    public void makesItEasyToGetAllTheCookies(){
+        // given
+        final Cookie nameCookie = new Cookie("name", "ralph");
+        final Cookie ageCookie = new Cookie("age", "21");
+        RequestHeader testSubject = new RequestHeader(
+                new CookieField(
+                        nameCookie, 
+                        ageCookie
+                )
+        );
+        // when
+        final List<Cookie> results = testSubject.cookies();
+        
+        // then
+        assertNotNull(results);
+        assertEquals(2, results.size());
+        assertTrue(results.get(0)==nameCookie);
+        assertTrue(results.get(1)==ageCookie);
     }
     
-    @Override
-    public CharSequence mkstring(final String separator) {
-        final StringBuilder text = new StringBuilder();
+    @Test
+    public void makesItEasyToGetTheCookiesByName(){
+        // given
+        final Cookie nameCookie = new Cookie("name", "ralph");
+        RequestHeader testSubject = new RequestHeader(
+                new CookieField(
+                        nameCookie, 
+                        new Cookie("age", "21")
+                )
+        );
         
-        this.foreach(new Fn<T, Void>(){
-            boolean isFirst = true;
-            public Void exec(T in) {
-                if(isFirst){
-                    isFirst=false;
-                }else{
-                    text.append(separator);
-                }
-                text.append(in.toString());
-                return null;
-            };
-        });
+        // when
+        List<Cookie> results = testSubject.cookiesNamed("name");
         
-        return text;
+        // then
+        assertNotNull(results);
+        assertEquals(1, results.size());
+        assertTrue(results.get(0)==nameCookie);
     }
 }

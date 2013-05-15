@@ -69,10 +69,6 @@ public class LazyRequestImpl implements Request {
 	public boolean hasRepresentation() {
 		return true;
 	}
-	@Override
-	public List<SetCookieField> cookies() {
-		return HttpServletRequestUtil.buildCookies(request);
-	}
 	
 	@Override
 	public String query(){
