@@ -47,7 +47,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.httpobjects.HttpObject;
 import org.httpobjects.header.HeaderField;
-import org.httpobjects.header.OtherHeaderField;
+import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.servlet.ServletMethodInvoker;
 import org.mortbay.jetty.HttpConnection;
 import org.mortbay.jetty.Request;
@@ -87,7 +87,7 @@ public class HttpObjectsJettyHandler extends AbstractHandler {
 	public static Server launchServer(int port, HttpObject ... objects) {
 		try {
 			Server s = new Server(port);
-			s.setHandler(new HttpObjectsJettyHandler(Collections.singletonList(new OtherHeaderField("Cache-Control", "no-cache")), objects));
+			s.setHandler(new HttpObjectsJettyHandler(Collections.singletonList(new GenericHeaderField("Cache-Control", "no-cache")), objects));
 			
 			s.start();
 			

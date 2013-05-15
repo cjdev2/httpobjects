@@ -54,7 +54,7 @@ import org.httpobjects.Response;
 import org.httpobjects.ResponseCode;
 import org.httpobjects.header.DefaultHeaderFieldVisitor;
 import org.httpobjects.header.HeaderField;
-import org.httpobjects.header.OtherHeaderField;
+import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.request.RequestHeader;
 import org.httpobjects.jetty.HttpObjectsJettyHandler;
 import org.httpobjects.proxy.Proxy;
@@ -99,7 +99,7 @@ public class TestThatProxy {
 						for(HeaderField field : req.header().fields()){
 							boolean found = field.accept(new DefaultHeaderFieldVisitor<Boolean>(){
 								@Override
-								public Boolean visit(OtherHeaderField custom) {
+								public Boolean visit(GenericHeaderField custom) {
 									return custom.name().equals("xyz123") && custom.value().equals("yes!");
 								}
 								@Override
@@ -237,7 +237,7 @@ public class TestThatProxy {
 		Request input = new MockRequest(subject, "/requirescustomheader"){
 			@Override
 			public RequestHeader header() {
-				return new RequestHeader(new OtherHeaderField("xyz123", "yes!"));
+				return new RequestHeader(new GenericHeaderField("xyz123", "yes!"));
 			}
 		};
 		

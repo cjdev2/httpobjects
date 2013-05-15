@@ -37,10 +37,10 @@
  */
 package org.httpobjects.header;
 
-public class OtherHeaderField extends HeaderField {
+public class GenericHeaderField extends HeaderField {
 	private final String name, value;
 	
-	public OtherHeaderField(String name, String value) {
+	public GenericHeaderField(String name, String value) {
 		super();
 		this.name = name;
 		this.value = value;

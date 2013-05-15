@@ -54,5 +54,5 @@ public interface HeaderFieldVisitor<T> {
 	
 	T visit(CookieField cookieField);
 	
-	T visit(OtherHeaderField other);
+	T visit(GenericHeaderField other);
 }

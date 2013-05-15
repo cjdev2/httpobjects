@@ -44,7 +44,7 @@ import java.util.List;
 import org.httpobjects.Response;
 import org.httpobjects.header.DefaultHeaderFieldVisitor;
 import org.httpobjects.header.HeaderField;
-import org.httpobjects.header.OtherHeaderField;
+import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.response.LocationField;
 import org.httpobjects.header.response.SetCookieField;
 
@@ -130,7 +130,7 @@ public class HttpObjectAssert {
 			for(HeaderField h : response.header()){
 				boolean matches = h.accept(new DefaultHeaderFieldVisitor<Boolean>(){
 					@Override
-					public Boolean visit(OtherHeaderField custom) {
+					public Boolean visit(GenericHeaderField custom) {
 						return custom.name().equals(name) && custom.value().equals(value);
 					}
 					@Override

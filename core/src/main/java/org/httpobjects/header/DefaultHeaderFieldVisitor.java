@@ -62,7 +62,7 @@ public class DefaultHeaderFieldVisitor<T> implements HeaderFieldVisitor<T> {
 	}
 	
 	@Override
-	public T visit(OtherHeaderField other) {
+	public T visit(GenericHeaderField other) {
 		return defaultValue();
 	}
 	

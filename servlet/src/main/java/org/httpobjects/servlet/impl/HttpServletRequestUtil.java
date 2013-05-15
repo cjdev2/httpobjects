@@ -45,7 +45,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.httpobjects.header.HeaderField;
-import org.httpobjects.header.OtherHeaderField;
+import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.request.AuthorizationField;
 import org.httpobjects.header.request.CookieField;
 import org.httpobjects.header.request.RequestHeader;
@@ -93,7 +93,7 @@ public class HttpServletRequestUtil {
 				String fValue = request.getHeader(name);
 				fields.add(new CookieField(fValue));
 			}else{
-				fields.add(new OtherHeaderField(name, request.getHeader(name)));
+				fields.add(new GenericHeaderField(name, request.getHeader(name)));
 			}
 		}
 		return new RequestHeader(fields);

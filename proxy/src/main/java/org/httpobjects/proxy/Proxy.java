@@ -65,7 +65,7 @@ import org.httpobjects.Request;
 import org.httpobjects.Response;
 import org.httpobjects.ResponseCode;
 import org.httpobjects.header.HeaderField;
-import org.httpobjects.header.OtherHeaderField;
+import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.response.LocationField;
 import org.httpobjects.header.response.SetCookieField;
 
@@ -206,7 +206,7 @@ public class Proxy extends HttpObject {
                 log.debug("Redirecting to " + a);
                 headersReturned.add(new LocationField(a));
             }else {
-                headersReturned.add(new OtherHeaderField(name, value));
+                headersReturned.add(new GenericHeaderField(name, value));
             }
         }
         return headersReturned;

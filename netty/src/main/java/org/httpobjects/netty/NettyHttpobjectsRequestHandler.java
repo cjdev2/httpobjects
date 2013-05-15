@@ -11,7 +11,7 @@ import org.httpobjects.Representation;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
 import org.httpobjects.header.HeaderField;
-import org.httpobjects.header.OtherHeaderField;
+import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.request.AuthorizationField;
 import org.httpobjects.header.request.CookieField;
 import org.httpobjects.header.request.RequestHeader;
@@ -79,7 +79,7 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 						}else if(name.equals("Authorization")){
 							field = AuthorizationField.parse(value);
 						}else{
-							field = new OtherHeaderField(name, value);
+							field = new GenericHeaderField(name, value);
 						}
 						headers.add(field);
 					}
