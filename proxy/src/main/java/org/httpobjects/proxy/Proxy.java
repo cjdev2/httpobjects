@@ -51,8 +51,8 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.URIException;
-import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
 import org.apache.commons.httpclient.methods.DeleteMethod;
+import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -64,8 +64,8 @@ import org.httpobjects.Representation;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
 import org.httpobjects.ResponseCode;
-import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.GenericHeaderField;
+import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.response.LocationField;
 import org.httpobjects.header.response.SetCookieField;
 
@@ -127,9 +127,9 @@ public class Proxy extends HttpObject {
 	protected Response proxyRequest(Request req, final HttpMethodBase method) {
 		method.setFollowRedirects(false);
 		
-		String path = req.pathVars().valueFor("path");
+		String path = req.path().valueFor("path");
 		if(!path.startsWith("/")) path = "/" + path;
-		String query = req.query();
+		String query = req.query().toString();
 		if(query==null){
 			query = "";
 		}else{

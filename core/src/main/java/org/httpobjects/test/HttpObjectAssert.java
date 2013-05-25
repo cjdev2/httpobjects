@@ -43,8 +43,8 @@ import java.util.List;
 
 import org.httpobjects.Response;
 import org.httpobjects.header.DefaultHeaderFieldVisitor;
-import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.GenericHeaderField;
+import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.response.LocationField;
 import org.httpobjects.header.response.SetCookieField;
 

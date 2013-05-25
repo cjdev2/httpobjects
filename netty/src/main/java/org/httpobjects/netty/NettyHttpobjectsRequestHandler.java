@@ -2,24 +2,24 @@ package org.httpobjects.netty;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.httpobjects.DSL;
 import org.httpobjects.HttpObject;
+import org.httpobjects.Query;
 import org.httpobjects.Representation;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
-import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.GenericHeaderField;
+import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.request.AuthorizationField;
 import org.httpobjects.header.request.CookieField;
 import org.httpobjects.header.request.RequestHeader;
-import org.httpobjects.header.response.SetCookieField;
-import org.httpobjects.header.response.WWWAuthenticateField;
 import org.httpobjects.netty.http.HttpChannelHandler;
-import org.httpobjects.netty.http.HttpChannelHandler.RequestHandler;
-import org.httpobjects.path.PathVariables;
+import org.httpobjects.path.Path;
 import org.httpobjects.util.HttpObjectUtil;
 import org.httpobjects.util.Method;
 import org.jboss.netty.handler.codec.http.HttpChunkTrailer;
@@ -59,15 +59,10 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 		return new Request(){
 			
 			@Override
-			public String getParameter(String string) {
-				throw notImplemented();
-			}
-			
-			@Override
 			public boolean hasRepresentation() {
 				throw notImplemented();
 			}
-			
+
 			@Override
 			public RequestHeader header() {
 				List<HeaderField> headers = new ArrayList<HeaderField>();
@@ -87,9 +82,7 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 				return new RequestHeader(headers){
 					@Override
 					public AuthorizationField authorization() {
-						final boolean yesOrNo = lastChunk!=null && lastChunk.containsHeader("Authorization");
-						System.out.println("Header fields are " + request.getHeaderNames());
-						String value = request.getHeader("Authorization");
+						final String value = request.getHeader("Authorization");
 						return value==null?null:AuthorizationField.parse(value);
 					}
 				};
@@ -101,13 +94,22 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 			}
 			
 			@Override
-			public PathVariables pathVars() {
-				throw notImplemented();
+			public Path path() {
+                return new Path(jdkURL().getPath());
+			}
+			
+			private URL jdkURL(){
+                try {
+                    return new URL("http://foo" + request.getUri());
+                } catch (MalformedURLException e) {
+                    throw new RuntimeException(e);
+                }
+			    
 			}
 			
 			@Override
-			public String query() {
-				throw notImplemented();
+			public Query query() {
+			    return new Query(jdkURL().getQuery());
 			}
 			
 			@Override

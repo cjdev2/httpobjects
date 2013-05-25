@@ -35,32 +35,47 @@
  * obligated to do so.  If you do not wish to do so, delete this
  * exception statement from your version.
  */
-package org.httpobjects.path;
+package org.httpobjects;
 
-import java.util.HashMap;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
-public class PathVariables {
-	private HashMap<String, String> params = new HashMap<String, String>();
-	
-	public PathVariables(PathParam ... params) {
-		if(params!=null){
-			for(PathParam next : params){
-				this.params.put(next.name.name, next.value);
-			}
-		}
-	}
-	
-	public String valueFor(String key){
-		return params.get(key);
-	}
-	
-	public String valueFor(String key, String defaultValue){
-		final String value = valueFor(key);
-		return value==null?defaultValue:value;
-	}
-	
-	public int size(){
-		return params.size();
-	}
-	
+import org.httpobjects.util.RequestQueryUtil;
+
+public final class Query {
+    private final String string;
+    
+    public Query(String string) {
+        super();
+        this.string = string;
+    }
+    
+    @Override
+    public String toString() {
+        return string==null?"":string;
+    }
+
+    
+    public String valueFor(String name) {
+        return parse().get(name);
+    }
+    
+    private Map<String, String> memoizedParams = null;
+    private Map<String, String>  parse() {
+        try {
+            if(memoizedParams==null){
+                memoizedParams = RequestQueryUtil.getUrlParameters(string); 
+            }
+            return memoizedParams;
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<String> paramNames() {
+//        return Collections.emptyList();
+        return new ArrayList<String>(parse().keySet());
+    }
 }

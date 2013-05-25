@@ -39,7 +39,6 @@ package org.httpobjects.servlet;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -50,9 +49,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
+import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.HeaderFieldVisitor;
-import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.request.AuthorizationField;
 import org.httpobjects.header.request.CookieField;
 import org.httpobjects.header.response.LocationField;

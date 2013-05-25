@@ -43,8 +43,8 @@ import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
 import org.httpobjects.util.impl.ClassResourceLoader;
-import org.httpobjects.util.impl.WrapperForInsecureClassloader;
 import org.httpobjects.util.impl.ResourceLoader;
+import org.httpobjects.util.impl.WrapperForInsecureClassloader;
 
 public class ClasspathResourcesObject  extends HttpObject {
 	private final ResourceLoader loader;
@@ -62,7 +62,7 @@ public class ClasspathResourcesObject  extends HttpObject {
 
 	@Override
 	public Response get(Request req) {
-		final String resource = req.pathVars().valueFor("resource");
+		final String resource = req.path().valueFor("resource");
 		if(isNullOrEmpty(resource) ||  resource.endsWith("/")) return null;
 		
 		final InputStream data = loader.getResourceAsStream(prefix + resource);

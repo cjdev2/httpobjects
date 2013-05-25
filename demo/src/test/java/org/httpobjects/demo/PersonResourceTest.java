@@ -40,12 +40,13 @@ package org.httpobjects.demo;
 import static org.httpobjects.test.HttpObjectAssert.bodyOf;
 import static org.httpobjects.test.HttpObjectAssert.contentTypeOf;
 import static org.httpobjects.test.HttpObjectAssert.responseCodeOf;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
-import org.httpobjects.demo.PersonResource;
 import org.httpobjects.test.MockRequest;
 import org.junit.Test;
 

@@ -37,7 +37,7 @@
  */
 package org.httpobjects.proxy;
 
-import static org.httpobjects.HttpObject.Bytes;
+import static org.httpobjects.DSL.Bytes;
 import static org.httpobjects.test.HttpObjectAssert.bodyOf;
 import static org.httpobjects.test.HttpObjectAssert.contentTypeOf;
 import static org.httpobjects.test.HttpObjectAssert.cookiesIn;
@@ -53,11 +53,10 @@ import org.httpobjects.Request;
 import org.httpobjects.Response;
 import org.httpobjects.ResponseCode;
 import org.httpobjects.header.DefaultHeaderFieldVisitor;
-import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.GenericHeaderField;
+import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.request.RequestHeader;
 import org.httpobjects.jetty.HttpObjectsJettyHandler;
-import org.httpobjects.proxy.Proxy;
 import org.httpobjects.test.MockRequest;
 import org.junit.After;
 import org.junit.Before;
@@ -77,7 +76,7 @@ public class TestThatProxy {
 				new HttpObject("/frog"){
 					public Response get(Request req) {
 						String response = "Kermit";
-						String q = req.query();
+						String q = req.query().toString();
 						if(q!=null){
 							response += q;
 						}
@@ -163,7 +162,7 @@ public class TestThatProxy {
 				},
 				new HttpObject("/queryStringEcho"){
 					public Response get(Request req) {
-						return OK(Text(req.query()));
+						return OK(Text(req.query().toString()));
 					};
 				},
 				new HttpObject("/contentTypeEcho"){

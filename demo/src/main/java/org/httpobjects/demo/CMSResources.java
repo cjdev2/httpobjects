@@ -58,8 +58,8 @@ public class CMSResources extends HttpObject {
 	
 	@Override
 	public Response get(Request req) {
-		String cid = req.pathVars().valueFor("cid");
-		String path = req.pathVars().valueFor("path");
+		String cid = req.path().valueFor("cid");
+		String path = req.path().valueFor("path");
 		File localPath = (path==null || path.isEmpty())?root:new File(root, path);
 		
 		System.out.println(path);

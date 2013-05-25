@@ -101,7 +101,7 @@ public class PathPattern{
 		}
 	}
 	
-	public PathVariables match(String path){
+	public Path match(String path){
 		if(path == null) return null;
 		
 		String[] segments = path.split(Pattern.quote("/"));
@@ -146,7 +146,7 @@ public class PathPattern{
 		}
 		
 		if(matches){
-			return new PathVariables(params.toArray(new PathParam[]{}));
+			return new Path(path, params.toArray(new PathParam[]{}));
 		}else{
 			return null;
 		}

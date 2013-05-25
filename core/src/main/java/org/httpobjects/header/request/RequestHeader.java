@@ -37,9 +37,7 @@
  */
 package org.httpobjects.header.request;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.httpobjects.header.DefaultHeaderFieldVisitor;

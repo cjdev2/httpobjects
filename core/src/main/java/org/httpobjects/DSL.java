@@ -51,8 +51,8 @@ import org.httpobjects.header.response.SetCookieField;
 import org.httpobjects.header.response.WWWAuthenticateField;
 import org.httpobjects.representation.BinaryRepresentation;
 import org.httpobjects.util.impl.ClassResourceLoader;
-import org.httpobjects.util.impl.WrapperForInsecureClassloader;
 import org.httpobjects.util.impl.ResourceLoader;
+import org.httpobjects.util.impl.WrapperForInsecureClassloader;
 
 /**########################################################
  * ## DSL METHODS

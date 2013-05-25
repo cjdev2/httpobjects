@@ -39,7 +39,6 @@ package org.httpobjects.header.request.credentials;
 
 import junit.framework.Assert;
 
-import org.httpobjects.header.request.credentials.BasicCredentials;
 import org.junit.Test;
 
 public class BasicCredentialsTest {

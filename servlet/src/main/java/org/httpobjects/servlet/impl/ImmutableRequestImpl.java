@@ -44,15 +44,16 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.httpobjects.Query;
 import org.httpobjects.Representation;
 import org.httpobjects.Request;
 import org.httpobjects.header.request.RequestHeader;
 import org.httpobjects.header.response.SetCookieField;
-import org.httpobjects.path.PathVariables;
+import org.httpobjects.path.Path;
 import org.httpobjects.util.RequestQueryUtil;
 
 public class ImmutableRequestImpl implements Request {
-	private final PathVariables vars;
+	private final Path vars;
 	private final String contentType;
 	private final List<SetCookieField> cookies;
 	private final String query;
@@ -60,9 +61,7 @@ public class ImmutableRequestImpl implements Request {
 	private final RequestHeader header;
 	private final Representation representation;
 	
-	public ImmutableRequestImpl(PathVariables vars, HttpServletRequest request) {
-
-
+	public ImmutableRequestImpl(Path vars, HttpServletRequest request) {
 
 		this.vars = vars;
 		this.contentType = request.getContentType();
@@ -87,9 +86,8 @@ public class ImmutableRequestImpl implements Request {
 		this.representation = new ImmutableHttpServletRequestRepresentation(request);
 	}
 
-
 	@Override
-	public PathVariables pathVars() {
+	public Path path() {
 		return vars;
 	}
 	
@@ -103,15 +101,9 @@ public class ImmutableRequestImpl implements Request {
 	}
 	
 	@Override
-	public String query(){
-		return query;
+	public Query query(){
+		return new Query(query);
 	}
-	
-	@Override
-	public String getParameter(String name) {
-		return parameters.get(name);
-	}
-	
 	
 	@Override
 	public RequestHeader header() {

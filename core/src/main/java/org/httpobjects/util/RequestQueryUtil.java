@@ -39,14 +39,14 @@ package org.httpobjects.util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class RequestQueryUtil {
 
     public static Map<String, String> getUrlParameters(String url)
         throws UnsupportedEncodingException {
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new LinkedHashMap<String, String>();
         if(url!=null){
             String[] urlParts = url.split("\\?");
             if (urlParts.length > 1) {

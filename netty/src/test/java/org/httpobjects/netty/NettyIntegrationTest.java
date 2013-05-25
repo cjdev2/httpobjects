@@ -42,7 +42,6 @@ import java.util.Arrays;
 
 import org.httpobjects.HttpObject;
 import org.httpobjects.jetty.IntegrationTest;
-import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
 
 public class NettyIntegrationTest extends IntegrationTest {

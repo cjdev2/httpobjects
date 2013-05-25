@@ -46,8 +46,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.httpobjects.HttpObject;
-import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.GenericHeaderField;
+import org.httpobjects.header.HeaderField;
 import org.httpobjects.servlet.ServletMethodInvoker;
 import org.mortbay.jetty.HttpConnection;
 import org.mortbay.jetty.Request;

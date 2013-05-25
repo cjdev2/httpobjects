@@ -37,18 +37,79 @@
  */
 package org.httpobjects;
 
-import org.httpobjects.header.request.RequestHeader;
-import org.httpobjects.path.Path;
+import static org.junit.Assert.assertEquals;
 
-public interface Request {
-	
-    Query query();
-    Path path();
-    RequestHeader header();
+import java.util.List;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+public class QueryTest {
+
     
-	boolean hasRepresentation();
-	Representation representation();
-	
-	Request immutableCopy();
-	
+    @Test
+    public void toStringIsNullSafe(){
+        // given
+        Query testSubject = new Query(null);
+        
+        // when
+        String result = testSubject.toString();
+        
+        // then
+        assertEquals("", result);
+        
+    }
+    
+    @Test
+    public void toStringDoesWhatYouWouldExpect() {
+        // given
+        Query testSubject = new Query("?xyz=123&abc=456");
+        
+        // when
+        final String result = testSubject.toString();
+        
+        // then
+        Assert.assertEquals("?xyz=123&abc=456", result);
+    }
+    
+    @Test
+    public void readsParametersByName() {
+        // given
+        Query testSubject = new Query("?xyz=123&abc=456");
+        
+        // when
+        final String abc = testSubject.valueFor("abc");
+        final String xyz = testSubject.valueFor("xyz");
+        
+        // then
+        assertEquals("123", xyz);
+        assertEquals("456", abc);
+    }
+    
+
+    @Test
+    public void listsParameterNames() {
+        // given
+        Query testSubject = new Query("?xyz=123&abc=456");
+        
+        // when
+        final List<String> names = testSubject.paramNames();
+        
+        // then
+        assertEquals(2, names.size());
+        assertEquals("xyz", names.get(0));
+        assertEquals("abc", names.get(1));
+    }
+
+    @Test
+    public void returnsEmptyListOfParamNamesWhenTheQueryStringIsEmpty() {
+        // given
+        Query testSubject = new Query("");
+        
+        // when
+        final List<String> names = testSubject.paramNames();
+        
+        // then
+        assertEquals(0, names.size());
+    }
 }

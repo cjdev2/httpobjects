@@ -41,19 +41,18 @@ import static org.httpobjects.DSL.Bytes;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import org.httpobjects.HttpObject;
+import org.httpobjects.Query;
 import org.httpobjects.Representation;
 import org.httpobjects.Request;
 import org.httpobjects.header.request.RequestHeader;
-import org.httpobjects.header.response.SetCookieField;
-import org.httpobjects.path.PathVariables;
+import org.httpobjects.path.Path;
 import org.httpobjects.util.RequestQueryUtil;
 
 public class MockRequest implements Request {
-	private final PathVariables vars;
+	private final Path vars;
 	private final Representation representation;
 	private final String query;
     private final Map<String, String> parameters;
@@ -89,12 +88,13 @@ public class MockRequest implements Request {
         this.parameters = null;
 		vars = object.pattern().match(path);
 	}
+	
 	@Override
 	public RequestHeader header() {
 		return new RequestHeader();
 	}
 	@Override
-	public PathVariables pathVars() {
+	public Path path() {
 		return vars;
 	}
 
@@ -107,14 +107,10 @@ public class MockRequest implements Request {
 	public Representation representation() {
 		return representation;
 	}
-	@Override
-	public String getParameter(String string) {
-		return parameters.get(string);
-	}
 	
 	@Override
-	public String query() {
-		return query;
+	public Query query() {
+		return new Query(query);
 	}
 	
 	@Override

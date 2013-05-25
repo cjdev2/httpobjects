@@ -35,20 +35,39 @@
  * obligated to do so.  If you do not wish to do so, delete this
  * exception statement from your version.
  */
-package org.httpobjects;
+package org.httpobjects.path;
 
-import org.httpobjects.header.request.RequestHeader;
-import org.httpobjects.path.Path;
+import java.util.HashMap;
 
-public interface Request {
+public class Path {
+    private final String rawPath;
+	private final HashMap<String, String> params = new HashMap<String, String>();
 	
-    Query query();
-    Path path();
-    RequestHeader header();
-    
-	boolean hasRepresentation();
-	Representation representation();
+	public Path(String rawPath, PathParam ... params) {
+	    this.rawPath = rawPath;
+		if(params!=null){
+			for(PathParam next : params){
+				this.params.put(next.name.name, next.value);
+			}
+		}
+	}
 	
-	Request immutableCopy();
+	public String valueFor(String key){
+		return params.get(key);
+	}
+	
+	public String valueFor(String key, String defaultValue){
+		final String value = valueFor(key);
+		return value==null?defaultValue:value;
+	}
+	
+	public int size(){
+		return params.size();
+	}
+	
+	@Override
+	public String toString() {
+	    return rawPath==null?"":rawPath;
+	}
 	
 }

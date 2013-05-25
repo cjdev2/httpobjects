@@ -44,8 +44,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.GenericHeaderField;
+import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.request.AuthorizationField;
 import org.httpobjects.header.request.CookieField;
 import org.httpobjects.header.request.RequestHeader;

@@ -37,10 +37,11 @@
  */
 package org.httpobjects.path;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
-import org.httpobjects.path.PathPattern;
-import org.httpobjects.path.PathVariables;
 import org.junit.Test;
 
 public class PathPatternTest {
@@ -51,7 +52,7 @@ public class PathPatternTest {
 		PathPattern p = new PathPattern("/");
 		
 		// when
-		PathVariables r = p.match("/");
+		Path r = p.match("/");
 		
 		// then
 		assertNotNull(r);
@@ -65,7 +66,7 @@ public class PathPatternTest {
 
 	@Test
 	public void aTopLevelItemPatternDoesntMatchRoot(){
-		PathVariables r = new PathPattern("/test").match("/");
+		Path r = new PathPattern("/test").match("/");
 		assertNull(r);
 	}
 	
@@ -76,7 +77,7 @@ public class PathPatternTest {
 	
 	@Test
 	public void parsesPathVariablesOutOfATwoLevelPatternWithTwoVars(){
-		PathVariables r = new PathPattern("/{apple}/{orange}").match("/jane/doe");
+		Path r = new PathPattern("/{apple}/{orange}").match("/jane/doe");
 		assertNotNull(r);
 		assertEquals(2, r.size());
 		assertEquals("jane", r.valueFor("apple"));
@@ -85,7 +86,7 @@ public class PathPatternTest {
 
     @Test
 	public void justChecking(){
-		PathVariables r = new PathPattern("/advertiser/{cid}/cms/data/logo.jpeg").match("/advertiser/3042233/cms/data/logo.jpeg");
+		Path r = new PathPattern("/advertiser/{cid}/cms/data/logo.jpeg").match("/advertiser/3042233/cms/data/logo.jpeg");
 		assertNotNull(r);
 		assertEquals(1, r.size());
 		assertEquals("3042233", r.valueFor("cid"));
@@ -93,7 +94,7 @@ public class PathPatternTest {
 
 	@Test
 	public void doesntChokeOnQueryString(){
-		PathVariables r = new PathPattern("/{apple}/{orange}").match("/jane/doe?flavor=chocolate");
+		Path r = new PathPattern("/{apple}/{orange}").match("/jane/doe?flavor=chocolate");
 		assertNotNull(r);
 		assertEquals(2, r.size());
 		assertEquals("jane", r.valueFor("apple"));
@@ -102,7 +103,7 @@ public class PathPatternTest {
 	
 	@Test
 	public void parsesThePathVariableOutOfAOneLevelPatternWithOneVar(){
-		PathVariables r = new PathPattern("/{apple}/").match("/jane/");
+		Path r = new PathPattern("/{apple}/").match("/jane/");
 		assertNotNull(r);
 		assertEquals(1, r.size());
 		assertEquals("jane", r.valueFor("apple"));
@@ -110,7 +111,7 @@ public class PathPatternTest {
 	
 	@Test
 	public void toplevelWildcardPatternMatchesSubpaths(){
-		PathVariables r = new PathPattern("/{apple*}").match("/jane/is/cool");
+		Path r = new PathPattern("/{apple*}").match("/jane/is/cool");
 		assertNotNull(r);
 		assertEquals(1, r.size());
 		assertEquals("jane/is/cool", r.valueFor("apple"));
@@ -118,7 +119,7 @@ public class PathPatternTest {
 	
 	@Test
 	public void secondlevelWildcardPatternMatchesSubpaths(){
-		PathVariables r = new PathPattern("/house/{apple*}").match("/house/");
+		Path r = new PathPattern("/house/{apple*}").match("/house/");
 		assertNotNull(r);
 		assertEquals(1, r.size());
 		assertNull(r.valueFor("apple"));

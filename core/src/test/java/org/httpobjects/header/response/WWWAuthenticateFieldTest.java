@@ -39,7 +39,6 @@ package org.httpobjects.header.response;
 
 import junit.framework.Assert;
 
-import org.httpobjects.header.response.WWWAuthenticateField;
 import org.junit.Test;
 
 public class WWWAuthenticateFieldTest {

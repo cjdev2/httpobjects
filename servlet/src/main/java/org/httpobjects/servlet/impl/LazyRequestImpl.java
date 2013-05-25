@@ -37,27 +37,40 @@
  */
 package org.httpobjects.servlet.impl;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 
+import org.httpobjects.Query;
 import org.httpobjects.Representation;
 import org.httpobjects.Request;
 import org.httpobjects.header.request.RequestHeader;
-import org.httpobjects.header.response.SetCookieField;
-import org.httpobjects.path.PathVariables;
+import org.httpobjects.path.Path;
 
 public class LazyRequestImpl implements Request {
 	private final HttpServletRequest request;
-	private final PathVariables vars;
+	private final Path vars;
 	
-	public LazyRequestImpl(PathVariables vars, HttpServletRequest request) {
+	public LazyRequestImpl(Path vars, HttpServletRequest request) {
 		super();
 		this.vars = vars;
 		this.request = request;
 	}
+	
+	private String queryOrEmpty(){
+	    final String query = request.getQueryString();
+	    if(query==null){
+	        return "";
+	    }else{
+	        return "?" + query;
+	    }
+	}
+	
+//	@Override
+//	public GenericRelativeURI uri() {
+//	    return new GenericRelativeURI(request.getProtocol(), request.getLocalAddr(), request.getLocalPort(), request.getRequestURI() + queryOrEmpty());
+//	}
+	
 	@Override
-	public PathVariables pathVars() {
+	public Path path() {
 		return vars;
 	}
 	
@@ -71,15 +84,9 @@ public class LazyRequestImpl implements Request {
 	}
 	
 	@Override
-	public String query(){
-		return request.getQueryString();
+	public Query query(){
+		return new Query(request.getQueryString());
 	}
-	
-	@Override
-	public String getParameter(String name) {
-		return request.getParameter(name);
-	}
-	
 	
 	@Override
 	public RequestHeader header() {

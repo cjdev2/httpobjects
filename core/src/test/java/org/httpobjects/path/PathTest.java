@@ -35,20 +35,35 @@
  * obligated to do so.  If you do not wish to do so, delete this
  * exception statement from your version.
  */
-package org.httpobjects;
+package org.httpobjects.path;
 
-import org.httpobjects.header.request.RequestHeader;
-import org.httpobjects.path.Path;
+import static org.junit.Assert.assertEquals;
 
-public interface Request {
-	
-    Query query();
-    Path path();
-    RequestHeader header();
+import org.junit.Test;
+
+public class PathTest {
+    @Test
+    public void toStringDoesWhatYouWouldExpect(){
+        // given
+        Path testSubject = new Path("/foo/bar");
+        
+        // when
+        String result = testSubject.toString();
+        
+        // then
+        assertEquals("/foo/bar", result);
+    }
     
-	boolean hasRepresentation();
-	Representation representation();
-	
-	Request immutableCopy();
-	
+    @Test
+    public void toStringIsNullSafe(){
+        // given
+        Path testSubject = new Path(null);
+        
+        // when
+        String result = testSubject.toString();
+        
+        // then
+        assertEquals("", result);
+        
+    }
 }

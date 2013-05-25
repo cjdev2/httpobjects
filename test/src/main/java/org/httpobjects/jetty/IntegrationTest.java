@@ -50,6 +50,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.httpobjects.HttpObject;
+import org.httpobjects.Query;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
 import org.httpobjects.header.DefaultHeaderFieldVisitor;
@@ -106,6 +107,34 @@ public abstract class IntegrationTest {
 						}
 						return UNAUTHORIZED(BasicAuthentication("secure area"), Text("You must first log-in"));
 					};
+				},
+				new HttpObject("/echoUrl/{id}/{name}"){
+				    @Override
+				    public Response get(Request req) {
+				        try {
+    				        final String mode = req.query().valueFor("mode");
+    				        if(mode == null){
+    				            final String query = req.query().toString();
+    				            final String tail = query.isEmpty()?"":("?" + query);
+    				            return OK(Text(req.path().toString() + tail));
+    				        }else if(mode.equals("printParams")){
+    				            final StringBuffer text = new StringBuffer();
+    				            final Query query = req.query();
+    				            for(String name : query.paramNames()){
+    				                if(text.length()>0){
+    				                    text.append('\n');
+    				                }
+    				                text.append(name + "=" + query.valueFor(name));
+    				            }
+    				           return OK(Text(text.toString()));
+    				        }else{
+    				            return BAD_REQUEST();
+    				        }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            return INTERNAL_SERVER_ERROR(e);
+                        }
+				    }
 				},
 				new HttpObject("/echoCookies"){
 					public Response get(Request req) {
@@ -175,6 +204,16 @@ public abstract class IntegrationTest {
 		assertResource(withBody(new PutMethod("http://localhost:8080/app/inbox/abc"), "hello world"), "hello world", 200);
 	}
 	
+	@Test
+    public void queryParameters(){
+        assertResource(withBody(new PutMethod("http://localhost:8080/app/inbox/abc"), "hello world"), "hello world", 200);
+    }
+    
+	@Test
+	public void urlToString(){
+	    assertResource(new GetMethod("http://localhost:8080/echoUrl/34/marty?a=1&b=2"), "/echoUrl/34/marty?a=1&b=2", 200);
+        assertResource(new GetMethod("http://localhost:8080/echoUrl/44/foo"), "/echoUrl/44/foo", 200);
+	}
 	
 	@Test
 	public void methodNotAllowed(){
