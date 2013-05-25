@@ -45,6 +45,8 @@ public interface Request {
     Query query();
     Path path();
     RequestHeader header();
+    // int httpVersion();    
+    // ConnectionInfo connectionInfo();
     
 	boolean hasRepresentation();
 	Representation representation();

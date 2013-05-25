@@ -46,7 +46,6 @@ import org.junit.Test;
 
 public class QueryTest {
 
-    
     @Test
     public void toStringIsNullSafe(){
         // given
@@ -57,7 +56,6 @@ public class QueryTest {
         
         // then
         assertEquals("", result);
-        
     }
     
     @Test
