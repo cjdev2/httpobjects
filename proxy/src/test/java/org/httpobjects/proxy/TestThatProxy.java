@@ -196,7 +196,7 @@ public class TestThatProxy {
 		
 		
 		// THEN: The url should come through unmolested
-		assertEquals("name=beforeTab%09afterTab", bodyOf(output).asString());
+		assertEquals("?name=beforeTab%09afterTab", bodyOf(output).asString());
 	}
 	
 	@Test
@@ -294,7 +294,7 @@ public class TestThatProxy {
 		// then
 		assertTrue(responseCodeOf(output).isOK_200());
 		assertTrue(contentTypeOf(output).isPlainText());
-		assertEquals("Kermitname=kermit&property=value", bodyOf(output).asString());
+		assertEquals("Kermit?name=kermit&property=value", bodyOf(output).asString());
 	}
 	
 	

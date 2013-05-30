@@ -49,7 +49,8 @@ public final class Query {
     
     public Query(String string) {
         super();
-        this.string = string;
+        final boolean needsQuestionMark = string!=null && !string.startsWith("?");
+        this.string = needsQuestionMark ? "?" + string : string;
     }
     
     @Override

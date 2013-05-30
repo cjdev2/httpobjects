@@ -71,6 +71,21 @@ public class QueryTest {
     }
     
     @Test
+    public void initialQuestionMarkIsOptional(){
+        // given
+    	String string = "xyz=123&abc=456";
+        
+        // when
+        Query result = new Query(string);
+        
+        // then
+        assertEquals("?xyz=123&abc=456", result.toString());
+        assertEquals("456", result.valueFor("abc"));
+        assertEquals("123", result.valueFor("xyz"));
+        assertEquals(2, result.paramNames().size());
+    	
+    }
+    @Test
     public void readsParametersByName() {
         // given
         Query testSubject = new Query("?xyz=123&abc=456");

@@ -112,29 +112,27 @@ public abstract class IntegrationTest {
 				    @Override
 				    public Response get(Request req) {
 				        try {
-    				        final String mode = req.query().valueFor("mode");
-    				        if(mode == null){
-    				            final String query = req.query().toString();
-    				            final String tail = query.isEmpty()?"":("?" + query);
-    				            return OK(Text(req.path().toString() + tail));
-    				        }else if(mode.equals("printParams")){
-    				            final StringBuffer text = new StringBuffer();
-    				            final Query query = req.query();
-    				            for(String name : query.paramNames()){
-    				                if(text.length()>0){
-    				                    text.append('\n');
-    				                }
-    				                text.append(name + "=" + query.valueFor(name));
-    				            }
-    				           return OK(Text(text.toString()));
-    				        }else{
-    				            return BAD_REQUEST();
-    				        }
+				            final String query = req.query().toString();
+				            return OK(Text(req.path().toString() + query));
                         } catch (Exception e) {
                             e.printStackTrace();
                             return INTERNAL_SERVER_ERROR(e);
                         }
 				    }
+				},
+				new HttpObject("/echoQuery"){
+					@Override
+					public Response get(Request req) {
+						final StringBuffer text = new StringBuffer();
+			            final Query query = req.query();
+			            for(String name : query.paramNames()){
+			                if(text.length()>0){
+			                    text.append('\n');
+			                }
+			                text.append(name + "=" + query.valueFor(name));
+			            }
+			           return OK(Text(text.toString()));
+					}
 				},
 				new HttpObject("/echoCookies"){
 					public Response get(Request req) {
@@ -206,7 +204,7 @@ public abstract class IntegrationTest {
 	
 	@Test
     public void queryParameters(){
-        assertResource(withBody(new PutMethod("http://localhost:8080/app/inbox/abc"), "hello world"), "hello world", 200);
+        assertResource(new GetMethod("http://localhost:8080/echoQuery?a=1&b=2"), "a=1\nb=2", 200);
     }
     
 	@Test
