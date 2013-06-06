@@ -190,7 +190,6 @@ public abstract class IntegrationTest {
         
         {
             String value = setCookies.get(0).getValue();
-            System.out.println(value);
             SetCookieField cookie = SetCookieField.fromHeaderValue(value);
             assertEquals("name", cookie.name);
             assertEquals("cookie monster", cookie.value);
@@ -199,25 +198,21 @@ public abstract class IntegrationTest {
 
         {
             String value = setCookies.get(1).getValue();
-            System.out.println(value);
             SetCookieField cookie = SetCookieField.fromHeaderValue(value);
             assertEquals("oldInsecureCookie", cookie.name);
             assertEquals("yes", cookie.value);
             assertEquals("the90sintranet.com", cookie.domain.toLowerCase());
             assertEquals("/images/animatedGifs", cookie.path);
-//            assertEquals("Wed, 13-Jan-2021 22:23:01 GMT", cookie.expiration);
             assertEquals(null, cookie.secure);
         }
 
         {
             String value = setCookies.get(2).getValue();
-            System.out.println(value);
             SetCookieField cookie = SetCookieField.fromHeaderValue(value);
             assertEquals("specialGuest", cookie.name);
             assertEquals("mr rogers", cookie.value);
             assertEquals("mrrogers.com", cookie.domain);
             assertEquals("/myNeighborhood", cookie.path);
-//            assertEquals("Wed, 13-Jan-2021 22:23:01 GMT", cookie.expiration);
             assertEquals(Boolean.TRUE, cookie.secure);
         }
     }

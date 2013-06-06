@@ -41,7 +41,6 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 		final String uri = request.getUri();
 		
 		for(HttpObject next : objects){
-			System.out.println("comparing " + next.pattern().raw() + " and " + uri);
 			if(next.pattern().matches(uri)){
 				HttpObject match = null;
 				match = next;
