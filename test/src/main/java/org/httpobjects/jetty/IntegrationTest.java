@@ -37,7 +37,14 @@
  */
 package org.httpobjects.jetty;
 
+import static junit.framework.Assert.assertEquals;
+
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import junit.framework.Assert;
 
@@ -59,6 +66,7 @@ import org.httpobjects.header.request.AuthorizationField;
 import org.httpobjects.header.request.Cookie;
 import org.httpobjects.header.request.CookieField;
 import org.httpobjects.header.request.credentials.BasicCredentials;
+import org.httpobjects.header.response.SetCookieField;
 import org.httpobjects.header.response.WWWAuthenticateField.Method;
 import org.junit.After;
 import org.junit.Before;
@@ -152,19 +160,88 @@ public abstract class IntegrationTest {
 						
 						return OK(Text(text.toString()));
 					};
+				},
+				new HttpObject("/cookieSetter"){
+				    //String name, String value, String domain, String path, String expiration, Boolean secure
+				    public Response get(Request req){
+				        return OK(
+				                    Text("Here are some cookies!"), 
+				                    new SetCookieField("name", "cookie monster", "sesamestreet.com"),
+                                    new SetCookieField("specialGuest", "mr rogers", "mrrogers.com", "/myNeighborhood", "Wed, 13-Jan-2021 22:23:01 GMT", true),
+                                    new SetCookieField("oldInsecureCookie", "yes", "the90sIntranet.com", "/images/animatedGifs", "Wed, 13-Jan-1999 22:23:01 GMT", false));
+				    }
 				}
 		);
 	}
 	
 	@Test
-	public void requestCookiesAreTranslated(){
-		// WHEN
-		GetMethod get = new GetMethod("http://localhost:8080/echoCookies");
-		get.setRequestHeader("Cookie", "Larry=Moe");
-		
-		assertResource(get, "Larry=Moe", 200);
-		
-	}
+	public void setCookieHeadersAreTranslated() throws Exception{
+	    // given
+        GetMethod request = new GetMethod("http://localhost:8080/cookieSetter");
+        HttpClient client = new HttpClient();
+
+        // when
+        int response = client.executeMethod(request);
+        
+        // then
+        assertEquals(200, response);
+        List<Header> setCookies = sortByValue(Arrays.asList(request.getResponseHeaders("Set-Cookie")));
+        assertEquals(3, setCookies.size());;
+        
+        {
+            String value = setCookies.get(0).getValue();
+            System.out.println(value);
+            SetCookieField cookie = SetCookieField.fromHeaderValue(value);
+            assertEquals("name", cookie.name);
+            assertEquals("cookie monster", cookie.value);
+            assertEquals("sesamestreet.com", cookie.domain);
+        }
+
+        {
+            String value = setCookies.get(1).getValue();
+            System.out.println(value);
+            SetCookieField cookie = SetCookieField.fromHeaderValue(value);
+            assertEquals("oldInsecureCookie", cookie.name);
+            assertEquals("yes", cookie.value);
+            assertEquals("the90sintranet.com", cookie.domain.toLowerCase());
+            assertEquals("/images/animatedGifs", cookie.path);
+//            assertEquals("Wed, 13-Jan-2021 22:23:01 GMT", cookie.expiration);
+            assertEquals(null, cookie.secure);
+        }
+
+        {
+            String value = setCookies.get(2).getValue();
+            System.out.println(value);
+            SetCookieField cookie = SetCookieField.fromHeaderValue(value);
+            assertEquals("specialGuest", cookie.name);
+            assertEquals("mr rogers", cookie.value);
+            assertEquals("mrrogers.com", cookie.domain);
+            assertEquals("/myNeighborhood", cookie.path);
+//            assertEquals("Wed, 13-Jan-2021 22:23:01 GMT", cookie.expiration);
+            assertEquals(Boolean.TRUE, cookie.secure);
+        }
+    }
+    private List<Header> sortByValue(final List<Header> cookies) {
+        List<Header> result = new ArrayList<Header>(cookies);
+        Collections.sort(result, new Comparator<Header>() {
+            @Override
+            public int compare(Header o1, Header o2) {
+                return o1.getValue().compareTo(o2.getValue());
+            }
+        });
+        return result;
+    }
+    
+
+    
+    @Test
+    public void requestCookiesAreTranslated() throws Exception {
+        // WHEN
+        GetMethod get = new GetMethod("http://localhost:8080/echoCookies");
+        get.setRequestHeader("Cookie", "Larry=Moe");
+        
+        assertResource(get, "Larry=Moe", 200);
+    }
 	
 	@Test
 	public void basicAuthentication(){

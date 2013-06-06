@@ -185,6 +185,21 @@ public class ServletMethodInvoker {
   }
   
 	private Cookie translate(SetCookieField cookie) {
-		return new Cookie(cookie.name, cookie.value);
+	    Cookie c = new Cookie(cookie.name, cookie.value);
+	    
+	    if(cookie.domain!=null){
+	        c.setDomain(cookie.domain);
+	    }
+//	    if(cookie.expiration!=null){
+//	        c.setMaxAge(Integer.parseInt(cookie.expiration));
+//	    }
+	    if(cookie.path!=null){
+	        c.setPath(cookie.path);
+	    }
+	    if(cookie.secure!=null) {
+	        c.setSecure(cookie.secure);
+	    }
+	    
+	    return c;
 	}
 }

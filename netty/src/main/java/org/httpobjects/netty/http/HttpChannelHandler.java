@@ -146,7 +146,7 @@ public class HttpChannelHandler extends SimpleChannelUpstreamHandler {
         }
         
         for(HeaderField field : r.header()){
-        	response.setHeader(field.name(), field.value());
+            response.addHeader(field.name(), field.value());
         }
 
         if (keepAlive) {
