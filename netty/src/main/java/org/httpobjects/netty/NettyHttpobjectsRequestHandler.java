@@ -35,8 +35,7 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 	}
 	
 	@Override
-	public Response respond(HttpRequest request, HttpChunkTrailer lastChunk,
-			byte[] body) {
+	public Response respond(HttpRequest request, HttpChunkTrailer lastChunk, byte[] body) {
 		
 		final String uri = request.getUri();
 		
@@ -51,7 +50,7 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 			}
 		}
 		
-			return defaultResponse;
+        return defaultResponse;
 	}
 	
 	private Request readRequest(final HttpRequest request, final HttpChunkTrailer lastChunk, final byte[] body) {
