@@ -49,6 +49,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.ByteArrayOutputStream;
 
 import org.httpobjects.HttpObject;
+import org.httpobjects.Query;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
 import org.httpobjects.ResponseCode;
@@ -192,8 +193,7 @@ public class TestThatProxy {
 		HttpObject subject = new Proxy("http://localhost:8080", "http://me.com");
 		
 		// WHEN: proxying a request for url with an encoded value in the query string
-		Response output = subject.get(new MockRequest(subject, "/queryStringEcho", "?name=beforeTab%09afterTab"));
-		
+		Response output = subject.get(new MockRequest(subject, "/queryStringEcho", new Query("?name=beforeTab%09afterTab")));
 		
 		// THEN: The url should come through unmolested
 		assertEquals("?name=beforeTab%09afterTab", bodyOf(output).asString());
@@ -286,7 +286,7 @@ public class TestThatProxy {
 		
 		// given
 		HttpObject subject = new Proxy("http://localhost:8080", "http://me.com");
-		Request input = new MockRequest(subject, "/frog", "?name=kermit&property=value");
+		Request input = new MockRequest(subject, "/frog", new Query("?name=kermit&property=value"));
 		
 		// when
 		Response output = subject.get(input);

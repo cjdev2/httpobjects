@@ -39,63 +39,51 @@ package org.httpobjects.test;
 
 import static org.httpobjects.DSL.Bytes;
 
-import java.io.UnsupportedEncodingException;
-import java.util.Collections;
-import java.util.Map;
-
 import org.httpobjects.HttpObject;
 import org.httpobjects.Query;
 import org.httpobjects.Representation;
 import org.httpobjects.Request;
+import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.request.RequestHeader;
 import org.httpobjects.path.Path;
-import org.httpobjects.util.RequestQueryUtil;
 
 public class MockRequest implements Request {
-	private final Path vars;
+	private final Path path;
 	private final Representation representation;
-	private final String query;
-    private final Map<String, String> parameters;
+	private final Query query;
+    private final RequestHeader header;
 	
-    private static Representation nullRepresentation(){
-    	return Bytes(null, new byte[]{});
+    public MockRequest(HttpObject object, String path, Query query, Representation representation, HeaderField ... fields) {
+        super();
+        assertNoQueryInPath(path);
+        this.representation = representation;
+        this.query = query;
+        this.path = object.pattern().match(path);
+        if(this.path==null){
+            throw new RuntimeException(object.pattern().raw() + " does not match " + path);
+        }
+        this.header = new RequestHeader(fields);
     }
     
-	public MockRequest(HttpObject object, String path, String query) {
-		super();
-		this.representation = nullRepresentation();
-		this.query = query.startsWith("?")?query.substring(1):query;
-        try {
-            this.parameters = Collections.unmodifiableMap(RequestQueryUtil.getUrlParameters(query));
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-		vars = object.pattern().match(path);
+	public MockRequest(HttpObject object, String path, Query query, HeaderField ... fields) {
+		this(object, path, query, nullRepresentation(), fields);
 	}
 	
-	public MockRequest(HttpObject object, String path) {
-		super();
-		this.representation = nullRepresentation();
-		this.query = null;
-        this.parameters = null;
-		vars = object.pattern().match(path);
+	public MockRequest(HttpObject object, String path, HeaderField ... fields) {
+        this(object, path, new Query(null), nullRepresentation(), fields);
 	}
 
-	public MockRequest(HttpObject object, String path, Representation representation) {
-		super();
-		this.representation = representation;
-		this.query = null;
-        this.parameters = null;
-		vars = object.pattern().match(path);
+	public MockRequest(HttpObject object, String path, Representation representation, HeaderField ... fields) {
+        this(object, path, new Query(""), representation, fields);
 	}
 	
 	@Override
 	public RequestHeader header() {
-		return new RequestHeader();
+		return header;
 	}
 	@Override
 	public Path path() {
-		return vars;
+		return path;
 	}
 
 	@Override
@@ -110,11 +98,21 @@ public class MockRequest implements Request {
 	
 	@Override
 	public Query query() {
-		return new Query(query);
+		return query;
 	}
 	
 	@Override
 	public Request immutableCopy() {
 		return this;
 	}
+	
+
+    private static Representation nullRepresentation(){
+        return Bytes(null, new byte[]{});
+    }
+    
+    private static void assertNoQueryInPath(String path){
+        if(path.indexOf('?')!=-1)
+            throw new RuntimeException("The query is in the path, but I wasn't expecting that; try using a constructor that takes a " + Query.class.getName() + " argument.");
+    }
 }
