@@ -204,6 +204,7 @@ public class HttpObjectAssert {
 			return response.hasRepresentation() ? response.representation().contentType():"";
 		}
 	}
+	
 	public static class Representation {
 		private final Response response; 
 		
@@ -222,7 +223,7 @@ public class HttpObjectAssert {
 			return new String(out.toByteArray());
 		}
 
-		public Object asString() {
+		public String asString() {
 			return response.hasRepresentation()?textOf(response.representation()):null;
 		}
 	}
