@@ -155,7 +155,7 @@ public class ServletMethodInvoker {
 				});
 			}
 			
-      addDefaultHeadersAsApplicable(r, resp);
+			addDefaultHeadersAsApplicable(r, resp);
 			
 			if(r.hasRepresentation()){
 				resp.setContentType(r.representation().contentType());
