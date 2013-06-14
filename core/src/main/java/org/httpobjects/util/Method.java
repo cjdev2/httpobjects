@@ -38,7 +38,7 @@
 package org.httpobjects.util;
 
 public enum Method {
-	GET, POST, PUT, DELETE;
+	GET, POST, PUT, DELETE, PATCH;
 	
 	public static Method fromString(String text){
 		try {

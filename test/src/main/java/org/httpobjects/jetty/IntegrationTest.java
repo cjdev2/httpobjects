@@ -40,6 +40,7 @@ package org.httpobjects.jetty;
 import static junit.framework.Assert.assertEquals;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -56,6 +57,7 @@ import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Query;
 import org.httpobjects.Request;
@@ -68,6 +70,7 @@ import org.httpobjects.header.request.CookieField;
 import org.httpobjects.header.request.credentials.BasicCredentials;
 import org.httpobjects.header.response.SetCookieField;
 import org.httpobjects.header.response.WWWAuthenticateField.Method;
+import org.httpobjects.util.HttpObjectUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -170,9 +173,43 @@ public abstract class IntegrationTest {
                                     new SetCookieField("specialGuest", "mr rogers", "mrrogers.com", "/myNeighborhood", "Wed, 13-Jan-2021 22:23:01 GMT", true),
                                     new SetCookieField("oldInsecureCookie", "yes", "the90sIntranet.com", "/images/animatedGifs", "Wed, 13-Jan-1999 22:23:01 GMT", false));
 				    }
-				}
+				},
+				new HttpObject("/patchme"){
+                    public org.httpobjects.Response patch(org.httpobjects.Request req) {
+                        try {
+                            final String input = new String(HttpObjectUtil.toByteArray(req.representation()), "UTF-8");
+                            return OK(Text("You told me to patch!" + input));
+                        } catch (UnsupportedEncodingException e) {
+                            return INTERNAL_SERVER_ERROR(e);
+                        }
+                    };
+                }
 		);
 	}
+	
+	class PatchMethod extends EntityEnclosingMethod {
+	    
+	    public PatchMethod(String uri) {
+            super(uri);
+        }
+
+        @Override
+	    public String getName() {
+	        return "PATCH";
+	    }
+	}
+
+    @Test
+    public void supportsPatch() throws Exception {
+        // given
+        PatchMethod request = new PatchMethod("http://localhost:8080/patchme");
+        request.setRequestEntity(new StringRequestEntity(" foo bar", "text/plain", "UTF-8"));
+        
+        // then/when
+        assertResource(request, "You told me to patch! foo bar", 200);
+    }
+    
+	
 	
 	@Test
 	public void setCookieHeadersAreTranslated() throws Exception{

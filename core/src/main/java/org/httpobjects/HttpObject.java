@@ -65,5 +65,6 @@ public class HttpObject extends DSL{
 	public Response post(Request req){return defaultResponse;}
 	public Response put(Request req){return defaultResponse;}
 	public Response trace(Request req){return defaultResponse;}
+    public Response patch(Request req){return defaultResponse;}
 	
 }
