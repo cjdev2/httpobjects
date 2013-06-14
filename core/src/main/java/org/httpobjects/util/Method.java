@@ -38,13 +38,13 @@
 package org.httpobjects.util;
 
 public enum Method {
-	GET, POST, PUT, DELETE, PATCH;
-	
-	public static Method fromString(String text){
-		try {
-			return Method.valueOf(text);
-		} catch (Exception e) {
-			return null;
-		}
-	}
+    GET, POST, PUT, DELETE, PATCH;
+
+    public static Method fromString(String text){
+        try {
+            return Method.valueOf(text);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

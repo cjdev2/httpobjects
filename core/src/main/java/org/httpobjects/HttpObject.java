@@ -41,30 +41,30 @@ import org.httpobjects.path.PathPattern;
 
 public class HttpObject extends DSL{
 
-	private final PathPattern pathPattern;
-	private final Response defaultResponse;
+    private final PathPattern pathPattern;
+    private final Response defaultResponse;
 
-	public HttpObject(String pathPattern, Response defaultResponse) {
-		super();
-		this.pathPattern = new PathPattern(pathPattern);
-		this.defaultResponse = defaultResponse;
-	}
-	
-	public HttpObject(String pathPattern) {
-		this(pathPattern, METHOD_NOT_ALLOWED());
-	}
-	
-	public PathPattern pattern() {
-		return pathPattern;
-	}
-	
-	public Response delete(Request req){return defaultResponse;}
-	public Response get(Request req){return defaultResponse;}
-	public Response head(Request req){return defaultResponse;}
-	public Response options(Request req){return defaultResponse;}
-	public Response post(Request req){return defaultResponse;}
-	public Response put(Request req){return defaultResponse;}
-	public Response trace(Request req){return defaultResponse;}
+    public HttpObject(String pathPattern, Response defaultResponse) {
+        super();
+        this.pathPattern = new PathPattern(pathPattern);
+        this.defaultResponse = defaultResponse;
+    }
+
+    public HttpObject(String pathPattern) {
+        this(pathPattern, METHOD_NOT_ALLOWED());
+    }
+
+    public PathPattern pattern() {
+        return pathPattern;
+    }
+
+    public Response delete(Request req){return defaultResponse;}
+    public Response get(Request req){return defaultResponse;}
+    public Response head(Request req){return defaultResponse;}
+    public Response options(Request req){return defaultResponse;}
+    public Response post(Request req){return defaultResponse;}
+    public Response put(Request req){return defaultResponse;}
+    public Response trace(Request req){return defaultResponse;}
     public Response patch(Request req){return defaultResponse;}
-	
+
 }

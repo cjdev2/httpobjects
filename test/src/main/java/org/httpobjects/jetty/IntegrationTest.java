@@ -76,155 +76,155 @@ import org.junit.Before;
 import org.junit.Test;
 
 public abstract class IntegrationTest {
-	
-	protected abstract void serve(int port, HttpObject ... objects);
-	protected abstract void stopServing();
-	
-	@Before
-	public void setup(){
-		
-		
-		serve(8080,
-				new HttpObject("/app/inbox"){
-					public Response post(Request req) {
-						return OK(Text("Message Received"));
-					};
-				},
-				new HttpObject("/app/inbox/abc"){
-					public Response put(Request req) {
-						return OK(req.representation());
-					};	
-				},
-				new HttpObject("/app"){
-					public Response get(Request req) {
-						return OK(Text("Welcome to the app"));
-					};	
-				},
-				new HttpObject("/app/message"){
-					public Response post(Request req) {
-						return SEE_OTHER(Location("/app"), SetCookie("name", "frank"));
-					};
-				},
-				new HttpObject("/nothing", null){},
-				new HttpObject("/secure"){
-					public Response get(Request req) {
-						AuthorizationField authorization = req.header().authorization();
-						if(authorization!=null && authorization.method()==Method.Basic){
-	
-							BasicCredentials creds = authorization.basicCredentials();
-							if(creds.user().equals("Aladdin")&& creds.password().equals("open sesame")){
-								return OK(Text("You're In!"));
-							}
-						}
-						return UNAUTHORIZED(BasicAuthentication("secure area"), Text("You must first log-in"));
-					};
-				},
-				new HttpObject("/echoUrl/{id}/{name}"){
-				    @Override
-				    public Response get(Request req) {
-				        try {
-				            final String query = req.query().toString();
-				            return OK(Text(req.path().toString() + query));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            return INTERNAL_SERVER_ERROR(e);
-                        }
-				    }
-				},
-				new HttpObject("/echoQuery"){
-					@Override
-					public Response get(Request req) {
-						final StringBuffer text = new StringBuffer();
-			            final Query query = req.query();
-			            for(String name : query.paramNames()){
-			                if(text.length()>0){
-			                    text.append('\n');
-			                }
-			                text.append(name + "=" + query.valueFor(name));
-			            }
-			           return OK(Text(text.toString()));
-					}
-				},
-				new HttpObject("/echoCookies"){
-					public Response get(Request req) {
-						
-						final StringBuffer text = new StringBuffer();
-						for(HeaderField next : req.header().fields()){
-							next.accept(new DefaultHeaderFieldVisitor<Void>(){
-								@Override
-								public Void visit(CookieField cookieField) {
-									for(Cookie cookie : cookieField.cookies()){
-										text.append(cookie.name + "=" + cookie.value);
-									}
-									return null;
-								}
-							});
-						}
-						
-						return OK(Text(text.toString()));
-					};
-				},
-				new HttpObject("/cookieSetter"){
-				    //String name, String value, String domain, String path, String expiration, Boolean secure
-				    public Response get(Request req){
-				        return OK(
-				                    Text("Here are some cookies!"), 
-				                    new SetCookieField("name", "cookie monster", "sesamestreet.com"),
-                                    new SetCookieField("specialGuest", "mr rogers", "mrrogers.com", "/myNeighborhood", "Wed, 13-Jan-2021 22:23:01 GMT", true),
-                                    new SetCookieField("oldInsecureCookie", "yes", "the90sIntranet.com", "/images/animatedGifs", "Wed, 13-Jan-1999 22:23:01 GMT", false));
-				    }
-				},
-				new HttpObject("/patchme"){
-                    public org.httpobjects.Response patch(org.httpobjects.Request req) {
-                        try {
-                            final String input = new String(HttpObjectUtil.toByteArray(req.representation()), "UTF-8");
-                            return OK(Text("You told me to patch!" + input));
-                        } catch (UnsupportedEncodingException e) {
-                            return INTERNAL_SERVER_ERROR(e);
-                        }
-                    };
+
+    protected abstract void serve(int port, HttpObject ... objects);
+    protected abstract void stopServing();
+
+    @Before
+    public void setup(){
+
+
+        serve(8080,
+                new HttpObject("/app/inbox"){
+            public Response post(Request req) {
+                return OK(Text("Message Received"));
+            };
+        },
+        new HttpObject("/app/inbox/abc"){
+            public Response put(Request req) {
+                return OK(req.representation());
+            };	
+        },
+        new HttpObject("/app"){
+            public Response get(Request req) {
+                return OK(Text("Welcome to the app"));
+            };	
+        },
+        new HttpObject("/app/message"){
+            public Response post(Request req) {
+                return SEE_OTHER(Location("/app"), SetCookie("name", "frank"));
+            };
+        },
+        new HttpObject("/nothing", null){},
+        new HttpObject("/secure"){
+            public Response get(Request req) {
+                AuthorizationField authorization = req.header().authorization();
+                if(authorization!=null && authorization.method()==Method.Basic){
+
+                    BasicCredentials creds = authorization.basicCredentials();
+                    if(creds.user().equals("Aladdin")&& creds.password().equals("open sesame")){
+                        return OK(Text("You're In!"));
+                    }
                 }
-		);
-	}
-	
-	class PatchMethod extends EntityEnclosingMethod {
-	    
-	    public PatchMethod(String uri) {
+                return UNAUTHORIZED(BasicAuthentication("secure area"), Text("You must first log-in"));
+            };
+        },
+        new HttpObject("/echoUrl/{id}/{name}"){
+            @Override
+            public Response get(Request req) {
+                try {
+                    final String query = req.query().toString();
+                    return OK(Text(req.path().toString() + query));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return INTERNAL_SERVER_ERROR(e);
+                }
+            }
+        },
+        new HttpObject("/echoQuery"){
+            @Override
+            public Response get(Request req) {
+                final StringBuffer text = new StringBuffer();
+                final Query query = req.query();
+                for(String name : query.paramNames()){
+                    if(text.length()>0){
+                        text.append('\n');
+                    }
+                    text.append(name + "=" + query.valueFor(name));
+                }
+                return OK(Text(text.toString()));
+            }
+        },
+        new HttpObject("/echoCookies"){
+            public Response get(Request req) {
+
+                final StringBuffer text = new StringBuffer();
+                for(HeaderField next : req.header().fields()){
+                    next.accept(new DefaultHeaderFieldVisitor<Void>(){
+                        @Override
+                        public Void visit(CookieField cookieField) {
+                            for(Cookie cookie : cookieField.cookies()){
+                                text.append(cookie.name + "=" + cookie.value);
+                            }
+                            return null;
+                        }
+                    });
+                }
+
+                return OK(Text(text.toString()));
+            };
+        },
+        new HttpObject("/cookieSetter"){
+            //String name, String value, String domain, String path, String expiration, Boolean secure
+            public Response get(Request req){
+                return OK(
+                        Text("Here are some cookies!"), 
+                        new SetCookieField("name", "cookie monster", "sesamestreet.com"),
+                        new SetCookieField("specialGuest", "mr rogers", "mrrogers.com", "/myNeighborhood", "Wed, 13-Jan-2021 22:23:01 GMT", true),
+                        new SetCookieField("oldInsecureCookie", "yes", "the90sIntranet.com", "/images/animatedGifs", "Wed, 13-Jan-1999 22:23:01 GMT", false));
+            }
+        },
+        new HttpObject("/patchme"){
+            public org.httpobjects.Response patch(org.httpobjects.Request req) {
+                try {
+                    final String input = new String(HttpObjectUtil.toByteArray(req.representation()), "UTF-8");
+                    return OK(Text("You told me to patch!" + input));
+                } catch (UnsupportedEncodingException e) {
+                    return INTERNAL_SERVER_ERROR(e);
+                }
+            };
+        }
+                );
+    }
+
+    class PatchMethod extends EntityEnclosingMethod {
+
+        public PatchMethod(String uri) {
             super(uri);
         }
 
         @Override
-	    public String getName() {
-	        return "PATCH";
-	    }
-	}
+        public String getName() {
+            return "PATCH";
+        }
+    }
 
     @Test
     public void supportsPatch() throws Exception {
         // given
         PatchMethod request = new PatchMethod("http://localhost:8080/patchme");
         request.setRequestEntity(new StringRequestEntity(" foo bar", "text/plain", "UTF-8"));
-        
+
         // then/when
         assertResource(request, "You told me to patch! foo bar", 200);
     }
-    
-	
-	
-	@Test
-	public void setCookieHeadersAreTranslated() throws Exception{
-	    // given
+
+
+
+    @Test
+    public void setCookieHeadersAreTranslated() throws Exception{
+        // given
         GetMethod request = new GetMethod("http://localhost:8080/cookieSetter");
         HttpClient client = new HttpClient();
 
         // when
         int response = client.executeMethod(request);
-        
+
         // then
         assertEquals(200, response);
         List<Header> setCookies = sortByValue(Arrays.asList(request.getResponseHeaders("Set-Cookie")));
         assertEquals(3, setCookies.size());;
-        
+
         {
             String value = setCookies.get(0).getValue();
             SetCookieField cookie = SetCookieField.fromHeaderValue(value);
@@ -263,124 +263,124 @@ public abstract class IntegrationTest {
         });
         return result;
     }
-    
 
-    
+
+
     @Test
     public void requestCookiesAreTranslated() throws Exception {
         // WHEN
         GetMethod get = new GetMethod("http://localhost:8080/echoCookies");
         get.setRequestHeader("Cookie", "Larry=Moe");
-        
+
         assertResource(get, "Larry=Moe", 200);
     }
-	
-	@Test
-	public void basicAuthentication(){
-		// without authorization header
-		assertResource(new GetMethod("http://localhost:8080/secure"), "You must first log-in", 401, new HeaderSpec("WWW-Authenticate", "Basic realm=secure area"));
-		
-		// with authorization header
-		GetMethod get = new GetMethod("http://localhost:8080/secure");
-		get.setRequestHeader("Authorization", "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==");
-		assertResource(get, "You're In!", 200);
-	}
-	
-	@Test
-	public void nullResponsesAreTreatedAsNotFound(){
-		assertResource(new GetMethod("http://localhost:8080/nothing"), 404);
-	}
-	
-	@Test
-	public void returnsNotFoundIfThereIsNoMatchingPattern(){
-		assertResource(new GetMethod("http://localhost:8080/bob"), 404);
-	}
-	
-	@Test
-	public void happyPathForGet(){
-		assertResource(new GetMethod("http://localhost:8080/app"), "Welcome to the app", 200);
-	}
-	
-	@Test
-	public void happyPathForPost(){
-		assertResource(new PostMethod("http://localhost:8080/app/inbox"), "Message Received", 200);
-	}
-	
-	@Test
-	public void happyPathForPut(){
-		assertResource(withBody(new PutMethod("http://localhost:8080/app/inbox/abc"), "hello world"), "hello world", 200);
-	}
-	
-	@Test
+
+    @Test
+    public void basicAuthentication(){
+        // without authorization header
+        assertResource(new GetMethod("http://localhost:8080/secure"), "You must first log-in", 401, new HeaderSpec("WWW-Authenticate", "Basic realm=secure area"));
+
+        // with authorization header
+        GetMethod get = new GetMethod("http://localhost:8080/secure");
+        get.setRequestHeader("Authorization", "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==");
+        assertResource(get, "You're In!", 200);
+    }
+
+    @Test
+    public void nullResponsesAreTreatedAsNotFound(){
+        assertResource(new GetMethod("http://localhost:8080/nothing"), 404);
+    }
+
+    @Test
+    public void returnsNotFoundIfThereIsNoMatchingPattern(){
+        assertResource(new GetMethod("http://localhost:8080/bob"), 404);
+    }
+
+    @Test
+    public void happyPathForGet(){
+        assertResource(new GetMethod("http://localhost:8080/app"), "Welcome to the app", 200);
+    }
+
+    @Test
+    public void happyPathForPost(){
+        assertResource(new PostMethod("http://localhost:8080/app/inbox"), "Message Received", 200);
+    }
+
+    @Test
+    public void happyPathForPut(){
+        assertResource(withBody(new PutMethod("http://localhost:8080/app/inbox/abc"), "hello world"), "hello world", 200);
+    }
+
+    @Test
     public void queryParameters(){
         assertResource(new GetMethod("http://localhost:8080/echoQuery?a=1&b=2"), "a=1\nb=2", 200);
     }
-    
-	@Test
-	public void urlToString(){
-	    assertResource(new GetMethod("http://localhost:8080/echoUrl/34/marty?a=1&b=2"), "/echoUrl/34/marty?a=1&b=2", 200);
+
+    @Test
+    public void urlToString(){
+        assertResource(new GetMethod("http://localhost:8080/echoUrl/34/marty?a=1&b=2"), "/echoUrl/34/marty?a=1&b=2", 200);
         assertResource(new GetMethod("http://localhost:8080/echoUrl/44/foo"), "/echoUrl/44/foo", 200);
-	}
-	
-	@Test
-	public void methodNotAllowed(){
-		assertResource(new GetMethod("http://localhost:8080/app/inbox"), "405 Client Error: Method Not Allowed", 405);
-	}
-	
-	@Test
-	public void redirectsAndSetsCookies(){
+    }
 
-		assertResource(new PostMethod("http://localhost:8080/app/message"), 303, 
-				new HeaderSpec("Location", "/app"),
-				new HeaderSpec("Set-Cookie", "name=frank"));
-	}
-	
-	@SuppressWarnings("deprecation")
-	private static <T extends EntityEnclosingMethod> T withBody(T m, String body){
-		m.setRequestBody(body);
-		return m;
-	}
+    @Test
+    public void methodNotAllowed(){
+        assertResource(new GetMethod("http://localhost:8080/app/inbox"), "405 Client Error: Method Not Allowed", 405);
+    }
 
-	private void assertResource(HttpMethod method,
-			int expectedResponseCode, HeaderSpec ... header) {
-		assertResource(method, null, expectedResponseCode, header);
-	}
-	private void assertResource(HttpMethod method, String expectedBody,
-			int expectedResponseCode, HeaderSpec ... header) {
-		try {
-			HttpClient client = new HttpClient();
-			int response = client.executeMethod(method);
+    @Test
+    public void redirectsAndSetsCookies(){
 
-			Assert.assertEquals(expectedResponseCode, response);
-			if(expectedBody!=null) Assert.assertEquals(expectedBody, method.getResponseBodyAsString());
-			
-			if(header!=null){
-				for(HeaderSpec next : header){
-					Header h = method.getResponseHeader(next.name);
-					Assert.assertNotNull("Expected a \"" + next.name + "\" value of \"" + next.value + "\"", h);
-					Assert.assertEquals(next.value, h.getValue());
-				}
-			}
-		} catch (HttpException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	private class HeaderSpec {
-		final String name;
-		final String value;
-		private HeaderSpec(String name, String value) {
-			super();
-			this.name = name;
-			this.value = value;
-		}
-		
-	}
-	
-	@After
-	public void tearDown() throws Exception {
-		stopServing();
-	}
+        assertResource(new PostMethod("http://localhost:8080/app/message"), 303, 
+                new HeaderSpec("Location", "/app"),
+                new HeaderSpec("Set-Cookie", "name=frank"));
+    }
+
+    @SuppressWarnings("deprecation")
+    private static <T extends EntityEnclosingMethod> T withBody(T m, String body){
+        m.setRequestBody(body);
+        return m;
+    }
+
+    private void assertResource(HttpMethod method,
+            int expectedResponseCode, HeaderSpec ... header) {
+        assertResource(method, null, expectedResponseCode, header);
+    }
+    private void assertResource(HttpMethod method, String expectedBody,
+            int expectedResponseCode, HeaderSpec ... header) {
+        try {
+            HttpClient client = new HttpClient();
+            int response = client.executeMethod(method);
+
+            Assert.assertEquals(expectedResponseCode, response);
+            if(expectedBody!=null) Assert.assertEquals(expectedBody, method.getResponseBodyAsString());
+
+            if(header!=null){
+                for(HeaderSpec next : header){
+                    Header h = method.getResponseHeader(next.name);
+                    Assert.assertNotNull("Expected a \"" + next.name + "\" value of \"" + next.value + "\"", h);
+                    Assert.assertEquals(next.value, h.getValue());
+                }
+            }
+        } catch (HttpException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private class HeaderSpec {
+        final String name;
+        final String value;
+        private HeaderSpec(String name, String value) {
+            super();
+            this.name = name;
+            this.value = value;
+        }
+
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        stopServing();
+    }
 }
