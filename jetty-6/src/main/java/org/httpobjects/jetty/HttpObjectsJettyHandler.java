@@ -71,10 +71,15 @@ public class HttpObjectsJettyHandler extends AbstractHandler {
 	public void handle(String target, HttpServletRequest request, HttpServletResponse response, int dispatch) 
 			throws IOException, ServletException {
 		
-		final boolean invocationHappened = invoker.invokeFirstPathMatchIfAble(target, request, response);
-		
-		if(invocationHappened)
-			setHandled(request);     
+		try {
+            final boolean invocationHappened = invoker.invokeFirstPathMatchIfAble(target, request, response);
+            
+            if(invocationHappened)
+            	setHandled(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Unhandled error: " + e, e);
+        }     
 		
 	}
 

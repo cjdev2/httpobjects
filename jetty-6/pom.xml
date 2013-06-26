@@ -3,11 +3,11 @@
 	<parent>
 		<artifactId>httpobjects-pom</artifactId>
 		<groupId>org.httpobjects.pom</groupId>
-		<version>0.3.1-SNAPSHOT</version>
+		<version>0.4.0-SNAPSHOT</version>
 	</parent>
 
 	<groupId>org.httpobjects.jetty</groupId>
-	<artifactId>httpobjects-jetty</artifactId>
+	<artifactId>httpobjects-jetty-6</artifactId>
 
 	<name>${artifactId}</name>
 
