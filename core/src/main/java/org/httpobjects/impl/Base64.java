@@ -52,6 +52,8 @@
 
 package org.httpobjects.impl;
 
+import java.io.UnsupportedEncodingException;
+
 /**
 * A Base64 encoder/decoder.
 *
@@ -89,8 +91,13 @@ static {
 * @param s  A String to be encoded.
 * @return   A String containing the Base64 encoded data.
 */
-public static String encodeString (String s) {
-return new String(encode(s.getBytes())); }
+public static String encodeString (String s, String encodingName) {
+    try {
+        return new String(encode(s.getBytes(encodingName)));
+    } catch (UnsupportedEncodingException e) {
+        throw new RuntimeException(e.getMessage(), e);
+    }
+}
 
 /**
 * Encodes a byte array into Base 64 format and breaks the output into lines of 76 characters.

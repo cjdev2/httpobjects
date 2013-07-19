@@ -48,11 +48,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 
-import org.httpobjects.HttpObject;
-import org.httpobjects.Query;
-import org.httpobjects.Request;
-import org.httpobjects.Response;
-import org.httpobjects.ResponseCode;
+import org.httpobjects.*;
 import org.httpobjects.header.DefaultHeaderFieldVisitor;
 import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
@@ -204,7 +200,7 @@ public class TestThatProxy {
 
 		// given
 		HttpObject subject = new Proxy("http://localhost:8080", "http://me.com");
-		Request input = new MockRequest(subject, "/echo", Bytes("image/png", "hi".getBytes()));
+		Request input = new MockRequest(subject, "/echo", Bytes("image/png", DSL.getBytes("hi", StandardCharset.UTF_8)));
 		
 		// when
 		Response output = subject.get(input);

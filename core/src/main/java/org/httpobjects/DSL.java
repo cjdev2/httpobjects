@@ -37,10 +37,7 @@
  */
 package org.httpobjects;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -59,7 +56,13 @@ import org.httpobjects.util.impl.WrapperForInsecureClassloader;
  * ########################################################
  */
 public class DSL {
-    
+    //according to
+    //http://w3techs.com/technologies/overview/character_encoding/all
+    //pulled on 2013-07-18
+    //UTF-8 is used on 76.0% of all websites
+    //ISO-8859-1 is used on 12.0% of all websites
+    public static final StandardCharset MOST_WIDELY_SUPPORTED_ENCODING = StandardCharset.UTF_8;
+    public static final StandardCharset DEFAULT_HTTP_ENCODING = StandardCharset.ISO_8859_1;
     /* ######################################################## 
      * ## Hand-coded response factory methods
      * ########################################################
@@ -109,15 +112,15 @@ public class DSL {
      */
     
     public static final Representation Html(String text){
-        return new BinaryRepresentation("text/html", new ByteArrayInputStream(text.getBytes()));
+        return new BinaryRepresentation("text/html", new ByteArrayInputStream(getBytes(text, StandardCharset.UTF_8)));
     }
 
     public static final Representation Text(String text){
-        return new BinaryRepresentation("text/plain", new ByteArrayInputStream(text.getBytes()));
+        return new BinaryRepresentation("text/plain", new ByteArrayInputStream(getBytes(text, StandardCharset.UTF_8)));
     }
 
     public static final Representation Json(String text){
-        return new BinaryRepresentation("application/json", new ByteArrayInputStream(text.getBytes()));
+        return new BinaryRepresentation("application/json", new ByteArrayInputStream(getBytes(text, StandardCharset.UTF_8)));
     }
 
     public static final Representation HtmlFromClasspath(String name, Object context){
@@ -158,7 +161,22 @@ public class DSL {
         }
     }
 
-    /* ######################################################## 
+    /* ########################################################
+     * ## Public utility methods
+     * ########################################################
+     */
+
+    public static final byte[] getBytes(String text, StandardCharset standardCharset) {
+        try {
+            //Every implementation of the Java platform is required to support the standard charsets
+            //So no point in throwing a checked exception
+            return text.getBytes(standardCharset.charsetName());
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    /* ########################################################
      * ## Utility methods
      * ########################################################
      */
@@ -372,5 +390,4 @@ public class DSL {
     public static final Response HTTP_VERSION_NOT_SUPPORTED(Throwable t){
         return new Response(ResponseCode.HTTP_VERSION_NOT_SUPPORTED, Text(toString(t)));
     };
-
 }

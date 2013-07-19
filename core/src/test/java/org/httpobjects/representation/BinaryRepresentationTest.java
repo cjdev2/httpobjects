@@ -46,6 +46,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.httpobjects.DSL;
+import org.httpobjects.StandardCharset;
 import org.junit.Test;
 
 public class BinaryRepresentationTest {
@@ -80,7 +82,7 @@ public class BinaryRepresentationTest {
     public void wrapsOutputExceptionsWithAHelpfulMessage() {
         // given
         final EOFException connectionException = new EOFException();
-        BinaryRepresentation r = new BinaryRepresentation("foo/bar", new ByteArrayInputStream("foobar".getBytes()));
+        BinaryRepresentation r = new BinaryRepresentation("foo/bar", new ByteArrayInputStream(DSL.getBytes("foobar", StandardCharset.UTF_8)));
         OutputStream out = new OutputStream() {
             @Override
             public void write(int b) throws IOException {
