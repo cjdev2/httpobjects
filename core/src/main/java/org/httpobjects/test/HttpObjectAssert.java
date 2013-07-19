@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.httpobjects.Response;
+import org.httpobjects.StandardCharset;
 import org.httpobjects.header.DefaultHeaderFieldVisitor;
 import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
@@ -186,10 +187,14 @@ public class HttpObjectAssert {
 			this.response = response;
 		}
 
-		public boolean isPlainText() {
+		public boolean isPlainTextWithDefaultHttpEncoding() {
 			return response.hasRepresentation() && response.representation().contentType().equals("text/plain");
 		}
-		
+
+        public boolean isPlainTextWithEncoding(String encodingName) {
+            return response.hasRepresentation() && response.representation().contentType().equals("text/plain; charset=" + encodingName);
+        }
+
 		public void assertIs(String expectation){
 			String value = toString();
 			if(

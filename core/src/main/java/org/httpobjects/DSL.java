@@ -112,15 +112,15 @@ public class DSL {
      */
     
     public static final Representation Html(String text){
-        return new BinaryRepresentation("text/html", new ByteArrayInputStream(getBytes(text, StandardCharset.UTF_8)));
+        return new BinaryRepresentation("text/html; charset="+MOST_WIDELY_SUPPORTED_ENCODING.charsetName(), new ByteArrayInputStream(getBytes(text, MOST_WIDELY_SUPPORTED_ENCODING)));
     }
 
     public static final Representation Text(String text){
-        return new BinaryRepresentation("text/plain", new ByteArrayInputStream(getBytes(text, StandardCharset.UTF_8)));
+        return new BinaryRepresentation("text/plain; charset="+MOST_WIDELY_SUPPORTED_ENCODING.charsetName(), new ByteArrayInputStream(getBytes(text, MOST_WIDELY_SUPPORTED_ENCODING)));
     }
 
     public static final Representation Json(String text){
-        return new BinaryRepresentation("application/json", new ByteArrayInputStream(getBytes(text, StandardCharset.UTF_8)));
+        return new BinaryRepresentation("application/json; charset="+MOST_WIDELY_SUPPORTED_ENCODING.charsetName(), new ByteArrayInputStream(getBytes(text, MOST_WIDELY_SUPPORTED_ENCODING)));
     }
 
     public static final Representation HtmlFromClasspath(String name, Object context){

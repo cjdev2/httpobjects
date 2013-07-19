@@ -50,8 +50,6 @@ import org.httpobjects.Response;
 import org.httpobjects.test.MockRequest;
 import org.junit.Test;
 
-
-
 public class PersonResourceTest {
 	
 	@Test
@@ -94,7 +92,7 @@ public class PersonResourceTest {
 		
 		// then
 		assertTrue(responseCodeOf(output).isOK_200());
-		assertTrue(contentTypeOf(output).isPlainText());
+		assertTrue(contentTypeOf(output).isPlainTextWithEncoding("utf-8"));
 		assertTrue(bodyOf(output).equals("stu"));
 	}
 		
@@ -109,7 +107,7 @@ public class PersonResourceTest {
 		
 		// then
 		assertTrue(responseCodeOf(output).isNOT_FOUND());
-		assertTrue(contentTypeOf(output).isPlainText());
+		assertTrue(contentTypeOf(output).isPlainTextWithEncoding("utf-8"));
 		assertEquals("No such person", bodyOf(output).asString());
 		
 	}

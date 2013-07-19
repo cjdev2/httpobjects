@@ -42,12 +42,12 @@ package org.httpobjects;
  * As defined in java.nio.charset.Charset
  */
 public enum StandardCharset {
-    US_ASCII("US-ASCII"),
-    ISO_8859_1("ISO-8859-1"),
-    UTF_8("UTF-8"),
-    UTF_16BE("UTF-16BE"),
-    UTF_16LE("UTF-16LE"),
-    UTF_16("UTF-16");
+    US_ASCII("us-ascii"),
+    ISO_8859_1("iso-8859-1"),
+    UTF_8("utf-8"),
+    UTF_16BE("utf-16be"),
+    UTF_16LE("utf-16le"),
+    UTF_16("utf-16");
 
     private final String charsetName;
 

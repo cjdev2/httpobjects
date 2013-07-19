@@ -54,6 +54,7 @@ import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.request.RequestHeader;
 import org.httpobjects.jetty.HttpObjectsJettyHandler;
+import org.httpobjects.test.HttpObjectAssert;
 import org.httpobjects.test.MockRequest;
 import org.junit.After;
 import org.junit.Before;
@@ -257,7 +258,9 @@ public class TestThatProxy {
 		responseCodeOf(output).assertIs(ResponseCode.OK);
 //		assertEquals("1234", )
 		cookiesIn(output).assertContains("id", "1234");
-		assertTrue(contentTypeOf(output).isPlainText());
+
+        HttpObjectAssert.ContentType contentType = contentTypeOf(output);
+		assertTrue(contentType.isPlainTextWithEncoding("utf-8"));
 		assertEquals("Here is a tasty cookie", bodyOf(output).asString());
 	}
 	
@@ -273,7 +276,7 @@ public class TestThatProxy {
 		
 		// then
 		responseCodeOf(output).assertIs(ResponseCode.OK);
-		assertTrue(contentTypeOf(output).isPlainText());
+		assertTrue(contentTypeOf(output).isPlainTextWithEncoding("utf-8"));
 		assertEquals("Kermit", bodyOf(output).asString());
 	}
 	
@@ -289,7 +292,7 @@ public class TestThatProxy {
 		
 		// then
 		assertTrue(responseCodeOf(output).isOK_200());
-		assertTrue(contentTypeOf(output).isPlainText());
+		assertTrue(contentTypeOf(output).isPlainTextWithEncoding("utf-8"));
 		assertEquals("Kermit?name=kermit&property=value", bodyOf(output).asString());
 	}
 	
@@ -307,7 +310,7 @@ public class TestThatProxy {
 		// then
 		responseCodeOf(output).assertIs(ResponseCode.SEE_OTHER);
 		locationHeaderOf(output).assertIs("/piggy");
-		assertTrue(contentTypeOf(output).isPlainText());
+		assertTrue(contentTypeOf(output).isPlainTextWithEncoding("utf-8"));
 		assertEquals("Oh, kermie!", bodyOf(output).asString());
 	}
 	
@@ -323,7 +326,7 @@ public class TestThatProxy {
 		
 		// then
 		responseCodeOf(output).assertIs(ResponseCode.OK);
-		assertTrue(contentTypeOf(output).isPlainText());
+		assertTrue(contentTypeOf(output).isPlainTextWithEncoding("utf-8"));
 		assertEquals("Kermie", bodyOf(output).asString());
 	}
 	
@@ -339,7 +342,7 @@ public class TestThatProxy {
 		
 		// then
 		responseCodeOf(output).assertIsOK_200();
-		assertTrue(contentTypeOf(output).isPlainText());
+		assertTrue(contentTypeOf(output).isPlainTextWithEncoding("utf-8"));
 		assertTrue(bodyOf(output).equals("Kermit"));
 	}
 	
