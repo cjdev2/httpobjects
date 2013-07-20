@@ -47,6 +47,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
 
 import org.httpobjects.*;
 import org.httpobjects.header.DefaultHeaderFieldVisitor;
@@ -61,11 +62,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mortbay.jetty.Server;
 
-public class TestThatProxy {
+public class ProxyTest {
 	Server jetty;
 	
 	public static void main(String[] args) {
-		new TestThatProxy().launch();
+		new ProxyTest().launch();
 	}
 	
 	@Before
@@ -197,11 +198,11 @@ public class TestThatProxy {
 	}
 	
 	@Test
-	public void sendsNonTextContentTypes(){
+	public void sendsNonTextContentTypes() throws Exception {
 
 		// given
 		HttpObject subject = new Proxy("http://localhost:8080", "http://me.com");
-		Request input = new MockRequest(subject, "/echo", Bytes("image/png", DSL.getBytes("hi", StandardCharset.UTF_8)));
+		Request input = new MockRequest(subject, "/echo", utf8Bytes("hi"));
 		
 		// when
 		Response output = subject.get(input);
@@ -210,6 +211,11 @@ public class TestThatProxy {
 		responseCodeOf(output).assertIs(ResponseCode.OK);
 		contentTypeOf(output).assertIs("image/png");
 	}
+
+    private Representation utf8Bytes(String text)
+            throws UnsupportedEncodingException {
+        return Bytes("image/png", text.getBytes("UTF-8"));
+    }
 	
 	@Test
 	public void doesntSendBlankContentTypes(){
@@ -256,7 +262,6 @@ public class TestThatProxy {
 		
 		// then
 		responseCodeOf(output).assertIs(ResponseCode.OK);
-//		assertEquals("1234", )
 		cookiesIn(output).assertContains("id", "1234");
 
         HttpObjectAssert.ContentType contentType = contentTypeOf(output);
