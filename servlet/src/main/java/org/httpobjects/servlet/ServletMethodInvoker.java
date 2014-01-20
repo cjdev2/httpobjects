@@ -65,6 +65,7 @@ public class ServletMethodInvoker {
 	private final HttpObject[] objects;
 	private final Response notFoundResponse;
 	private final List<? extends HeaderField> defaultResponseHeaders;
+    private final PathMatchObserver pathMatchObserver;
 	
 	public ServletMethodInvoker(HttpObject[] objects) {
 		this(HttpObject.NOT_FOUND(HttpObject.Text("Error: NOT_FOUND")), objects);
@@ -72,35 +73,47 @@ public class ServletMethodInvoker {
   public ServletMethodInvoker(Response notFoundResponse, HttpObject[] objects) {
     this(Collections.<HeaderField>emptyList(), notFoundResponse, objects);
   }
-	public ServletMethodInvoker(List<? extends HeaderField> defaultResponseHeader, Response notFoundResponse, HttpObject[] objects) {
-		super();
-		this.notFoundResponse = notFoundResponse;
-		this.objects = objects;
-		this.defaultResponseHeaders = defaultResponseHeader;
-	}
 
-	public boolean invokeFirstPathMatchIfAble(String path, HttpServletRequest r, HttpServletResponse httpResponse){
-		
-		Response lastResponse = null;
-		for(HttpObject next : objects){
-			if(next.pattern().matches(path)){
-				lastResponse = invoke(r, httpResponse, next);
-				if(lastResponse!=null){
-					returnResponse(lastResponse, httpResponse);
-					break;
-				}
-			}
-		}
-		
-		if(lastResponse!=null){
-			return true;
-		}else if(notFoundResponse!=null){
-			returnResponse(notFoundResponse, httpResponse);
-			return true;
-		}else{
-			return false;
-		}
-	}
+    public ServletMethodInvoker(List<? extends HeaderField> defaultResponseHeader, Response notFoundResponse, HttpObject[] objects) {
+        this(PathMatchObserver.DO_NOTHING, defaultResponseHeader, notFoundResponse, objects);
+    }
+
+    public ServletMethodInvoker(PathMatchObserver pathMatchObserver, List<? extends HeaderField> defaultResponseHeader, Response notFoundResponse, HttpObject[] objects) {
+        this.pathMatchObserver = pathMatchObserver;
+        this.notFoundResponse = notFoundResponse;
+        this.objects = objects;
+        this.defaultResponseHeaders = defaultResponseHeader;
+    }
+
+    public boolean invokeFirstPathMatchIfAble(String path, HttpServletRequest r, HttpServletResponse httpResponse) {
+        Response lastResponse = null;
+        HttpObject matchingObjectOrNull = findMatchingHttpObjectOrNull(path);
+
+        if (matchingObjectOrNull != null) {
+            lastResponse = invoke(r, httpResponse, matchingObjectOrNull);
+        }
+
+        if (lastResponse != null) {
+            returnResponse(lastResponse, httpResponse);
+            return true;
+        } else if (notFoundResponse != null) {
+            returnResponse(notFoundResponse, httpResponse);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public HttpObject findMatchingHttpObjectOrNull(String path) {
+        for(HttpObject next : objects){
+            pathMatchObserver.checkingPathAgainstPattern(path, next.pattern());
+            if(next.pattern().matches(path)){
+                pathMatchObserver.pathMatchedPattern(path, next.pattern());
+                return next;
+            }
+        }
+        return null;
+    }
 
 	private Response invoke(HttpServletRequest r, HttpServletResponse httpResponse, HttpObject object) {
 		final Method m = Method.fromString(r.getMethod());
