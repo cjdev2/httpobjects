@@ -87,14 +87,19 @@ public class ServletMethodInvoker {
 
     public boolean invokeFirstPathMatchIfAble(String path, HttpServletRequest r, HttpServletResponse httpResponse) {
         Response lastResponse = null;
-        HttpObject matchingObjectOrNull = findMatchingHttpObjectOrNull(path);
-
-        if (matchingObjectOrNull != null) {
-            lastResponse = invoke(r, httpResponse, matchingObjectOrNull);
+        for (HttpObject next : objects) {
+            pathMatchObserver.checkingPathAgainstPattern(path, next.pattern());
+            if (next.pattern().matches(path)) {
+                lastResponse = invoke(r, httpResponse, next);
+                if (lastResponse != null) {
+                    pathMatchObserver.pathMatchedPattern(path, next.pattern());
+                    returnResponse(lastResponse, httpResponse);
+                    break;
+                }
+            }
         }
 
         if (lastResponse != null) {
-            returnResponse(lastResponse, httpResponse);
             return true;
         } else if (notFoundResponse != null) {
             returnResponse(notFoundResponse, httpResponse);
@@ -104,18 +109,7 @@ public class ServletMethodInvoker {
         }
     }
 
-    public HttpObject findMatchingHttpObjectOrNull(String path) {
-        for(HttpObject next : objects){
-            pathMatchObserver.checkingPathAgainstPattern(path, next.pattern());
-            if(next.pattern().matches(path)){
-                pathMatchObserver.pathMatchedPattern(path, next.pattern());
-                return next;
-            }
-        }
-        return null;
-    }
-
-	private Response invoke(HttpServletRequest r, HttpServletResponse httpResponse, HttpObject object) {
+    private Response invoke(HttpServletRequest r, HttpServletResponse httpResponse, HttpObject object) {
 		final Method m = Method.fromString(r.getMethod());
 		final Request input = new LazyRequestImpl(object.pattern().match(r.getRequestURI()), r);
 
