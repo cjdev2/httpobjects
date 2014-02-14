@@ -3,7 +3,7 @@
   <parent>
     <artifactId>httpobjects-pom</artifactId>
     <groupId>org.httpobjects.pom</groupId>
-    <version>0.5.1-SNAPSHOT</version>
+    <version>0.6.0-SNAPSHOT</version>
   </parent>
   
   <groupId>org.httpobjects</groupId>
