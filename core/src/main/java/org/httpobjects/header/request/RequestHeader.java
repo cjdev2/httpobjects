@@ -59,7 +59,7 @@ public class RequestHeader extends Header {
 	}
 
 	public AuthorizationField authorization() {
-		
+
 		for(HeaderField next: fields()){
 			AuthorizationField auth = next.accept(new DefaultHeaderFieldVisitor<AuthorizationField>() {
 				@Override
@@ -67,8 +67,8 @@ public class RequestHeader extends Header {
 						AuthorizationField authorizationField) {
 					return authorizationField;
 				}
-			});	
-			
+			});
+
 			if(auth!=null) return auth;
 		}
 		
@@ -97,7 +97,12 @@ public class RequestHeader extends Header {
                 public Seq<Cookie> visit(CookieField cookies) {
                     return FunctionalJava.asSeq(cookies.cookies());
                 }
-            })); 
+
+                @Override
+                protected Seq<Cookie> defaultValue() {
+                    return FunctionalJava.emptySeq();
+                }
+            }));
         }
         
         return results;

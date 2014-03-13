@@ -85,25 +85,25 @@ public abstract class IntegrationTest {
 
 
         serve(8080,
-                new HttpObject("/app/inbox"){
+        new HttpObject("/app/inbox"){
             public Response post(Request req) {
                 return OK(Text("Message Received"));
-            };
+            }
         },
         new HttpObject("/app/inbox/abc"){
             public Response put(Request req) {
                 return OK(req.representation());
-            };	
+            }
         },
         new HttpObject("/app"){
             public Response get(Request req) {
                 return OK(Text("Welcome to the app"));
-            };	
+            }
         },
         new HttpObject("/app/message"){
             public Response post(Request req) {
                 return SEE_OTHER(Location("/app"), SetCookie("name", "frank"));
-            };
+            }
         },
         new HttpObject("/nothing", null){},
         new HttpObject("/secure"){
@@ -117,7 +117,7 @@ public abstract class IntegrationTest {
                     }
                 }
                 return UNAUTHORIZED(BasicAuthentication("secure area"), Text("You must first log-in"));
-            };
+            }
         },
         new HttpObject("/echoUrl/{id}/{name}"){
             @Override
@@ -162,7 +162,7 @@ public abstract class IntegrationTest {
                 }
 
                 return OK(Text(text.toString()));
-            };
+            }
         },
         new HttpObject("/cookieSetter"){
             //String name, String value, String domain, String path, String expiration, Boolean secure
@@ -182,9 +182,8 @@ public abstract class IntegrationTest {
                 } catch (UnsupportedEncodingException e) {
                     return INTERNAL_SERVER_ERROR(e);
                 }
-            };
-        }
-                );
+            }
+        });
     }
 
     class PatchMethod extends EntityEnclosingMethod {
@@ -223,7 +222,7 @@ public abstract class IntegrationTest {
         // then
         assertEquals(200, response);
         List<Header> setCookies = sortByValue(Arrays.asList(request.getResponseHeaders("Set-Cookie")));
-        assertEquals(3, setCookies.size());;
+        assertEquals(3, setCookies.size());
 
         {
             String value = setCookies.get(0).getValue();
@@ -278,7 +277,8 @@ public abstract class IntegrationTest {
     @Test
     public void basicAuthentication(){
         // without authorization header
-        assertResource(new GetMethod("http://localhost:8080/secure"), "You must first log-in", 401, new HeaderSpec("WWW-Authenticate", "Basic realm=secure area"));
+        assertResource(new GetMethod("http://localhost:8080/secure"), "You must first log-in", 401,
+                new HeaderSpec("WWW-Authenticate", "Basic realm=secure area"));
 
         // with authorization header
         GetMethod get = new GetMethod("http://localhost:8080/secure");

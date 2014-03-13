@@ -37,54 +37,70 @@
  */
 package org.httpobjects.header.request;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.httpobjects.header.GenericHeaderField;
+import org.junit.Test;
 
 import java.util.List;
 
-import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class RequestHeaderTest {
-    
+
     @Test
-    public void makesItEasyToGetAllTheCookies(){
+    public void makesItEasyToGetAllTheCookies() {
         // given
         final Cookie nameCookie = new Cookie("name", "ralph");
         final Cookie ageCookie = new Cookie("age", "21");
         RequestHeader testSubject = new RequestHeader(
                 new CookieField(
-                        nameCookie, 
+                        nameCookie,
                         ageCookie
                 )
         );
         // when
         final List<Cookie> results = testSubject.cookies();
-        
+
         // then
         assertNotNull(results);
         assertEquals(2, results.size());
-        assertTrue(results.get(0)==nameCookie);
-        assertTrue(results.get(1)==ageCookie);
+        assertTrue(results.get(0) == nameCookie);
+        assertTrue(results.get(1) == ageCookie);
     }
-    
+
     @Test
-    public void makesItEasyToGetTheCookiesByName(){
+    public void makesItEasyToGetTheCookiesByName() {
         // given
         final Cookie nameCookie = new Cookie("name", "ralph");
         RequestHeader testSubject = new RequestHeader(
                 new CookieField(
-                        nameCookie, 
+                        nameCookie,
                         new Cookie("age", "21")
                 )
         );
-        
+
         // when
         List<Cookie> results = testSubject.cookiesNamed("name");
-        
+
         // then
         assertNotNull(results);
         assertEquals(1, results.size());
-        assertTrue(results.get(0)==nameCookie);
+        assertTrue(results.get(0) == nameCookie);
+    }
+
+    @Test
+    public void getCookieByNameWhenOtherHeaderFieldsArePresent() {
+        // Given
+        final Cookie jalapenoCookie = new Cookie("jalapenoCookie", "isTotallyFake");
+        final CookieField cookieField = new CookieField(jalapenoCookie);
+        final GenericHeaderField justAnotherHeaderField = new GenericHeaderField("aName", "aValue");
+        RequestHeader requestHeader = new RequestHeader(cookieField, justAnotherHeaderField);
+
+        // When
+        List<Cookie> results = requestHeader.cookiesNamed("jalapenoCookie");
+
+        // Then
+        assertNotNull(results);
+        assertEquals(1, results.size());
+        assertEquals(jalapenoCookie, results.get(0));
     }
 }
