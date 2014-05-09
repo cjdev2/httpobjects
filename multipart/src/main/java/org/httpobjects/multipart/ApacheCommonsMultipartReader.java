@@ -37,19 +37,15 @@ exception statement from your version.
  */
 package org.httpobjects.multipart;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.Map;
-
+import org.apache.commons.fileupload.FileUploadBase;
 import org.apache.commons.fileupload.MultipartStream.MalformedStreamException;
 import org.apache.commons.fileupload.ParameterParser;
 import org.apache.commons.fileupload.UsableMultipartStream;
 import org.httpobjects.Representation;
 import org.httpobjects.multipart.header.MimePartHeader;
+
+import java.io.*;
+import java.util.Map;
 
 public class ApacheCommonsMultipartReader extends MultipartReader {
 
@@ -85,8 +81,10 @@ public class ApacheCommonsMultipartReader extends MultipartReader {
     public MimePartHeader readNextPartHeader() {
         try {
             return new MimePartHeader(stream.readHeaders());
+        } catch (FileUploadBase.FileUploadIOException e) {
+            throw new RuntimeException(e.getMessage(), e);
         } catch (MalformedStreamException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
