@@ -37,16 +37,14 @@
  */
 package org.httpobjects.util.impl;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-
-import junit.framework.Assert;
-import junit.framework.AssertionFailedError;
-
-import org.junit.Test;
 
 public class WrapperForInsecureClassloaderTest {
     
@@ -102,11 +100,11 @@ public class WrapperForInsecureClassloaderTest {
     }
     
     private static void assertArrayEquals(byte[] expected, byte[] actual){
-        if(expected.length!=actual.length) throw new AssertionFailedError("expected " + expected.length + " bytes but received " + actual.length);
+        if(expected.length!=actual.length) Assert.fail("expected " + expected.length + " bytes but received " + actual.length);
         for(int x=0;x<expected.length;x++){
             final byte byteExpected = expected[x];
             final byte actualByte = actual[x];
-            if(byteExpected!=actualByte) throw new AssertionFailedError("expected " + Byte.toString(byteExpected) + " at byte #" + x + ", but found " + Byte.toString(actualByte));
+            if(byteExpected!=actualByte) Assert.fail("expected " + Byte.toString(byteExpected) + " at byte #" + x + ", but found " + Byte.toString(actualByte));
         }
     }
     private static byte[] toByteArray(InputStream is){
