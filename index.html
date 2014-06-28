@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="jquery-1.7.2.min.js"></script>
+		<style type="text/css">
+            .bad {
+                font-style:italic;
+                text-decoration: line-through;
+            }
+            .sticky {
+                background-image: url('yellow_sticky_note.jpg');
+                background-repeat:no-repeat;
+                background-position:center top; 
+                width:240;
+                height:130px;
+                display:inline-block;
+                text-align:center;
+            }
+            .stickytext {
+                margin-top:40px;
+            }
+            .header {
+                text-align:center;
+                font-size: 21pt;
+                font-family:sans-serif;
+                margin:0px;
+                margin-top:10px;
+                padding:20px;
+                padding-bottom:10px;
+                background-color:white;
+            }
+            
+            body {
+                margin:0px;
+		background:#eeeeee;
+                padding:0px;
+            }
+            .heading {
+                color:grey;
+                font-size:25pt;
+                font-weight:normal;
+            }
+            .section {
+                margin:20px;
+            }
+            .section-text {
+                margin:5px;
+                margin-top:20px;
+                font-family:sans-serif;
+            }
+            pre {
+                border:2px solid grey;
+                padding:10px;
+            }
+            .mainLink a:link {text-decoration: none; color:white;}
+            .mainLink a:visited {text-decoration: none; color:white;}
+            .mainLink a:active {text-decoration: none; color:white;}
+            .mainLink a:hover {text-decoration: underline; color: white;}
+		</style>
+        <title>httpobjects</title>
+    </head>
+    <body>
+        <div class="mainLink" style="background:grey;color:white;font-family:sans-serif;font-weight:bold;font-size:14pt;padding:10px;text-align:left;margin-bottom:0px;border-bottom:1px solid #eeeeee;">
+		<a id="home-link" href="">[httpobjects]</a> 
+		<div style="float:right;">
+			<a id="examples-link" href="">USE</a> | 
+			<a id="who-link" href="">WHO</a> | 
+			<a href="https://github.com/cjdev/httpobjects">GITHUB</a> 
+		</div>
+	</div>
+	<div style="background:white;padding-bottom:50px;margin-top:0px;">
+	<div>&nbsp</div>
+        <div style="" id="overview">
+            <div class="header">
+                <div class="sticky"><div class="stickytext"><span class="bad">magic</span> simple</div></div>  
+                <div class="sticky"><div class="stickytext"><span class="bad">web</span> http</div></div>
+                <div class="sticky"><div class="stickytext"><span class="bad">framework</span> tool</div></div>
+            </div>
+            <div class="section"><div class="heading">httpobjects is servlets, done right</div><div class="section-text">httpobjects is a tool you can use to implement http resources in jvm languages like java and scala.</div></div>
+            <div class="section">
+                <div class="heading">embrace http</div>
+                <div class="section-text">httpobjects is a web technology that encourages you to think in http</div>
+            </div>
+    <div class="section"><div class="heading">no magic</div><div class="section-text">httpobjects is the web 'anti-framework'.  It favors 'simple code' over framework-driven magic.</div></div>
+        </div>
+        <div style="display:none;" id="examples">
+            <div class="section"><div class="heading">containerless java</div>
+                <div class="section-text">
+                    <pre>
+import org.httpobjects.*;
+import org.httpobjects.jetty.HttpObjectsJettyHandler;
+
+public class Example {
+    public static void main(String[] args){
+        HttpObjectsJettyHandler.launchServer(8080, new HttpObject("/speak"){
+        	@Override
+        	public Response get(Request req) {
+        		return OK(Html("Hello World"));
+        	}
+        });
+    }
+}
+</pre>
+                </div>
+            </div>
+<div class="section"><div class="heading">containerless scala</div>
+                <div class="section-text">
+                    <pre>
+import org.httpobjects.jetty.HttpObjectsJettyHandler
+import org.httpobjects._
+import org.httpobjects.DSL._
+
+object Example {
+  def main(args: Array[String]) {
+    HttpObjectsJettyHandler.launchServer(8080, 
+      new HttpObject("/speak"){
+        override def get(request:Request) = OK(Html("Hello World"))
+      }
+    )
+  }
+}
+</pre>
+                </div>
+            </div>
+<div class="section"><div class="heading">.war integration</div>
+                <div class="section-text">
+<ol><li>Create a subclass of <a href="https://github.com/stupenrose/httpobjects/blob/master/servlet/src/main/java/org/httpobjects/servlet/ServletFilter.java">org.httpobjects.servlet.ServletFilter</a> that references your httpobjects</li><li>Register that class as a filter in your web.xml</li></ol>
+                </div>
+            </div>
+        </div>
+
+	<div id="who" style="display:none;">
+		<div class="section">
+			<div class="section">
+			<div class="heading">corporate sponsor</div>
+	                <div class="section-text">
+        	                <div>
+					<a href="http://cj.com"><img src="cj-logo.png" style=""/></a>
+                	                <div style="margin:10px;margin-left:80px;font-size:10pt;">Httpobjects was born as a thought experiment in response to needs at CJ.  CJ has also been an early adopter, using httpobjects in a variety of internal projects and generously providing developer time to address bugs and limitations.</div>
+                        	</div>
+                	</div>
+                </div>
+
+		<div class="heading">core development team</div>
+	                <div class="section-text">
+				<div>
+					<img src="https://secure.gravatar.com/avatar/83eb919967f6232e6ca236dac4bab265" style="vertical-align:middle;float:left;"/>
+					<div style="font-size:14pt;font-weight:bold;">Stu Penrose</div>
+					<div style="margin:10px;font-size:10pt;">Stu is a senior engineer and team lead at <a href="http://cj.com">Commission Junction</a>.  httpobjects was his idea, and he is the driving force behind the project.</div>
+					<div style="clear:both;"/>
+				</div>
+                	</div>
+                </div>
+
+	</div>
+	</div>
+	</div>
+		<hr style="padding-top:0px;margin-top:0px;"/>
+		<div style="float:right;margin-right:50px; margin-top:20px;font-family:sans-serif;"><a href="http://cj.com"><img style="height:75px;" src="cj-badge.png"></img></a></div>
+
+        <script>
+            var examplesLink = $("#examples-link"), homeLink = $("#home-link"), whoLink = $("#who-link"), overviewPage = $("#overview"), examplesPage = $("#examples"), whoPage = $("#who");
+		
+            console.log(examplesLink.length);
+
+            examplesLink.click(function(event){
+                event.preventDefault();
+                overviewPage.hide();
+                examplesPage.show();
+		whoPage.hide();
+            });
+		
+            homeLink.click(function(event){
+                event.preventDefault();
+                overviewPage.show();
+                examplesPage.hide();
+		whoPage.hide();
+            });
+
+	    whoLink.click(function(event){
+		event.preventDefault();
+                overviewPage.hide();
+                examplesPage.hide();
+		whoPage.show();
+	    });
+        </script>
+    </body>
+</html>
