@@ -256,7 +256,7 @@ public class DSL {
     }
     @Deprecated
     /**
-     * @deprecated This response code must included an Allow header. http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.6
+     * @deprecated This response code must include an Allow header. http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.6
      * @see DSL#METHOD_NOT_ALLOWED(org.httpobjects.util.Method...) 
      */
     public static final Response METHOD_NOT_ALLOWED(){
@@ -264,7 +264,7 @@ public class DSL {
     }
     @Deprecated
     /**
-     * @deprecated This response code must included an Allow header. http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.6
+     * @deprecated This response code must include an Allow header. http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.6
      * @see DSL#METHOD_NOT_ALLOWED(Representation, org.httpobjects.util.Method...)
      */
     public static final Response METHOD_NOT_ALLOWED(Representation representation){
