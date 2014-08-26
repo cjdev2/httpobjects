@@ -37,39 +37,21 @@
  */
 package org.httpobjects.header.response;
 
-import org.httpobjects.header.HeaderField;
-import org.httpobjects.header.HeaderFieldVisitor;
+import org.httpobjects.util.Method;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class WWWAuthenticateField extends HeaderField {
-	public enum Method{Basic}
-	
-	private final Method method;
-	private final String realmName;
-
-	public WWWAuthenticateField(Method method, String realmName) {
-		super();
-		this.method = method;
-		this.realmName = realmName;
-	}
-	@Override
-	public <T> T accept(HeaderFieldVisitor<T> visitor) {
-		return visitor.visit(this);
-	}
-	public Method method() {
-		return method;
-	}
-	
-	public String realmName() {
-		return realmName;
-	}
-
-    @Override
-    public String name() {
-        return "WWW-Authenticate";
+public class AllowFieldTest {
+    @Test
+    public void testValue() {
+        AllowField allowField = new AllowField(Method.GET, Method.DELETE);
+        Assert.assertEquals("GET, DELETE", allowField.value());
     }
-
-    @Override
-    public String value() {
-        return  method.name() + " realm=" + realmName;
+    
+    @Test
+    public void testName() {
+        AllowField allowField = new AllowField();
+        Assert.assertEquals("Allow", allowField.name());
     }
+    
 }

@@ -39,37 +39,35 @@ package org.httpobjects.header.response;
 
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.HeaderFieldVisitor;
+import org.httpobjects.util.Method;
 
-public class WWWAuthenticateField extends HeaderField {
-	public enum Method{Basic}
-	
-	private final Method method;
-	private final String realmName;
+public class AllowField extends HeaderField {
 
-	public WWWAuthenticateField(Method method, String realmName) {
-		super();
-		this.method = method;
-		this.realmName = realmName;
-	}
-	@Override
-	public <T> T accept(HeaderFieldVisitor<T> visitor) {
-		return visitor.visit(this);
-	}
-	public Method method() {
-		return method;
-	}
-	
-	public String realmName() {
-		return realmName;
-	}
+    private Method[] allowed;
+
+    public AllowField(Method... allowed) {
+        this.allowed = allowed;
+    }
+
+    @Override
+    public <T> T accept(HeaderFieldVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
 
     @Override
     public String name() {
-        return "WWW-Authenticate";
+        return "Allow";
     }
 
     @Override
     public String value() {
-        return  method.name() + " realm=" + realmName;
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < allowed.length; i++) {
+            sb.append(allowed[i].toString());
+            if(i < allowed.length-1) {
+                sb.append(", ");
+            }
+        }
+        return sb.toString();
     }
 }

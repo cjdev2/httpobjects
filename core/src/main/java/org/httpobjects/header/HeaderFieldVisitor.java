@@ -39,6 +39,7 @@ package org.httpobjects.header;
 
 import org.httpobjects.header.request.AuthorizationField;
 import org.httpobjects.header.request.CookieField;
+import org.httpobjects.header.response.AllowField;
 import org.httpobjects.header.response.LocationField;
 import org.httpobjects.header.response.SetCookieField;
 import org.httpobjects.header.response.WWWAuthenticateField;
@@ -55,4 +56,6 @@ public interface HeaderFieldVisitor<T> {
 	T visit(CookieField cookieField);
 	
 	T visit(GenericHeaderField other);
+
+    T visit(AllowField allowField);
 }

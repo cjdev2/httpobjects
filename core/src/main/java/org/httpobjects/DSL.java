@@ -43,10 +43,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.httpobjects.header.HeaderField;
+import org.httpobjects.header.response.AllowField;
 import org.httpobjects.header.response.LocationField;
 import org.httpobjects.header.response.SetCookieField;
 import org.httpobjects.header.response.WWWAuthenticateField;
 import org.httpobjects.representation.BinaryRepresentation;
+import org.httpobjects.util.Method;
 import org.httpobjects.util.impl.ClassResourceLoader;
 import org.httpobjects.util.impl.ResourceLoader;
 import org.httpobjects.util.impl.WrapperForInsecureClassloader;
@@ -201,7 +203,7 @@ public class DSL {
         if(subsequent!=null){
             items.addAll(Arrays.asList(subsequent));
         }
-        return items.toArray(new HeaderField[]{});
+        return items.toArray(new HeaderField[items.size()]);
     }
 
 
@@ -252,11 +254,27 @@ public class DSL {
     public static final Response NOT_FOUND(Representation representation){
         return new Response(ResponseCode.NOT_FOUND, representation);
     }
+    @Deprecated
+    /**
+     * @deprecated This response code must included an Allow header. http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.6
+     * @see DSL#METHOD_NOT_ALLOWED(org.httpobjects.util.Method...) 
+     */
     public static final Response METHOD_NOT_ALLOWED(){
         return new Response(ResponseCode.METHOD_NOT_ALLOWED, Text("405 Client Error: Method Not Allowed"));
     }
+    @Deprecated
+    /**
+     * @deprecated This response code must included an Allow header. http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.6
+     * @see DSL#METHOD_NOT_ALLOWED(Representation, org.httpobjects.util.Method...)
+     */
     public static final Response METHOD_NOT_ALLOWED(Representation representation){
         return new Response(ResponseCode.METHOD_NOT_ALLOWED, representation);
+    }
+    public static final Response METHOD_NOT_ALLOWED(Representation representation, Method... allowed){
+        return new Response(ResponseCode.METHOD_NOT_ALLOWED, representation, new AllowField(allowed));
+    }
+    public static final Response METHOD_NOT_ALLOWED(Method... allowed) {
+        return METHOD_NOT_ALLOWED(Text("405 Client Error: Method Not Allowed"), allowed);
     }
     public static final Response NOT_ACCEPTABLE(){
         return new Response(ResponseCode.NOT_ACCEPTABLE, Text("406 Client Error: Not Acceptable"));
