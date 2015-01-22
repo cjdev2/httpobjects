@@ -20,6 +20,7 @@ import org.httpobjects.header.request.CookieField;
 import org.httpobjects.header.request.RequestHeader;
 import org.httpobjects.netty.http.HttpChannelHandler;
 import org.httpobjects.path.Path;
+import org.httpobjects.path.PathPattern;
 import org.httpobjects.util.HttpObjectUtil;
 import org.httpobjects.util.Method;
 import org.jboss.netty.handler.codec.http.HttpChunkTrailer;
@@ -40,10 +41,11 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 		final String uri = request.getUri();
 		
 		for(HttpObject next : objects){
-			if(next.pattern().matches(uri)){
+		    final PathPattern pattern = next.pattern();
+			if(pattern.matches(uri)){
 				HttpObject match = null;
 				match = next;
-				Request in = readRequest(request, lastChunk, body);
+				Request in = readRequest(pattern, request, lastChunk, body);
 				Method m = Method.fromString(request.getMethod().getName());
 				Response out = HttpObjectUtil.invokeMethod(match, m, in);
 				if(out!=null) return out;
@@ -53,12 +55,12 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
         return defaultResponse;
 	}
 	
-	private Request readRequest(final HttpRequest request, final HttpChunkTrailer lastChunk, final byte[] body) {
+	private Request readRequest(final PathPattern pathPattern, final HttpRequest request, final HttpChunkTrailer lastChunk, final byte[] body) {
 		return new Request(){
 			
 			@Override
 			public boolean hasRepresentation() {
-				throw notImplemented();
+			    return body!=null;
 			}
 
 			@Override
@@ -88,12 +90,12 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 			
 			@Override
 			public Request immutableCopy() {
-				throw notImplemented();
+				return this;
 			}
 			
 			@Override
 			public Path path() {
-                return new Path(jdkURL().getPath());
+			    return pathPattern.match(jdkURL().getPath());
 			}
 			
 			private URL jdkURL(){
@@ -112,7 +114,6 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 			
 			@Override
 			public Representation representation() {
-				
 				
 				return new Representation(){
 					@Override
@@ -133,9 +134,6 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 				};
 			}
 			
-			private RuntimeException notImplemented(){
-				return new RuntimeException("not implemented");
-			}
 		};
 	}
 	

@@ -41,7 +41,7 @@ package org.httpobjects.netty;
 import java.util.Arrays;
 
 import org.httpobjects.HttpObject;
-import org.httpobjects.jetty.IntegrationTest;
+import org.httpobjects.tck.IntegrationTest;
 import org.jboss.netty.channel.Channel;
 
 public class NettyIntegrationTest extends IntegrationTest {

@@ -38,9 +38,10 @@
 package org.httpobjects.jetty;
 
 import org.httpobjects.HttpObject;
+import org.httpobjects.tck.IntegrationTest;
 import org.mortbay.jetty.Server;
 
-public class JettyIntegrationTest extends IntegrationTest {
+public class Jetty6IntegrationTest extends IntegrationTest {
 	private static Server jetty;
 	
 	@Override

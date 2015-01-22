@@ -39,6 +39,7 @@ package org.httpobjects.jetty;
 
 import org.eclipse.jetty.server.Server;
 import org.httpobjects.HttpObject;
+import org.httpobjects.tck.IntegrationTest;
 
 public class JettyIntegrationTest extends IntegrationTest {
 	private static Server jetty;
