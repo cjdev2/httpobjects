@@ -27,10 +27,12 @@ import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
 public class HttpServerPipelineFactory implements ChannelPipelineFactory {
 	
 	private final RequestHandler handler;
+	private final ByteAccumulatorFactory accumulatorFactory;
 	
-    public HttpServerPipelineFactory(RequestHandler handler) {
+    public HttpServerPipelineFactory(RequestHandler handler, ByteAccumulatorFactory accumulatorFactory) {
 		super();
 		this.handler = handler;
+		this.accumulatorFactory = accumulatorFactory;
 	}
 
 	public ChannelPipeline getPipeline() throws Exception {
@@ -48,7 +50,7 @@ public class HttpServerPipelineFactory implements ChannelPipelineFactory {
         pipeline.addLast("encoder", new HttpResponseEncoder());
         // Remove the following line if you don't want automatic content compression.
         pipeline.addLast("deflater", new HttpContentCompressor());
-        pipeline.addLast("handler", new HttpChannelHandler(handler));
+        pipeline.addLast("handler", new HttpChannelHandler(handler, accumulatorFactory.newAccumulator()));
         return pipeline;
     }
 }

@@ -1,6 +1,7 @@
 package org.httpobjects.netty;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -18,6 +19,7 @@ import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.request.AuthorizationField;
 import org.httpobjects.header.request.CookieField;
 import org.httpobjects.header.request.RequestHeader;
+import org.httpobjects.netty.http.ByteAccumulator;
 import org.httpobjects.netty.http.HttpChannelHandler;
 import org.httpobjects.path.Path;
 import org.httpobjects.path.PathPattern;
@@ -36,7 +38,7 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 	}
 	
 	@Override
-	public Response respond(HttpRequest request, HttpChunkTrailer lastChunk, byte[] body) {
+	public Response respond(HttpRequest request, HttpChunkTrailer lastChunk, ByteAccumulator body) {
 		
 		final String uri = request.getUri();
 		
@@ -55,7 +57,7 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
         return defaultResponse;
 	}
 	
-	private Request readRequest(final PathPattern pathPattern, final HttpRequest request, final HttpChunkTrailer lastChunk, final byte[] body) {
+	private Request readRequest(final PathPattern pathPattern, final HttpRequest request, final HttpChunkTrailer lastChunk, final ByteAccumulator body) {
 		return new Request(){
 			
 			@Override
@@ -125,12 +127,24 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 					public void write(OutputStream out) {
 						try {
 							if(body!=null){
-								out.write(body);
+							    InputStream data = body.toStream();
+					            copy(out, data);
 							}
 						} catch (IOException e) {
 							throw new RuntimeException(e);
 						}
 					}
+
+                    private void copy(OutputStream out, InputStream data) throws IOException {
+                        byte[] buffer = new byte[1024 * 10];
+                        int x;
+                        while((x = data.read(buffer))!=-1){
+                            System.out.println("read " + x);
+                            out.write(buffer, 0, x);
+                        }
+                        out.close();
+                        data.close();
+                    }
 				};
 			}
 			

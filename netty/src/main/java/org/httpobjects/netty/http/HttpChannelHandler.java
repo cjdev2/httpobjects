@@ -54,17 +54,17 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 public class HttpChannelHandler extends SimpleChannelUpstreamHandler {
 	
 	public static interface RequestHandler {
-		Response respond(HttpRequest request, HttpChunkTrailer lastChunk, byte[] body);
+		Response respond(HttpRequest request, HttpChunkTrailer lastChunk, ByteAccumulator body);
 	}
 	
 	private final RequestHandler handler;
+	private final ByteAccumulator contentAccumulator;
     private HttpRequest request;
     private boolean readingChunks;
-    /** Buffer that stores the response content */
-    private ByteArrayOutputStream buf = new ByteArrayOutputStream();
     
-    public HttpChannelHandler(RequestHandler handler) {
+    public HttpChannelHandler(RequestHandler handler, ByteAccumulator contentAccumulator) {
 		this.handler = handler;
+		this.contentAccumulator = contentAccumulator;
 	}
 
 	@Override
@@ -75,19 +75,16 @@ public class HttpChannelHandler extends SimpleChannelUpstreamHandler {
             if (is100ContinueExpected(request)) {
                 send100Continue(e);
             }
-            
 
             if (request.isChunked()) {
                 readingChunks = true;
             } else {
                 ChannelBuffer content = request.getContent();
                 if (content.readable()) {
-//                    buf.append("CONTENT: " + content.toString(CharsetUtil.UTF_8) + "\r\n");
                 	writeToBuffer(content);
                 }
                 
-            	writeResponse(e.getChannel(), handler.respond(request, null, buf.toByteArray()));
-//                writeResponse(e);
+            	writeResponse(e.getChannel(), handler.respond(request, null, contentAccumulator));
             }
         } else {
             HttpChunk chunk = (HttpChunk) e.getMessage();
@@ -95,29 +92,17 @@ public class HttpChannelHandler extends SimpleChannelUpstreamHandler {
                 readingChunks = false;
 
                 HttpChunkTrailer trailer = (HttpChunkTrailer) chunk;
-//                if (!trailer.getHeaderNames().isEmpty()) {
-//                    buf.append("\r\n");
-//                    for (String name: trailer.getHeaderNames()) {
-//                        for (String value: trailer.getHeaders(name)) {
-//                            buf.append("TRAILING HEADER: " + name + " = " + value + "\r\n");
-//                        }
-//                    }
-//                    buf.append("\r\n");
-//                }
                 writeToBuffer(trailer.getContent());
-            	writeResponse(e.getChannel(), handler.respond(request, trailer, buf.toByteArray()));
-//                writeResponse(e);
+            	writeResponse(e.getChannel(), handler.respond(request, trailer, contentAccumulator));
             } else {
             	writeToBuffer(chunk.getContent());
-            	
-//                buf.append("CHUNK: " + chunk.getContent().toString(CharsetUtil.UTF_8) + "\r\n");
             }
         }
     }
 
 
 	private void writeToBuffer(ChannelBuffer content) throws IOException {
-		content.getBytes(0, buf, content.capacity());
+		content.getBytes(0, contentAccumulator.out(), content.capacity());
 	}
 
 	private byte[] read(Response out) {
