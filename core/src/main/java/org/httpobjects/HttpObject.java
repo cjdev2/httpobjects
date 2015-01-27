@@ -38,22 +38,34 @@
 package org.httpobjects;
 
 import org.httpobjects.path.PathPattern;
+import org.httpobjects.path.SimplePathPattern;
 
 public class HttpObject extends DSL{
 
     private final PathPattern pathPattern;
     private final Response defaultResponse;
 
-    public HttpObject(String pathPattern, Response defaultResponse) {
+    public HttpObject(PathPattern pathPattern, Response defaultResponse) {
         super();
-        this.pathPattern = new PathPattern(pathPattern);
+        this.pathPattern = pathPattern;
         this.defaultResponse = defaultResponse;
     }
+    
+    public HttpObject(String pathPattern, Response defaultResponse) {
+        this(new SimplePathPattern(pathPattern), defaultResponse);
+    }
 
-    public HttpObject(String pathPattern) {
+    public HttpObject(PathPattern pathPattern) {
         this(pathPattern, METHOD_NOT_ALLOWED());
     }
 
+    public HttpObject(String pathPattern) {
+        this(new SimplePathPattern(pathPattern));
+    }
+
+    
+    
+    
     public PathPattern pattern() {
         return pathPattern;
     }

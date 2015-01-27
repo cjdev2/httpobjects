@@ -37,54 +37,26 @@
  */
 package org.httpobjects.util;
 
-import java.io.InputStream;
+import static org.junit.Assert.*;
 
-import org.httpobjects.HttpObject;
-import org.httpobjects.Request;
-import org.httpobjects.Response;
-import org.httpobjects.util.impl.ClassResourceLoader;
-import org.httpobjects.util.impl.ResourceLoader;
-import org.httpobjects.util.impl.WrapperForInsecureClassloader;
+import org.junit.Test;
 
-public class ClasspathResourcesObject  extends HttpObject {
-    private static final String PATH_VAR_NAME = "resource";
-	private final ResourceLoader loader;
-	private final String prefix;
-	
-	public ClasspathResourcesObject(String pathPattern, Class<?> relativeTo) {
-		this(pathPattern, relativeTo, "");
-	}
+public class ClasspathResourcesObjectTest {
 
-	public ClasspathResourcesObject(String pathPattern, Class<?> relativeTo, String prefix) {
-		super(pathPattern, null);
-		if(!pattern().varNames().contains(PATH_VAR_NAME)) throw new RuntimeException("Must have a path var named '" + PATH_VAR_NAME + "', but there is none in '" + pathPattern + "'.  Hint: maybe you meant '" + pathPattern + "/{resource*}' ?"); 
-		this.prefix = (!prefix.equals("") && !prefix.endsWith("/"))? prefix + "/" : prefix;
-		this.loader = new WrapperForInsecureClassloader(new ClassResourceLoader(relativeTo));
-	}
+    @Test
+    public void failsFastIfThePathVarIsMissing() {
+        // given
+        
+        // when
+        Exception err = null;
+        try{
+            new ClasspathResourcesObject("/foo", getClass(), "/resources");
+        }catch(Exception e){
+            err = e;
+        }
+        // then
+        assertNotNull(err);
+        assertEquals("Must have a path var named 'resource', but there is none in '/foo'.  Hint: maybe you meant '/foo/{resource*}' ?", err.getMessage());
+    }
 
-	@Override
-	public Response get(Request req) {
-		final String resource = req.path().valueFor(PATH_VAR_NAME);
-		if(isNullOrEmpty(resource) ||  resource.endsWith("/")) return null;
-		
-		final InputStream data = loader.getResourceAsStream(prefix + resource);
-		
-		if(data!=null){
-			return OK(Bytes(mimeTypeFor(resource), data));
-		}else{
-			return null;
-		}
-	}
-
-	private static String mimeTypeFor(String resource){
-		return ieCompat(new MimeTypeTool().guessMimeTypeFromName(resource));
-	}
-
-	private static String ieCompat(String t) {
-		return t.equals("text/html")?"text/html;charset=utf-8":t;
-	}
-
-	private boolean isNullOrEmpty(String t){
-		return t==null || t.trim().isEmpty();
-	}
 }

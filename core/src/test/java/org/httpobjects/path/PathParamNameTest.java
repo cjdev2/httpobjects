@@ -37,28 +37,15 @@
  */
 package org.httpobjects.path;
 
-public class PathParamName {
-	final String name;
+import static org.junit.Assert.assertEquals;
 
-	public PathParamName(String name) {
-		super();
-		this.name = name;
-	}
-	
-	public PathParam withValue(String value){
-		return new PathParam(this, value);
-	}
-	
-	@Override
-	public boolean equals(Object obj) {
-	    if(obj instanceof PathParamName){
-	        return ((PathParamName)obj).name.equals(name);
-	    }
-	    return name.equals(obj);
-	}
-	
-	@Override
-	public int hashCode() {
-	    return name.hashCode();
-	}
+import org.junit.Test;
+
+public class PathParamNameTest {
+
+    @Test
+    public void equalsWorksOnStringsToo() {
+        assertEquals(new PathParamName("foo"), "foo");
+    }
+
 }
