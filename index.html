@@ -1,8 +1,16 @@
 <!DOCTYPE html>
 <html>
     <head>
+    <link href="prettify/prettify.css" type="text/css" rel="stylesheet" />
+    <!--<link href="prettify/desert.css" type="text/css" rel="stylesheet" />-->
+    <script type="text/javascript" src="prettify/prettify.js"></script>
+
         <script src="jquery-1.7.2.min.js"></script>
 		<style type="text/css">
+            pre.prettyprint {
+              padding:10px;
+              border:1px solid rgba(128, 128, 128, 0.18);
+            }
             .bad {
                 font-style:italic;
                 text-decoration: line-through;
@@ -39,6 +47,8 @@
                 color:grey;
                 font-size:25pt;
                 font-weight:normal;
+                font-family:monospace;
+                border-bottom:1px solid grey;
             }
             .section {
                 margin:20px;
@@ -49,7 +59,7 @@
                 font-family:sans-serif;
             }
             pre {
-                border:2px solid grey;
+                border:0px;
                 padding:10px;
             }
             .mainLink a:link {text-decoration: none; color:white;}
@@ -59,53 +69,61 @@
 		</style>
         <title>httpobjects</title>
     </head>
-    <body>
+    <body onload="prettyPrint()">
         <div class="mainLink" style="background:grey;color:white;font-family:sans-serif;font-weight:bold;font-size:14pt;padding:10px;text-align:left;margin-bottom:0px;border-bottom:1px solid #eeeeee;">
 		<a id="home-link" href="">[httpobjects]</a> 
 		<div style="float:right;">
-			<a id="examples-link" href="">USE</a> | 
-			<a id="who-link" href="">WHO</a> | 
 			<a href="https://github.com/cjdev/httpobjects">GITHUB</a> 
 		</div>
 	</div>
 	<div style="background:white;padding-bottom:50px;margin-top:0px;">
 	<div>&nbsp</div>
-        <div style="" id="overview">
-            <div class="header">
-                <div class="sticky"><div class="stickytext"><span class="bad">magic</span> simple</div></div>  
-                <div class="sticky"><div class="stickytext"><span class="bad">web</span> http</div></div>
-                <div class="sticky"><div class="stickytext"><span class="bad">framework</span> tool</div></div>
-            </div>
-            <div class="section"><div class="heading">httpobjects is servlets, done right</div><div class="section-text">httpobjects is a tool you can use to implement http resources in jvm languages like java and scala.</div></div>
+        <div id="overview">
             <div class="section">
-                <div class="heading">embrace http</div>
+                
+            <div class="heading">why httpobjects?</div>
+                <h2>httpobjects is servlets, done right</h2><div class="section-text">httpobjects is a tool you can use to implement http resources in jvm languages like java and scala.</div></div>
+            <div class="section">
+                <h2>embrace http</h2>
                 <div class="section-text">httpobjects is a web technology that encourages you to think in http</div>
             </div>
-    <div class="section"><div class="heading">no magic</div><div class="section-text">httpobjects is the web 'anti-framework'.  It favors 'simple code' over framework-driven magic.</div></div>
+    <div class="section"><h2>no magic</h2><div class="section-text">httpobjects is the web 'anti-framework'.  It favors 'simple code' over framework-driven magic.</div></div>
         </div>
-        <div style="display:none;" id="examples">
-            <div class="section"><div class="heading">containerless java</div>
+        <div id="examples">
+
+            <div class="section">
+                
+    <div class="heading">quick start</div>
                 <div class="section-text">
-                    <pre>
+                    <pre class="prettyprint">
+/**
+ * Containerless Java
+ */
 import org.httpobjects.*;
 import org.httpobjects.jetty.HttpObjectsJettyHandler;
 
 public class Example {
     public static void main(String[] args){
-        HttpObjectsJettyHandler.launchServer(8080, new HttpObject("/speak"){
-        	@Override
-        	public Response get(Request req) {
-        		return OK(Html("Hello World"));
-        	}
-        });
+
+        HttpObject speaker = new HttpObject("/speak"){
+            @Override
+            public Response get(Request req) {
+                return OK(Html("Hello World"));
+            }
+        };
+
+        HttpObjectsJettyHandler.launchServer(8080, speaker);
     }
 }
 </pre>
                 </div>
             </div>
-<div class="section"><div class="heading">containerless scala</div>
+<div class="section">
                 <div class="section-text">
-                    <pre>
+                    <pre class="prettyprint">
+/**
+  * Containerless Scala
+  */
 import org.httpobjects.jetty.HttpObjectsJettyHandler
 import org.httpobjects._
 import org.httpobjects.DSL._
@@ -122,17 +140,15 @@ object Example {
 </pre>
                 </div>
             </div>
-<div class="section"><div class="heading">.war integration</div>
+<div class="section"><h2>.war integration</h2>
                 <div class="section-text">
-<ol><li>Create a subclass of <a href="https://github.com/stupenrose/httpobjects/blob/master/servlet/src/main/java/org/httpobjects/servlet/ServletFilter.java">org.httpobjects.servlet.ServletFilter</a> that references your httpobjects</li><li>Register that class as a filter in your web.xml</li></ol>
+<ol><li>Create a subclass of <a href="https://github.com/cjdev/httpobjects/blob/master/servlet/src/main/java/org/httpobjects/servlet/ServletFilter.java">org.httpobjects.servlet.ServletFilter</a> that references your httpobjects</li><li>Register that class as a filter in your web.xml</li></ol>
                 </div>
             </div>
         </div>
 
-	<div id="who" style="display:none;">
+	<div id="who" >
 		<div class="section">
-			<div class="section">
-			<div class="heading">corporate sponsor</div>
 	                <div class="section-text">
         	                <div>
 					<a href="http://cj.com"><img src="cj-logo.png" style=""/></a>
@@ -141,16 +157,6 @@ object Example {
                 	</div>
                 </div>
 
-		<div class="heading">core development team</div>
-	                <div class="section-text">
-				<div>
-					<img src="https://secure.gravatar.com/avatar/83eb919967f6232e6ca236dac4bab265" style="vertical-align:middle;float:left;"/>
-					<div style="font-size:14pt;font-weight:bold;">Stu Penrose</div>
-					<div style="margin:10px;font-size:10pt;">Stu is a senior engineer and team lead at <a href="http://cj.com">Commission Junction</a>.  httpobjects was his idea, and he is the driving force behind the project.</div>
-					<div style="clear:both;"/>
-				</div>
-                	</div>
-                </div>
 
 	</div>
 	</div>
