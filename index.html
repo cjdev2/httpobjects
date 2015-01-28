@@ -40,7 +40,7 @@
             
             body {
                 margin:0px;
-		background:#eeeeee;
+		        background:#eeeeee;
                 padding:0px;
             }
             .heading {
@@ -81,23 +81,119 @@
         <div id="overview">
             <div class="section">
                 
-            <div class="heading">why httpobjects?</div>
-                <h2>httpobjects is servlets, done right</h2><div class="section-text">httpobjects is a tool you can use to implement http resources in jvm languages like java and scala.</div></div>
-            <div class="section">
-                <h2>embrace http</h2>
-                <div class="section-text">httpobjects is a web technology that encourages you to think in http</div>
-            </div>
-    <div class="section"><h2>no magic</h2><div class="section-text">httpobjects is the web 'anti-framework'.  It favors 'simple code' over framework-driven magic.</div></div>
+            <div class="heading">what is httpobjects?</div>
+            <p>
+                <ul>
+                    <li>a watertight API for implementing JVM code that speaks http(s)</li>
+                    <li>implementations of that API for various popular http servers & containers</li>
+                    <li>a set of companion libraries for interoperating with various popular JVM libraries</li>
+                </ul>
+            </p>
+            <div class="heading">what are the design goals?</div>
+                    <ul>
+                        <li>immutable - everything expressed as pure functions</li>
+                        <li>watertight - strives to be a non-leaky abstraction of the http(s) protocol</li>
+                        <li>focused - do one thing, do it well</li>
+                        <li>performant - suitable for stream processing of very large requests</li>
+                        <li>portable - not tied to any other API, works well with popular JVM languages</li>
+                        <li>stable - suitable as a foundation for mission-critical components</li>
+                        <li>non-blocking - suitable for highly concurrent applications</li>
+                        <li>self-documenting - the API documents itself</li>
+                    </ul>
+
         </div>
         <div id="examples">
 
             <div class="section">
                 
-    <div class="heading">quick start</div>
+    <div class="heading">how do I get it?</div>
+    <p>httpobjects is available in <a href="http://search.maven.org/#search%7Cga%7C1%7Chttpobjects">maven central</a></p>
+
+    <pre class="prettyprint xml">
+<!-- You'll need the core API -->
+<dependency>
+    <groupId>org.httpobjects</groupId>
+    <artifactId>httpobjects</artifactId>
+    <version>0.7.0</version>
+</dependency>
+
+<!-- Plus one of the following implementations -->
+
+<dependency>
+    <groupId>org.httpobjects.servlet</groupId>
+    <artifactId>httpobjects-servlet</artifactId>
+    <version>0.7.0</version>
+</dependency>
+
+<dependency>
+    <groupId>org.httpobjects.jetty</groupId>
+    <artifactId>httpobjects-jetty-7-and-8</artifactId>
+    <version>0.7.0</version>
+</dependency>
+
+<dependency>
+    <groupId>org.httpobjects.jetty</groupId>
+    <artifactId>httpobjects-jetty-6</artifactId>
+    <version>0.7.0</version>
+</dependency>
+
+<dependency>
+    <groupId>org.httpobjects.netty</groupId>
+    <artifactId>httpobjects-netty</artifactId>
+    <version>0.7.0</version>
+</dependency>
+
+   </pre>
+<script>
+$(function(){
+    var tags = $("pre.xml");
+
+    tags.each(function(idx, tag){
+        var t = $(tag);
+        t.text(t.html());
+    });
+});
+</script>
+ 
+    <div class="heading">can I use my servlet/J2EE container?</div>
+
+    <p>Yes.  First, include the servlet implementation</p>
+<pre class="prettyprint xml">
+<dependency>
+    <groupid>org.httpobjects.servlet</groupid>
+    <artifactid>httpobjects-servlet</artifactid>
+    <version>0.7.0</version>
+</dependency>
+
+</pre>
+
+<p>
+Then:
+<ul><li>Create a subclass of <a href="https://github.com/cjdev/httpobjects/blob/master/servlet/src/main/java/org/httpobjects/servlet/ServletFilter.java">org.httpobjects.servlet.ServletFilter</a> that references your httpobjects</li><li>Register that class as a filter in your web.xml</li></ul>
+</p>
+
+    <div class="heading">can I use embedded jetty?</div>
+<p>Yes.  Choose one of the following:</p>
+<pre class="prettyprint xml">
+<dependency>
+    <groupId>org.httpobjects.jetty</groupId>
+    <artifactId>httpobjects-jetty-7-and-8</artifactId>
+    <version>0.7.0</version>
+</dependency>
+
+<dependency>
+    <groupId>org.httpobjects.jetty</groupId>
+    <artifactId>httpobjects-jetty-6</artifactId>
+    <version>0.7.0</version>
+</dependency>
+</pre>
+
+<p>And then launch the server:</p>
+
                 <div class="section-text">
                     <pre class="prettyprint">
 /**
- * Containerless Java
+ * Java
  */
 import org.httpobjects.*;
 import org.httpobjects.jetty.HttpObjectsJettyHandler;
@@ -122,7 +218,7 @@ public class Example {
                 <div class="section-text">
                     <pre class="prettyprint">
 /**
-  * Containerless Scala
+  * Scala
   */
 import org.httpobjects.jetty.HttpObjectsJettyHandler
 import org.httpobjects._
@@ -140,18 +236,56 @@ object Example {
 </pre>
                 </div>
             </div>
-<div class="section"><h2>.war integration</h2>
-                <div class="section-text">
-<ol><li>Create a subclass of <a href="https://github.com/cjdev/httpobjects/blob/master/servlet/src/main/java/org/httpobjects/servlet/ServletFilter.java">org.httpobjects.servlet.ServletFilter</a> that references your httpobjects</li><li>Register that class as a filter in your web.xml</li></ol>
-                </div>
-            </div>
-        </div>
+
+
+<div class="section">
+<div class="section-text">
+<div class="heading">can I use netty?</div>
+<p>Yes.  There is a sample netty implementation that you can either use as-is or modify to fit into your existing netty.</p>
+
+    <pre class="prettyprint xml">
+<!-- The netty implementation -->
+
+<dependency>
+    <groupId>org.httpobjects.netty</groupId>
+    <artifactId>httpobjects-netty</artifactId>
+    <version>0.7.0</version>
+</dependency>
+
+   </pre>
+
+<pre class="prettyprint">
+
+/**
+ * Java
+ */
+import org.httpobjects.*;
+import org.httpobjects.netty.HttpobjectsNettySupport;
+
+public class Example {
+    public static void main(String[] args){
+
+        HttpObject speaker = new HttpObject("/speak"){
+            @Override
+            public Response get(Request req) {
+                return OK(Html("Hello World"));
+            }
+        };
+
+        HttpobjectsNettySupport.serve(port, Arrays.asList(speaker));
+    }
+}
+
+</pre>
+</div>
+</div>
 
 	<div id="who" >
 		<div class="section">
 	                <div class="section-text">
+<div class="heading">who's responsible for this?</div>
         	                <div>
-					<a href="http://cj.com"><img src="cj-logo.png" style=""/></a>
+					<a href="http://engineering.cj.com/blog"><img src="cj-logo.png" style=""/></a>
                 	                <div style="margin:10px;margin-left:80px;font-size:10pt;">Httpobjects was born as a thought experiment in response to needs at CJ.  CJ has also been an early adopter, using httpobjects in a variety of internal projects and generously providing developer time to address bugs and limitations.</div>
                         	</div>
                 	</div>
@@ -161,34 +295,6 @@ object Example {
 	</div>
 	</div>
 	</div>
-		<hr style="padding-top:0px;margin-top:0px;"/>
-		<div style="float:right;margin-right:50px; margin-top:20px;font-family:sans-serif;"><a href="http://cj.com"><img style="height:75px;" src="cj-badge.png"></img></a></div>
 
-        <script>
-            var examplesLink = $("#examples-link"), homeLink = $("#home-link"), whoLink = $("#who-link"), overviewPage = $("#overview"), examplesPage = $("#examples"), whoPage = $("#who");
-		
-            console.log(examplesLink.length);
-
-            examplesLink.click(function(event){
-                event.preventDefault();
-                overviewPage.hide();
-                examplesPage.show();
-		whoPage.hide();
-            });
-		
-            homeLink.click(function(event){
-                event.preventDefault();
-                overviewPage.show();
-                examplesPage.hide();
-		whoPage.hide();
-            });
-
-	    whoLink.click(function(event){
-		event.preventDefault();
-                overviewPage.hide();
-                examplesPage.hide();
-		whoPage.show();
-	    });
-        </script>
     </body>
 </html>
