@@ -90,7 +90,7 @@
 		<module>demo</module>
                 <module>freemarker</module>
                 <module>jackson</module>
-                <module>netty</module>
+                <module>netty-3</module>
                 <module>test</module>
 		<module>multipart</module>
 	</modules>

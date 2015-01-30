@@ -7,7 +7,7 @@
 	</parent>
 
 	<groupId>org.httpobjects.netty</groupId>
-	<artifactId>httpobjects-netty</artifactId>
+	<artifactId>httpobjects-netty-3</artifactId>
 
 	<name>${artifactId}</name>
 	<build>
