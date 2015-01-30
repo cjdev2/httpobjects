@@ -127,23 +127,23 @@ public class HttpChannelHandler extends SimpleChannelUpstreamHandler {
         if(r.hasRepresentation()){
         	response.setContent(ChannelBuffers.copiedBuffer(read(r)));
         	if(r.representation().contentType() != null)
-        		response.setHeader(CONTENT_TYPE, r.representation().contentType());
+        		response.headers().set(CONTENT_TYPE, r.representation().contentType());
         }
         
         for(HeaderField field : r.header()){
-            response.addHeader(field.name(), field.value());
+            response.headers().add(field.name(), field.value());
         }
 
         if (keepAlive) {
             // Add 'Content-Length' header only for a keep-alive connection.
-            response.setHeader(CONTENT_LENGTH, response.getContent().readableBytes());
+            response.headers().set(CONTENT_LENGTH, response.getContent().readableBytes());
             // Add keep alive header as per:
             // - http://www.w3.org/Protocols/HTTP/1.1/draft-ietf-http-v11-spec-01.html#Connection
-            response.setHeader(CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
+            response.headers().set(CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
         }
 
         // Encode the cookie.
-        String cookieString = request.getHeader(COOKIE);
+        String cookieString = request.headers().get(COOKIE);
         if (cookieString != null) {
             CookieDecoder cookieDecoder = new CookieDecoder();
             Set<Cookie> cookies = cookieDecoder.decode(cookieString);
@@ -152,7 +152,7 @@ public class HttpChannelHandler extends SimpleChannelUpstreamHandler {
                 CookieEncoder cookieEncoder = new CookieEncoder(true);
                 for (Cookie cookie : cookies) {
                     cookieEncoder.addCookie(cookie);
-                    response.addHeader(SET_COOKIE, cookieEncoder.encode());
+                    response.headers().add(SET_COOKIE, cookieEncoder.encode());
                 }
             }
         }

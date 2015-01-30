@@ -26,6 +26,7 @@ import org.httpobjects.path.PathPattern;
 import org.httpobjects.util.HttpObjectUtil;
 import org.httpobjects.util.Method;
 import org.jboss.netty.handler.codec.http.HttpChunkTrailer;
+import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 
 public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.RequestHandler {
@@ -67,9 +68,10 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 
 			@Override
 			public RequestHeader header() {
-				List<HeaderField> headers = new ArrayList<HeaderField>();
-				for(String name: request.getHeaderNames()){
-					for(String value: request.getHeaders(name)){
+				List<HeaderField> results = new ArrayList<HeaderField>();
+				final HttpHeaders headers = request.headers(); 
+				for(String name: headers.names()){
+					for(String value: headers.getAll(name)){
 						final HeaderField field;
 						if(name.equals("Cookie")){
 							field = new CookieField(value);
@@ -78,13 +80,13 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 						}else{
 							field = new GenericHeaderField(name, value);
 						}
-						headers.add(field);
+						results.add(field);
 					}
 				}
-				return new RequestHeader(headers){
+				return new RequestHeader(results){
 					@Override
 					public AuthorizationField authorization() {
-						final String value = request.getHeader("Authorization");
+						final String value = headers.get("Authorization");
 						return value==null?null:AuthorizationField.parse(value);
 					}
 				};
@@ -120,7 +122,7 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 				return new Representation(){
 					@Override
 					public String contentType() {
-						return request.getHeader("ContentType");
+						return request.headers().get("ContentType");
 					}
 					
 					@Override
