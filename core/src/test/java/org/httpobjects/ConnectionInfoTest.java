@@ -37,6 +37,7 @@
  */
 package org.httpobjects;
 
+import static java.lang.Integer.valueOf;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
@@ -44,37 +45,84 @@ import org.junit.Test;
 public class ConnectionInfoTest {
 
     @Test
-    public void doesntAllowNullRemoteAddresses() {
+    public void whatGoesInMustComeOut(){
+        // when
+        ConnectionInfo testSubject = new ConnectionInfo("1.2.3.4", 8080, "4.3.2.1", 4433);
+
+        // then
+        assertEquals("4.3.2.1", testSubject.remoteAddress);
+        assertEquals(valueOf(4433), testSubject.remotePort);
+        assertEquals("1.2.3.4", testSubject.localAddress);
+        assertEquals(valueOf(8080), testSubject.localPort);
+    }
+
+
+    @Test
+    public void doesntAllowNullRemotePorts() {
         // given
-        final String remoteAddress = null;
-        
+        final Integer remotePort = null;
+
         // when
         Throwable t;
         try{
-            new ConnectionInfo("1.2.3.4", remoteAddress);
+            new ConnectionInfo("1.2.3.4", 8080, "4.3.2.1", remotePort);
             t = null;
         }catch(Throwable e){
             t = e;
         }
         assertEquals(IllegalArgumentException.class.getName(), t.getClass().getName());
         assertEquals("Null not allowed", t.getMessage());
-   }
+    }
+
+    @Test
+    public void doesntAllowNullRemoteAddresses() {
+        // given
+        final String remoteAddress = null;
+
+        // when
+        Throwable t;
+        try{
+            new ConnectionInfo("1.2.3.4", 8080, remoteAddress, 4433);
+            t = null;
+        }catch(Throwable e){
+            t = e;
+        }
+        assertEquals(IllegalArgumentException.class.getName(), t.getClass().getName());
+        assertEquals("Null not allowed", t.getMessage());
+    }
     
+    @Test
+    public void doesntAllowNullLocalPorts() {
+        // given
+        final Integer localPort = null;
+
+        // when
+        Throwable t;
+        try{
+            new ConnectionInfo("1.2.3.4", localPort, "4.3.2.1", 4433);
+            t = null;
+        }catch(Throwable e){
+            t = e;
+        }
+        assertEquals(IllegalArgumentException.class.getName(), t.getClass().getName());
+        assertEquals("Null not allowed", t.getMessage());
+    }
+
     @Test
     public void doesntAllowNullLocalAddresses() {
         // given
         final String localAddresses = null;
-        
+
         // when
         Throwable t;
         try{
-            new ConnectionInfo(localAddresses, "1.2.3.4");
+            new ConnectionInfo(localAddresses, 8080, "1.2.3.4", 4433);
             t = null;
         }catch(Throwable e){
             t = e;
         }
         assertEquals(IllegalArgumentException.class.getName(), t.getClass().getName());
         assertEquals("Null not allowed", t.getMessage());
-   }
+    }
 
 }

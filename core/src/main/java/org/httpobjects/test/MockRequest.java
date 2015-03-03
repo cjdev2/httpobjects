@@ -69,7 +69,7 @@ public class MockRequest implements Request {
     }
     
     public MockRequest(HttpObject object, String path, Query query, Representation representation, HeaderField ... fields) {
-        this(new ConnectionInfo("1.2.3.4", "4.3.2.1"), object, path, query, representation, fields);
+        this(new ConnectionInfo("1.2.3.4", 8080, "4.3.2.1", 4332), object, path, query, representation, fields);
     }
     
 	public MockRequest(HttpObject object, String path, Query query, HeaderField ... fields) {

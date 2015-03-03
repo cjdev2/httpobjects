@@ -55,7 +55,8 @@ import org.httpobjects.header.response.SetCookieField;
 public class HttpServletRequestUtil {
 
     public static ConnectionInfo connectionInfo(HttpServletRequest request){
-        return new ConnectionInfo(request.getLocalAddr(), request.getRemoteAddr());
+        return new ConnectionInfo(request.getLocalAddr(), request.getLocalPort(), 
+                                  request.getRemoteAddr(), request.getRemotePort());
     }
     
 	public static List<SetCookieField> buildCookies(HttpServletRequest request) {

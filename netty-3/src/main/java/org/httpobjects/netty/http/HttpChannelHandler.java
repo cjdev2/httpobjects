@@ -105,13 +105,18 @@ public class HttpChannelHandler extends SimpleChannelUpstreamHandler {
         }
     }
     
-    private String toString(SocketAddress addr){
-        return ((InetSocketAddress)addr).getAddress().getHostAddress();
-    }
-    
+	@SuppressWarnings("unchecked")
+    private <O, T extends O> T cast(O o){return (T)o;}
+	
     private ConnectionInfo connectionInfo(ChannelHandlerContext ctx) {
         final Channel channel = ctx.getChannel();
-        return new ConnectionInfo(toString(channel.getLocalAddress()), toString(channel.getRemoteAddress()));
+        final InetSocketAddress local = cast(channel.getLocalAddress());
+        final InetSocketAddress remote = cast(channel.getRemoteAddress());
+        return new ConnectionInfo(
+                        local.getAddress().getHostAddress(),
+                        local.getPort(),
+                        remote.getAddress().getHostAddress(),
+                        remote.getPort());
     }
     
     private void writeToBuffer(ChannelBuffer content) throws IOException {

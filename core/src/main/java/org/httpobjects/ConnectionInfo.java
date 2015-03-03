@@ -42,22 +42,21 @@ public class ConnectionInfo {
 //  String protocol;
     
     public final String localAddress;
-//  int localPort;
+    public final Integer localPort;
 
     public final String remoteAddress;
-//  int remotePort;
+    public final Integer remotePort;
 
-    public ConnectionInfo(String localAddress, String remoteAddress) {
+    public ConnectionInfo(String localAddress, Integer localPort, String remoteAddress, Integer remotePort) {
         super();
         this.localAddress = notNull(localAddress);
+        this.localPort = notNull(localPort);
         this.remoteAddress = notNull(remoteAddress);
+        this.remotePort = notNull(remotePort);
     }
     
     private static <T> T notNull(T value){
         if(value==null) throw new IllegalArgumentException("Null not allowed");
         return value;
     }
-    
-    
-    
 }

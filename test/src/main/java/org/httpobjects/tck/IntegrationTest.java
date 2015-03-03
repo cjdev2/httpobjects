@@ -42,6 +42,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.*;
+import org.httpobjects.ConnectionInfo;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Query;
 import org.httpobjects.Request;
@@ -64,9 +65,12 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.httpobjects.util.HttpObjectUtil.toAscii;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Technology Compatibility Kit
@@ -236,7 +240,9 @@ public abstract class IntegrationTest {
         }, 
         new HttpObject("/connectionInfo"){
             public Response get(Request req) {
-                return OK(Text("Local: " + req.connectionInfo().localAddress + ", Remote: " + req.connectionInfo().remoteAddress));
+                final ConnectionInfo connection = req.connectionInfo();
+                return OK(Text("Local " + connection.localAddress + ":" + connection.localPort + ", " + 
+                               "Remote " + connection.remoteAddress + ":" + connection.remotePort));
             }
         });
     }
@@ -256,10 +262,22 @@ public abstract class IntegrationTest {
     @Test
     public void returnsConnectionInfo() throws Exception {
         // given
-        GetMethod request = new GetMethod("http://localhost:8080/connectionInfo");
+        String url = "http://127.0.0.2:8080/connectionInfo";
         
-        // then/when
-        assertResource(request, "Local: 127.0.0.1, Remote: 127.0.0.1", 200);
+        //when
+        final String result = get(url);
+        
+        // then
+        Pattern expectedPattern = Pattern.compile("Local 127.0.0.2:8080, Remote 127.0.0.1:([0-9].*)");
+        assertTrue("'" + result + " should match '" + expectedPattern, 
+                expectedPattern.matcher(result).matches());
+    }
+    private String get(String url) throws IOException, HttpException {
+        HttpClient client = new HttpClient();
+        GetMethod request = new GetMethod(url);
+        int responseCode = client.executeMethod(request);
+        String result = request.getResponseBodyAsString();
+        return result;
     }
     
     @Test
@@ -457,7 +475,7 @@ public abstract class IntegrationTest {
         try {
             HttpClient client = new HttpClient();
             int response = client.executeMethod(method);
-
+            
             Assert.assertEquals(expectedResponseCode, response);
             if(expectedBody!=null) Assert.assertEquals(expectedBody, method.getResponseBodyAsString());
 
