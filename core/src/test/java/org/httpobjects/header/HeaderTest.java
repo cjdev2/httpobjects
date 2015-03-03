@@ -37,32 +37,37 @@
  */
 package org.httpobjects.header;
 
-import java.util.Collections;
-import java.util.List;
+import static java.util.Arrays.asList;
 
-public class Header {
-	private final List<HeaderField> fields;
-	
-	public Header(List<HeaderField> fields){
-		this.fields = Collections.unmodifiableList(fields);
-	}
-	
-	public List<HeaderField> fields() {
-		return fields;
-	}
-	
-	public HeaderField field(String name){
-		for(HeaderField next : fields){
-			if(next.name().equals(name)){
-				return next;
-			}
-		}
-		return null;
-	}
+import org.junit.Test;
 
-    public String getOrElse(String name, String defaultValue) {
-        final HeaderField field = field(name);
-        return field==null?defaultValue:field.value();
+public class HeaderTest {
+
+    @Test
+    public void getOrElseReturnsValueWhenPresent() {
+        //given
+        final Header h = new Header(asList(header("name", "larry")));
+        
+        // when
+        final String value = h.getOrElse("name", "John Doe");
+        
+        // then
+        org.junit.Assert.assertEquals("larry", value);
+    }
+    
+    @Test
+    public void getOrElseReturnsDefaultValueAsNeeded() {
+        //given
+        final Header h = new Header(asList(header("name", "larry")));
+        
+        // when
+        final String value = h.getOrElse("age", "29");
+        
+        // then
+        org.junit.Assert.assertEquals("29", value);
     }
 
+    private static HeaderField header(String name, String value){
+        return new GenericHeaderField(name, value);
+    }
 }
