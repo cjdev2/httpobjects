@@ -27,8 +27,13 @@ import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.Set;
 
+import org.httpobjects.ConnectionInfo;
 import org.httpobjects.Response;
 import org.httpobjects.header.HeaderField;
 import org.jboss.netty.buffer.ChannelBuffer;
@@ -54,7 +59,7 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 public class HttpChannelHandler extends SimpleChannelUpstreamHandler {
 	
 	public static interface RequestHandler {
-		Response respond(HttpRequest request, HttpChunkTrailer lastChunk, ByteAccumulator body);
+		Response respond(HttpRequest request, HttpChunkTrailer lastChunk, ByteAccumulator body, ConnectionInfo connection);
 	}
 	
 	private final RequestHandler handler;
@@ -84,7 +89,7 @@ public class HttpChannelHandler extends SimpleChannelUpstreamHandler {
                 	writeToBuffer(content);
                 }
                 
-            	writeResponse(e.getChannel(), handler.respond(request, null, contentAccumulator));
+            	writeResponse(e.getChannel(), handler.respond(request, null, contentAccumulator, connectionInfo(ctx)));
             }
         } else {
             HttpChunk chunk = (HttpChunk) e.getMessage();
@@ -93,30 +98,38 @@ public class HttpChannelHandler extends SimpleChannelUpstreamHandler {
 
                 HttpChunkTrailer trailer = (HttpChunkTrailer) chunk;
                 writeToBuffer(trailer.getContent());
-            	writeResponse(e.getChannel(), handler.respond(request, trailer, contentAccumulator));
+            	writeResponse(e.getChannel(), handler.respond(request, trailer, contentAccumulator, connectionInfo(ctx)));
             } else {
             	writeToBuffer(chunk.getContent());
             }
         }
     }
-
-
-	private void writeToBuffer(ChannelBuffer content) throws IOException {
-		content.getBytes(0, contentAccumulator.out(), content.capacity());
-	}
-
-	private byte[] read(Response out) {
-		try {
-			ByteArrayOutputStream stream = new ByteArrayOutputStream();
-			out.representation().write(stream);
-			stream.close();
-			return stream.toByteArray();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-	private void writeResponse(/*MessageEvent e*/ Channel sink, Response r) {
-		
+    
+    private String toString(SocketAddress addr){
+        return ((InetSocketAddress)addr).getAddress().getHostAddress();
+    }
+    
+    private ConnectionInfo connectionInfo(ChannelHandlerContext ctx) {
+        final Channel channel = ctx.getChannel();
+        return new ConnectionInfo(toString(channel.getLocalAddress()), toString(channel.getRemoteAddress()));
+    }
+    
+    private void writeToBuffer(ChannelBuffer content) throws IOException {
+    	content.getBytes(0, contentAccumulator.out(), content.capacity());
+    }
+    
+    private byte[] read(Response out) {
+        try {
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            out.representation().write(stream);
+            stream.close();
+            return stream.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    private void writeResponse(/*MessageEvent e*/ Channel sink, Response r) {
+    	
         // Decide whether to close the connection or not.
         boolean keepAlive = isKeepAlive(request);
 

@@ -161,7 +161,6 @@ public abstract class IntegrationTest {
             }
         },
         new HttpObject("/cookieSetter"){
-            //String name, String value, String domain, String path, String expiration, Boolean secure
             public Response get(Request req){
                 return OK(
                         Text("Here are some cookies!"), 
@@ -234,6 +233,11 @@ public abstract class IntegrationTest {
                     return INTERNAL_SERVER_ERROR(e);
                 }
             }
+        }, 
+        new HttpObject("/connectionInfo"){
+            public Response get(Request req) {
+                return OK(Text("Local: " + req.connectionInfo().localAddress + ", Remote: " + req.connectionInfo().remoteAddress));
+            }
         });
     }
 
@@ -249,6 +253,15 @@ public abstract class IntegrationTest {
         }
     }
 
+    @Test
+    public void returnsConnectionInfo() throws Exception {
+        // given
+        GetMethod request = new GetMethod("http://localhost:8080/connectionInfo");
+        
+        // then/when
+        assertResource(request, "Local: 127.0.0.1, Remote: 127.0.0.1", 200);
+    }
+    
     @Test
     public void hasRepresentation() throws Exception {
         // given

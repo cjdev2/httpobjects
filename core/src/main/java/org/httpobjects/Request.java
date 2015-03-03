@@ -46,7 +46,7 @@ public interface Request {
     Path path();
     RequestHeader header();
     // int httpVersion();    
-    // ConnectionInfo connectionInfo();
+     ConnectionInfo connectionInfo();
     
 	boolean hasRepresentation();
 	Representation representation();

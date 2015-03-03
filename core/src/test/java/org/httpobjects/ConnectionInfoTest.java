@@ -35,70 +35,46 @@
  * obligated to do so.  If you do not wish to do so, delete this
  * exception statement from your version.
  */
-package org.httpobjects.servlet.impl;
+package org.httpobjects;
 
-import javax.servlet.http.HttpServletRequest;
+import static org.junit.Assert.*;
 
-import org.httpobjects.ConnectionInfo;
-import org.httpobjects.Query;
-import org.httpobjects.Representation;
-import org.httpobjects.Request;
-import org.httpobjects.header.request.RequestHeader;
-import org.httpobjects.path.Path;
+import org.junit.Test;
 
-public class ImmutableRequestImpl implements Request {
-	private final Path vars;
-	private final String contentType;
-	private final String query;
-	private final RequestHeader header;
-	private final Representation representation;
-	private final ConnectionInfo connectionInfo;
-	
-	public ImmutableRequestImpl(Path vars, HttpServletRequest request) {
-		this.vars = vars;
-		this.contentType = request.getContentType();
-		this.query = request.getQueryString();
-		this.connectionInfo = HttpServletRequestUtil.connectionInfo(request);
-        this.header = HttpServletRequestUtil.buildHeader(request);
-		this.representation = new ImmutableHttpServletRequestRepresentation(request);
-	}
+public class ConnectionInfoTest {
 
-	@Override
-	public Path path() {
-		return vars;
-	}
-	
-	public String contentType(){
-		return contentType;
-	}
-	
-	@Override
-	public boolean hasRepresentation() {
-		return true;
-	}
-	
-	@Override
-	public Query query(){
-		return new Query(query);
-	}
-	
-	@Override
-	public RequestHeader header() {
-		return header;
-	}
-	
-	@Override
-	public Representation representation() {
-		return representation;		
-	}
-	
-	@Override
-	public Request immutableCopy() {
-		return this;
-	}
-	
-	@Override
-	public ConnectionInfo connectionInfo() {
-	    return connectionInfo;
-	}
+    @Test
+    public void doesntAllowNullRemoteAddresses() {
+        // given
+        final String remoteAddress = null;
+        
+        // when
+        Throwable t;
+        try{
+            new ConnectionInfo("1.2.3.4", remoteAddress);
+            t = null;
+        }catch(Throwable e){
+            t = e;
+        }
+        assertEquals(IllegalArgumentException.class.getName(), t.getClass().getName());
+        assertEquals("Null not allowed", t.getMessage());
+   }
+    
+    @Test
+    public void doesntAllowNullLocalAddresses() {
+        // given
+        final String localAddresses = null;
+        
+        // when
+        Throwable t;
+        try{
+            new ConnectionInfo(localAddresses, "1.2.3.4");
+            t = null;
+        }catch(Throwable e){
+            t = e;
+        }
+        assertEquals(IllegalArgumentException.class.getName(), t.getClass().getName());
+        assertEquals("Null not allowed", t.getMessage());
+   }
+
 }

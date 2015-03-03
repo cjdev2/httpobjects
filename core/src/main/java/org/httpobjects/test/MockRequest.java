@@ -39,6 +39,7 @@ package org.httpobjects.test;
 
 import static org.httpobjects.DSL.Bytes;
 
+import org.httpobjects.ConnectionInfo;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Query;
 import org.httpobjects.Representation;
@@ -52,10 +53,12 @@ public class MockRequest implements Request {
 	private final Representation representation;
 	private final Query query;
     private final RequestHeader header;
+    private final ConnectionInfo connectionInfo;
 	
-    public MockRequest(HttpObject object, String path, Query query, Representation representation, HeaderField ... fields) {
+    public MockRequest(ConnectionInfo connectionInfo, HttpObject object, String path, Query query, Representation representation, HeaderField ... fields) {
         super();
         assertNoQueryInPath(path);
+        this.connectionInfo = connectionInfo;
         this.representation = representation;
         this.query = query;
         this.path = object.pattern().match(path);
@@ -63,6 +66,10 @@ public class MockRequest implements Request {
             throw new RuntimeException(object.pattern().raw() + " does not match " + path);
         }
         this.header = new RequestHeader(fields);
+    }
+    
+    public MockRequest(HttpObject object, String path, Query query, Representation representation, HeaderField ... fields) {
+        this(new ConnectionInfo("1.2.3.4", "4.3.2.1"), object, path, query, representation, fields);
     }
     
 	public MockRequest(HttpObject object, String path, Query query, HeaderField ... fields) {
@@ -75,6 +82,11 @@ public class MockRequest implements Request {
 
 	public MockRequest(HttpObject object, String path, Representation representation, HeaderField ... fields) {
         this(object, path, new Query(""), representation, fields);
+	}
+	
+	@Override
+	public ConnectionInfo connectionInfo() {
+	    return connectionInfo;
 	}
 	
 	@Override

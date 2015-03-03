@@ -8,6 +8,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.httpobjects.ConnectionInfo;
 import org.httpobjects.DSL;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Query;
@@ -39,7 +40,7 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 	}
 	
 	@Override
-	public Response respond(HttpRequest request, HttpChunkTrailer lastChunk, ByteAccumulator body) {
+	public Response respond(HttpRequest request, HttpChunkTrailer lastChunk, ByteAccumulator body, ConnectionInfo connectionInfo) {
 		
 		final String uri = request.getUri();
 		
@@ -48,7 +49,7 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 			if(pattern.matches(uri)){
 				HttpObject match = null;
 				match = next;
-				Request in = readRequest(pattern, request, lastChunk, body);
+				Request in = readRequest(pattern, request, lastChunk, body, connectionInfo);
 				Method m = Method.fromString(request.getMethod().getName());
 				Response out = HttpObjectUtil.invokeMethod(match, m, in);
 				if(out!=null) return out;
@@ -58,14 +59,19 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
         return defaultResponse;
 	}
 	
-	private Request readRequest(final PathPattern pathPattern, final HttpRequest request, final HttpChunkTrailer lastChunk, final ByteAccumulator body) {
+	private Request readRequest(final PathPattern pathPattern, final HttpRequest request, final HttpChunkTrailer lastChunk, final ByteAccumulator body, final ConnectionInfo connectionInfo) {
 		return new Request(){
 			
 			@Override
 			public boolean hasRepresentation() {
 			    return body!=null;
 			}
-
+			
+			@Override
+			public ConnectionInfo connectionInfo() {
+			    return connectionInfo;
+			}
+			
 			@Override
 			public RequestHeader header() {
 				List<HeaderField> results = new ArrayList<HeaderField>();

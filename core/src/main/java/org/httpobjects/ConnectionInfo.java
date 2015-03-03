@@ -37,14 +37,27 @@
  */
 package org.httpobjects;
 
-public interface ConnectionInfo {
-//    String protocol;
+public class ConnectionInfo {
+//  String protocolVersion
+//  String protocol;
     
-//    String localAddress;
-//    int localPort;
+    public final String localAddress;
+//  int localPort;
 
-//    String remoteAddress;
-//    int remotePort;
+    public final String remoteAddress;
+//  int remotePort;
 
-//    String protocolVersion
+    public ConnectionInfo(String localAddress, String remoteAddress) {
+        super();
+        this.localAddress = notNull(localAddress);
+        this.remoteAddress = notNull(remoteAddress);
+    }
+    
+    private static <T> T notNull(T value){
+        if(value==null) throw new IllegalArgumentException("Null not allowed");
+        return value;
+    }
+    
+    
+    
 }

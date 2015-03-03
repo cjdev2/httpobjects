@@ -55,19 +55,9 @@ public class LazyRequestImpl implements Request {
 		this.request = request;
 	}
 	
-	private String queryOrEmpty(){
-	    final String query = request.getQueryString();
-	    if(query==null){
-	        return "";
-	    }else{
-	        return "?" + query;
-	    }
+	public org.httpobjects.ConnectionInfo connectionInfo() {
+	    return HttpServletRequestUtil.connectionInfo(request);
 	}
-	
-//	@Override
-//	public GenericRelativeURI uri() {
-//	    return new GenericRelativeURI(request.getProtocol(), request.getLocalAddr(), request.getLocalPort(), request.getRequestURI() + queryOrEmpty());
-//	}
 	
 	@Override
 	public Path path() {
