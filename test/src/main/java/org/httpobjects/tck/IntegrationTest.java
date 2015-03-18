@@ -48,6 +48,7 @@ import org.httpobjects.Query;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
 import org.httpobjects.header.DefaultHeaderFieldVisitor;
+import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.request.AuthorizationField;
 import org.httpobjects.header.request.Cookie;
@@ -244,6 +245,12 @@ public abstract class IntegrationTest {
                 return OK(Text("Local " + connection.localAddress + ":" + connection.localPort + ", " + 
                                "Remote " + connection.remoteAddress + ":" + connection.remotePort));
             }
+        },
+        new HttpObject("/head"){
+        	@Override
+        	public Response head(Request req) {
+        		return OK(Text(""), new GenericHeaderField("foo", "bar"));
+        	}
         });
     }
 
@@ -260,6 +267,21 @@ public abstract class IntegrationTest {
     }
 
     @Test
+    public void supportsHead() throws Exception {
+        // given
+        HttpClient client = new HttpClient();
+        HeadMethod request = new HeadMethod("http://127.0.0.2:8080/head");
+        
+        //when
+        int responseCode = client.executeMethod(request);
+        
+        // then
+
+        assertEquals(200, responseCode);
+        assertEquals("bar", request.getResponseHeader("foo").getValue());
+    }
+    
+    @Test
     public void returnsConnectionInfo() throws Exception {
         // given
         String url = "http://127.0.0.2:8080/connectionInfo";
@@ -272,6 +294,7 @@ public abstract class IntegrationTest {
         assertTrue("'" + result + " should match '" + expectedPattern, 
                 expectedPattern.matcher(result).matches());
     }
+    
     private String get(String url) throws IOException, HttpException {
         HttpClient client = new HttpClient();
         GetMethod request = new GetMethod(url);

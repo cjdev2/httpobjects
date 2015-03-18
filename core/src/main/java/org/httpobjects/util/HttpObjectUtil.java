@@ -66,6 +66,9 @@ public class HttpObjectUtil {
         case PATCH:
             output = object.patch(input);
             break;
+        case HEAD:
+            output = object.head(input);
+            break;
         default:
             output = HttpObject.NOT_FOUND();
         }
