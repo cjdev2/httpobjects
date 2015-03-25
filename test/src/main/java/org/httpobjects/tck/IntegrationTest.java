@@ -37,11 +37,9 @@
  */
 package org.httpobjects.tck;
 
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.methods.*;
+import org.apache.commons.httpclient.params.HttpParams;
 import org.httpobjects.ConnectionInfo;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Query;
@@ -65,6 +63,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -287,22 +286,14 @@ public abstract class IntegrationTest {
         String url = "http://127.0.0.2:8080/connectionInfo";
         
         //when
-        final String result = get(url);
+        final String result = getFrom("127.0.0.3", url);
         
         // then
-        Pattern expectedPattern = Pattern.compile("Local 127.0.0.2:8080, Remote 127.0.0.1:([0-9].*)");
+        Pattern expectedPattern = Pattern.compile("Local 127.0.0.2:8080, Remote 127.0.0.3:([0-9].*)");
         assertTrue("'" + result + " should match '" + expectedPattern, 
                 expectedPattern.matcher(result).matches());
     }
-    
-    private String get(String url) throws IOException, HttpException {
-        HttpClient client = new HttpClient();
-        GetMethod request = new GetMethod(url);
-        int responseCode = client.executeMethod(request);
-        String result = request.getResponseBodyAsString();
-        return result;
-    }
-    
+
     @Test
     public void hasRepresentation() throws Exception {
         // given
@@ -525,6 +516,27 @@ public abstract class IntegrationTest {
             this.value = value;
         }
 
+    }
+
+    private String getFrom(String address, String url) {
+        try {
+            HttpClient client = new HttpClient();
+            client.getHostConfiguration().setLocalAddress(InetAddress.getByName(address));
+            GetMethod request = new GetMethod(url);
+            int responseCode = client.executeMethod(request);
+            String result = request.getResponseBodyAsString();
+            return result;
+        }catch(Exception e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String get(String url) throws IOException, HttpException {
+        HttpClient client = new HttpClient();
+        GetMethod request = new GetMethod(url);
+        int responseCode = client.executeMethod(request);
+        String result = request.getResponseBodyAsString();
+        return result;
     }
 
     @After
