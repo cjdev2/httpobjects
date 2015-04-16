@@ -42,6 +42,8 @@ import java.util.List;
 public interface Seq<T> extends Iterable<T> {
     <O> Seq<O> map(Fn<T, O> fn);
     Seq<T> filter(Fn<T, Boolean> fn);
+    boolean exists(Fn<T, Boolean> fn);
+    boolean contains(Object o);
     void foreach(Fn<T, Void> fn);
     CharSequence mkstring(String separator);
     Seq<T> plus(Seq<? extends T> other);

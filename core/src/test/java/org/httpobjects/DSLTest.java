@@ -35,30 +35,53 @@
  * obligated to do so.  If you do not wish to do so, delete this
  * exception statement from your version.
  */
-package org.httpobjects.util;
+package org.httpobjects;
 
-import org.httpobjects.HttpObject;
-import org.httpobjects.Request;
-import org.httpobjects.Response;
+import static org.junit.Assert.*;
 
-public class ClasspathResourceObject extends HttpObject {
-	private final Class<?> clazz;
-	private final String contentType, resourceName;
+import org.httpobjects.test.MockRequest;
+import org.httpobjects.util.ClasspathResourcesObject;
+import org.httpobjects.util.HttpObjectUtil;
+import org.junit.Test;
 
-	public ClasspathResourceObject(String pathPattern, String resourceName, Class<?> clazz) {
-		this(pathPattern, new MimeTypeTool().guessMimeTypeFromName(resourceName), resourceName, clazz);
-	}
-	
-	public ClasspathResourceObject(String pathPattern, String contentType, String resourceName, Class<?> clazz) {
-		super(pathPattern, null);
-		this.clazz = clazz;
-		this.contentType = contentType;
-		this.resourceName = resourceName;
-	}
+public class DSLTest {
 
-	@Override
-	public Response get(Request req) {
-		return OK(FromClasspath(contentType, resourceName, clazz));
-	}
-
+    @Test
+    public void builderHappyPath(){
+    	// given/when
+    	ClasspathResourcesObject object = DSL
+    			.classpathResourcesAt("/org/httpobjects/util/ClasspathResourcesObjectTest")
+    			.servedAt("/");
+    		
+    	// then
+    	assertEquals("/{resource*}", object.pattern().raw());
+    	Response response = object.get(new MockRequest(object, "/a.txt"));
+    	assertEquals("hello", HttpObjectUtil.toAscii(response.representation()));
+    }
+    
+    @Test
+    public void builderWithDifferentServiceRoot(){
+    	// given/when
+    	ClasspathResourcesObject object = DSL
+    			.classpathResourcesAt("/org/httpobjects/util/ClasspathResourcesObjectTest")
+    			.servedAt("/bar");
+    		
+    	// then
+    	assertEquals("/bar/{resource*}", object.pattern().raw());
+    	Response response = object.get(new MockRequest(object, "/bar/a.txt"));
+    	assertEquals("hello", HttpObjectUtil.toAscii(response.representation()));
+    }
+    
+    @Test
+    public void builderHappyPath_withDifferentClasspathPattern(){
+    	// given/when
+    	ClasspathResourcesObject object = DSL
+    			.classpathResourcesAt("/org/httpobjects")
+    			.servedAt("/bar");
+    		
+    	// then
+    	assertEquals("/bar/{resource*}", object.pattern().raw());
+    	Response response = object.get(new MockRequest(object, "/bar/util/ClasspathResourcesObjectTest/a.txt"));
+    	assertEquals("hello", HttpObjectUtil.toAscii(response.representation()));
+    }
 }

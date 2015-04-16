@@ -48,6 +48,20 @@ public abstract class AbstractSeq<T> implements Seq<T>{
     public Seq<T> filter(Fn<T, Boolean> fn){
         return FunctionalJava.filter(this, fn);
     }
+    @Override
+    public boolean exists(Fn<T, Boolean> fn) {
+        final Iterator<T> i = iterator();
+        
+        while(i.hasNext()){
+            if(fn.exec(i.next())) return true;
+        }
+        
+        return false;
+    }
+    @Override
+    public boolean contains(Object o) {
+    	return exists(FunctionalJava.<T>isEqual(o));
+    }
     public void foreach(Fn<T, Void> fn){
         FunctionalJava.foreach(this, fn);
     }

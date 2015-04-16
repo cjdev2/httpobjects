@@ -48,6 +48,7 @@ import org.httpobjects.header.response.LocationField;
 import org.httpobjects.header.response.SetCookieField;
 import org.httpobjects.header.response.WWWAuthenticateField;
 import org.httpobjects.representation.BinaryRepresentation;
+import org.httpobjects.util.ClasspathResourcesObject;
 import org.httpobjects.util.Method;
 import org.httpobjects.util.impl.ClassResourceLoader;
 import org.httpobjects.util.impl.ResourceLoader;
@@ -65,6 +66,18 @@ public class DSL {
     //ISO-8859-1 is used on 12.0% of all websites
     public static final StandardCharset MOST_WIDELY_SUPPORTED_ENCODING = StandardCharset.UTF_8;
     public static final StandardCharset DEFAULT_HTTP_ENCODING = StandardCharset.ISO_8859_1;
+    
+    
+    /*
+     * ########################################################
+     * ## Convenience builders
+     * ########################################################
+     */
+    
+    public static ClasspathResourcesObject.Builder classpathResourcesAt(String pattern){
+        return new ClasspathResourcesObject.Builder(DSL.class, pattern);
+    }
+	
     /* ######################################################## 
      * ## Hand-coded response factory methods
      * ########################################################

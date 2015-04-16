@@ -39,6 +39,9 @@ package org.httpobjects.util;
 
 import static org.junit.Assert.*;
 
+import org.httpobjects.Request;
+import org.httpobjects.Response;
+import org.httpobjects.test.MockRequest;
 import org.junit.Test;
 
 public class ClasspathResourcesObjectTest {
@@ -58,5 +61,23 @@ public class ClasspathResourcesObjectTest {
         assertNotNull(err);
         assertEquals("Must have a path var named 'resource', but there is none in '/foo'.  Hint: maybe you meant '/foo/{resource*}' ?", err.getMessage());
     }
-
+    
+    @Test
+    public void worksWithGreedyPatterns() {
+        // given
+        final String aGreedyPattern = "/foo/{resource*}";
+        
+        // when
+        Exception err = null;
+        try{
+            new ClasspathResourcesObject(aGreedyPattern, getClass(), "/resources");
+        }catch(Exception e){
+            err = e;
+        }
+        
+        // then
+        assertNull(err);
+    }
+    
+    
 }

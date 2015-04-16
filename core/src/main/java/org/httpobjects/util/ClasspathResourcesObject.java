@@ -42,6 +42,7 @@ import java.io.InputStream;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
+import org.httpobjects.impl.fn.FunctionalJava;
 import org.httpobjects.util.impl.ClassResourceLoader;
 import org.httpobjects.util.impl.ResourceLoader;
 import org.httpobjects.util.impl.WrapperForInsecureClassloader;
@@ -57,9 +58,22 @@ public class ClasspathResourcesObject  extends HttpObject {
 
 	public ClasspathResourcesObject(String pathPattern, Class<?> relativeTo, String prefix) {
 		super(pathPattern, null);
-		if(!pattern().varNames().contains(PATH_VAR_NAME)) throw new RuntimeException("Must have a path var named '" + PATH_VAR_NAME + "', but there is none in '" + pathPattern + "'.  Hint: maybe you meant '" + pathPattern + "/{resource*}' ?"); 
+		
+		if(!hasExpectedPathVar()) {
+			throw new RuntimeException("Must have a path var named '" + PATH_VAR_NAME + 
+			                            "', but there is none in '" + pathPattern + 
+			                            "'.  Hint: maybe you meant '" + pathPattern + "/{resource*}' ?"); 
+		}
 		this.prefix = (!prefix.equals("") && !prefix.endsWith("/"))? prefix + "/" : prefix;
 		this.loader = new WrapperForInsecureClassloader(new ClassResourceLoader(relativeTo));
+	}
+
+	
+	
+	private boolean hasExpectedPathVar() {
+       return FunctionalJava
+            .asSeq(pattern().varNames())
+            .contains(PATH_VAR_NAME);
 	}
 
 	@Override
@@ -87,4 +101,31 @@ public class ClasspathResourcesObject  extends HttpObject {
 	private boolean isNullOrEmpty(String t){
 		return t==null || t.trim().isEmpty();
 	}
+	
+	public static final class Builder {
+		final Class<?> clazz;
+		final String resourcePattern;
+		
+		public Builder(Class<?> clazz, String resourcePattern) {
+			super();
+			this.clazz = clazz;
+			this.resourcePattern = resourcePattern;
+		}
+
+		public ClasspathResourcesObject servedAt(String pathPattern) {
+			final String p;
+			if(pathPattern.endsWith("/")){
+				p = pathPattern.substring(0, pathPattern.length()-1);
+			}else{
+				p = pathPattern;
+			}
+			return new ClasspathResourcesObject(p + "/{resource*}", clazz, resourcePattern);
+		}
+
+		public Builder loadedVia(Class<?> clazz) {
+			return new Builder(clazz, resourcePattern);
+		}
+		
+	}
+
 }

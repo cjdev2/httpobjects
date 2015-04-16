@@ -41,7 +41,14 @@ import java.util.Collections;
 import java.util.Iterator;
 
 public class FunctionalJava {
-
+    public static <T> Fn<T, Boolean> isEqual(final Object o){
+        return new Fn<T, Boolean>(){
+            @Override
+            public Boolean exec(T t) {
+                return t.equals(o);
+            }
+        };
+    }
     public static <T> Seq<T> emptySeq(){
         return asSeq(Collections.<T>emptyList());
     }

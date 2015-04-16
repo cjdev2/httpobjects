@@ -47,5 +47,10 @@ public class PathParamNameTest {
     public void equalsWorksOnStringsToo() {
         assertEquals(new PathParamName("foo"), "foo");
     }
+    
+    @Test
+    public void toStringReturnsName() {
+        assertEquals(new PathParamName("foo").toString(), "foo");
+    }
 
 }
