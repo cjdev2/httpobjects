@@ -95,7 +95,7 @@ public class HttpObjectsJettyHandler extends org.eclipse.jetty.server.handler.Ab
 			
 			return s;
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException("" + e.getMessage() + " (port = " + port + ")", e);
 		}
 	}
 }
