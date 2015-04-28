@@ -37,20 +37,17 @@
  */
 package org.httpobjects.util;
 
-import static org.httpobjects.util.FsTools.dir;
-import static org.httpobjects.util.FsTools.file;
-import static org.httpobjects.util.FsTools.tempDir;
+import org.httpobjects.Representation;
+import org.httpobjects.Response;
+import org.httpobjects.test.MockRequest;
+import org.httpobjects.util.FsTools.*;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 
-import junit.framework.Assert;
-
-import org.httpobjects.Representation;
-import org.httpobjects.Response;
-import org.httpobjects.test.MockRequest;
-import org.httpobjects.util.FsTools.DirSpec;
-import org.junit.Test;
+import static org.httpobjects.util.FsTools.*;
 
 public class FilesystemResourcesObjectTest {
     @Test

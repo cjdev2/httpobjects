@@ -37,23 +37,20 @@
  */
 package org.httpobjects;
 
-import java.util.List;
-
 import org.httpobjects.header.request.RequestHeader;
-import org.httpobjects.header.response.SetCookieField;
-import org.httpobjects.path.PathVariables;
+import org.httpobjects.path.Path;
 
 public interface Request {
-	PathVariables pathVars();
 	
+    Query query();
+    Path path();
+    RequestHeader header();
+    // int httpVersion();    
+     ConnectionInfo connectionInfo();
+    
 	boolean hasRepresentation();
 	Representation representation();
-	 
-	@Deprecated
-	List<SetCookieField> cookies();
-	String getParameter(String string);
-	String query();
-	RequestHeader header();
 	
 	Request immutableCopy();
+	
 }

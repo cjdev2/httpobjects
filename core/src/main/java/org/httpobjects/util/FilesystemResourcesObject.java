@@ -57,7 +57,7 @@ public class FilesystemResourcesObject  extends HttpObject {
 	
 	@Override
 	public Response get(Request req) {
-		final String resource = req.pathVars().valueFor("resource");
+		final String resource = req.path().valueFor("resource");
 		if(isNullOrEmpty(resource) ||  resource.endsWith("/")) return null;
 		
 		File path = new File(relativeTo, resource);

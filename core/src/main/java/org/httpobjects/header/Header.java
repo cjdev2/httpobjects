@@ -60,4 +60,9 @@ public class Header {
 		return null;
 	}
 
+    public String getOrElse(String name, String defaultValue) {
+        final HeaderField field = field(name);
+        return field==null?defaultValue:field.value();
+    }
+
 }

@@ -39,7 +39,6 @@ package org.httpobjects.servlet;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -50,11 +49,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
+import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.HeaderFieldVisitor;
-import org.httpobjects.header.OtherHeaderField;
 import org.httpobjects.header.request.AuthorizationField;
 import org.httpobjects.header.request.CookieField;
+import org.httpobjects.header.response.AllowField;
 import org.httpobjects.header.response.LocationField;
 import org.httpobjects.header.response.SetCookieField;
 import org.httpobjects.header.response.WWWAuthenticateField;
@@ -66,6 +66,7 @@ public class ServletMethodInvoker {
 	private final HttpObject[] objects;
 	private final Response notFoundResponse;
 	private final List<? extends HeaderField> defaultResponseHeaders;
+    private final PathMatchObserver pathMatchObserver;
 	
 	public ServletMethodInvoker(HttpObject[] objects) {
 		this(HttpObject.NOT_FOUND(HttpObject.Text("Error: NOT_FOUND")), objects);
@@ -73,37 +74,43 @@ public class ServletMethodInvoker {
   public ServletMethodInvoker(Response notFoundResponse, HttpObject[] objects) {
     this(Collections.<HeaderField>emptyList(), notFoundResponse, objects);
   }
-	public ServletMethodInvoker(List<? extends HeaderField> defaultResponseHeader, Response notFoundResponse, HttpObject[] objects) {
-		super();
-		this.notFoundResponse = notFoundResponse;
-		this.objects = objects;
-		this.defaultResponseHeaders = defaultResponseHeader;
-	}
 
-	public boolean invokeFirstPathMatchIfAble(String path, HttpServletRequest r, HttpServletResponse httpResponse){
-		
-		Response lastResponse = null;
-		for(HttpObject next : objects){
-			if(next.pattern().matches(path)){
-				lastResponse = invoke(r, httpResponse, next);
-				if(lastResponse!=null){
-					returnResponse(lastResponse, httpResponse);
-					break;
-				}
-			}
-		}
-		
-		if(lastResponse!=null){
-			return true;
-		}else if(notFoundResponse!=null){
-			returnResponse(notFoundResponse, httpResponse);
-			return true;
-		}else{
-			return false;
-		}
-	}
+    public ServletMethodInvoker(List<? extends HeaderField> defaultResponseHeader, Response notFoundResponse, HttpObject[] objects) {
+        this(PathMatchObserver.DO_NOTHING, defaultResponseHeader, notFoundResponse, objects);
+    }
 
-	private Response invoke(HttpServletRequest r, HttpServletResponse httpResponse, HttpObject object) {
+    public ServletMethodInvoker(PathMatchObserver pathMatchObserver, List<? extends HeaderField> defaultResponseHeader, Response notFoundResponse, HttpObject[] objects) {
+        this.pathMatchObserver = pathMatchObserver;
+        this.notFoundResponse = notFoundResponse;
+        this.objects = objects;
+        this.defaultResponseHeaders = defaultResponseHeader;
+    }
+
+    public boolean invokeFirstPathMatchIfAble(String path, HttpServletRequest r, HttpServletResponse httpResponse) {
+        Response lastResponse = null;
+        for (HttpObject next : objects) {
+            pathMatchObserver.checkingPathAgainstPattern(path, next.pattern());
+            if (next.pattern().matches(path)) {
+                lastResponse = invoke(r, httpResponse, next);
+                if (lastResponse != null) {
+                    pathMatchObserver.pathMatchedPattern(path, next.pattern());
+                    returnResponse(lastResponse, httpResponse);
+                    break;
+                }
+            }
+        }
+
+        if (lastResponse != null) {
+            return true;
+        } else if (notFoundResponse != null) {
+            returnResponse(notFoundResponse, httpResponse);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private Response invoke(HttpServletRequest r, HttpServletResponse httpResponse, HttpObject object) {
 		final Method m = Method.fromString(r.getMethod());
 		final Request input = new LazyRequestImpl(object.pattern().match(r.getRequestURI()), r);
 
@@ -126,14 +133,20 @@ public class ServletMethodInvoker {
 					}
 					
 					@Override
-					public Void visit(OtherHeaderField other) {
+					public Void visit(GenericHeaderField other) {
 						resp.setHeader(other.name(), other.value());
 						return null;
 					}
-					
-					@Override
+
+                    @Override
+                    public Void visit(AllowField allowField) {
+                        resp.setHeader(allowField.name(), allowField.value());
+                        return null;
+                    }
+
+                    @Override
 					public Void visit(LocationField location) {
-						resp.setHeader("Location", location.value());
+						resp.setHeader(location.name(), location.value());
 						return null;
 					}
 					
@@ -145,7 +158,7 @@ public class ServletMethodInvoker {
 					
 					@Override
 					public Void visit(WWWAuthenticateField wwwAuthorizationField) {
-						resp.setHeader("WWW-Authenticate", wwwAuthorizationField.method().name() + " realm=" + wwwAuthorizationField.realmName());
+						resp.setHeader(wwwAuthorizationField.name(), wwwAuthorizationField.value());
 						return null;
 					}
 					@Override
@@ -156,7 +169,7 @@ public class ServletMethodInvoker {
 				});
 			}
 			
-      addDefaultHeadersAsApplicable(r, resp);
+			addDefaultHeadersAsApplicable(r, resp);
 			
 			if(r.hasRepresentation()){
 				resp.setContentType(r.representation().contentType());
@@ -186,6 +199,21 @@ public class ServletMethodInvoker {
   }
   
 	private Cookie translate(SetCookieField cookie) {
-		return new Cookie(cookie.name, cookie.value);
+	    Cookie c = new Cookie(cookie.name, cookie.value);
+	    
+	    if(cookie.domain!=null){
+	        c.setDomain(cookie.domain);
+	    }
+//	    if(cookie.expiration!=null){
+//	        c.setMaxAge(Integer.parseInt(cookie.expiration));
+//	    }
+	    if(cookie.path!=null){
+	        c.setPath(cookie.path);
+	    }
+	    if(cookie.secure!=null) {
+	        c.setSecure(cookie.secure);
+	    }
+	    
+	    return c;
 	}
 }

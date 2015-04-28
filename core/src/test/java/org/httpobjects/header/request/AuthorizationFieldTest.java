@@ -37,9 +37,8 @@
  */
 package org.httpobjects.header.request;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
-import org.httpobjects.header.request.AuthorizationField;
 import org.httpobjects.header.response.WWWAuthenticateField;
 import org.junit.Test;
 

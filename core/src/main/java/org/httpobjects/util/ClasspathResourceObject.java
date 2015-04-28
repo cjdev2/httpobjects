@@ -60,4 +60,5 @@ public class ClasspathResourceObject extends HttpObject {
 	public Response get(Request req) {
 		return OK(FromClasspath(contentType, resourceName, clazz));
 	}
+
 }

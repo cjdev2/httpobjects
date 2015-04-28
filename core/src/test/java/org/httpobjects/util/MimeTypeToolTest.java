@@ -37,13 +37,12 @@
  */
 package org.httpobjects.util;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import org.junit.Test;
-
-import junit.framework.Assert;
 
 
 public class MimeTypeToolTest {

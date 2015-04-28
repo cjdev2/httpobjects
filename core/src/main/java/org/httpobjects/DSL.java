@@ -37,29 +37,47 @@
  */
 package org.httpobjects;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.httpobjects.header.HeaderField;
+import org.httpobjects.header.response.AllowField;
 import org.httpobjects.header.response.LocationField;
 import org.httpobjects.header.response.SetCookieField;
 import org.httpobjects.header.response.WWWAuthenticateField;
 import org.httpobjects.representation.BinaryRepresentation;
+import org.httpobjects.util.ClasspathResourcesObject;
+import org.httpobjects.util.Method;
 import org.httpobjects.util.impl.ClassResourceLoader;
-import org.httpobjects.util.impl.WrapperForInsecureClassloader;
 import org.httpobjects.util.impl.ResourceLoader;
+import org.httpobjects.util.impl.WrapperForInsecureClassloader;
 
 /**########################################################
  * ## DSL METHODS
  * ########################################################
  */
 public class DSL {
+    //according to
+    //http://w3techs.com/technologies/overview/character_encoding/all
+    //pulled on 2013-07-18
+    //UTF-8 is used on 76.0% of all websites
+    //ISO-8859-1 is used on 12.0% of all websites
+    public static final StandardCharset MOST_WIDELY_SUPPORTED_ENCODING = StandardCharset.UTF_8;
+    public static final StandardCharset DEFAULT_HTTP_ENCODING = StandardCharset.ISO_8859_1;
     
+    
+    /*
+     * ########################################################
+     * ## Convenience builders
+     * ########################################################
+     */
+    
+    public static ClasspathResourcesObject.Builder classpathResourcesAt(String pattern){
+        return new ClasspathResourcesObject.Builder(DSL.class, pattern);
+    }
+	
     /* ######################################################## 
      * ## Hand-coded response factory methods
      * ########################################################
@@ -109,15 +127,15 @@ public class DSL {
      */
     
     public static final Representation Html(String text){
-        return new BinaryRepresentation("text/html", new ByteArrayInputStream(text.getBytes()));
+        return new BinaryRepresentation("text/html; charset="+MOST_WIDELY_SUPPORTED_ENCODING.charsetName(), new ByteArrayInputStream(getBytes(text, MOST_WIDELY_SUPPORTED_ENCODING)));
     }
 
     public static final Representation Text(String text){
-        return new BinaryRepresentation("text/plain", new ByteArrayInputStream(text.getBytes()));
+        return new BinaryRepresentation("text/plain; charset="+MOST_WIDELY_SUPPORTED_ENCODING.charsetName(), new ByteArrayInputStream(getBytes(text, MOST_WIDELY_SUPPORTED_ENCODING)));
     }
 
     public static final Representation Json(String text){
-        return new BinaryRepresentation("application/json", new ByteArrayInputStream(text.getBytes()));
+        return new BinaryRepresentation("application/json; charset="+MOST_WIDELY_SUPPORTED_ENCODING.charsetName(), new ByteArrayInputStream(getBytes(text, MOST_WIDELY_SUPPORTED_ENCODING)));
     }
 
     public static final Representation HtmlFromClasspath(String name, Object context){
@@ -158,7 +176,22 @@ public class DSL {
         }
     }
 
-    /* ######################################################## 
+    /* ########################################################
+     * ## Public utility methods
+     * ########################################################
+     */
+
+    public static final byte[] getBytes(String text, StandardCharset standardCharset) {
+        try {
+            //Every implementation of the Java platform is required to support the standard charsets
+            //So no point in throwing a checked exception
+            return text.getBytes(standardCharset.charsetName());
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    /* ########################################################
      * ## Utility methods
      * ########################################################
      */
@@ -183,7 +216,7 @@ public class DSL {
         if(subsequent!=null){
             items.addAll(Arrays.asList(subsequent));
         }
-        return items.toArray(new HeaderField[]{});
+        return items.toArray(new HeaderField[items.size()]);
     }
 
 
@@ -234,11 +267,27 @@ public class DSL {
     public static final Response NOT_FOUND(Representation representation){
         return new Response(ResponseCode.NOT_FOUND, representation);
     }
+    @Deprecated
+    /**
+     * @deprecated This response code must include an Allow header. http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.6
+     * @see DSL#METHOD_NOT_ALLOWED(org.httpobjects.util.Method...) 
+     */
     public static final Response METHOD_NOT_ALLOWED(){
         return new Response(ResponseCode.METHOD_NOT_ALLOWED, Text("405 Client Error: Method Not Allowed"));
     }
+    @Deprecated
+    /**
+     * @deprecated This response code must include an Allow header. http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.6
+     * @see DSL#METHOD_NOT_ALLOWED(Representation, org.httpobjects.util.Method...)
+     */
     public static final Response METHOD_NOT_ALLOWED(Representation representation){
         return new Response(ResponseCode.METHOD_NOT_ALLOWED, representation);
+    }
+    public static final Response METHOD_NOT_ALLOWED(Representation representation, Method... allowed){
+        return new Response(ResponseCode.METHOD_NOT_ALLOWED, representation, new AllowField(allowed));
+    }
+    public static final Response METHOD_NOT_ALLOWED(Method... allowed) {
+        return METHOD_NOT_ALLOWED(Text("405 Client Error: Method Not Allowed"), allowed);
     }
     public static final Response NOT_ACCEPTABLE(){
         return new Response(ResponseCode.NOT_ACCEPTABLE, Text("406 Client Error: Not Acceptable"));
@@ -372,5 +421,4 @@ public class DSL {
     public static final Response HTTP_VERSION_NOT_SUPPORTED(Throwable t){
         return new Response(ResponseCode.HTTP_VERSION_NOT_SUPPORTED, Text(toString(t)));
     };
-
 }

@@ -44,8 +44,9 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.httpobjects.ConnectionInfo;
+import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
-import org.httpobjects.header.OtherHeaderField;
 import org.httpobjects.header.request.AuthorizationField;
 import org.httpobjects.header.request.CookieField;
 import org.httpobjects.header.request.RequestHeader;
@@ -53,6 +54,11 @@ import org.httpobjects.header.response.SetCookieField;
 
 public class HttpServletRequestUtil {
 
+    public static ConnectionInfo connectionInfo(HttpServletRequest request){
+        return new ConnectionInfo(request.getLocalAddr(), request.getLocalPort(), 
+                                  request.getRemoteAddr(), request.getRemotePort());
+    }
+    
 	public static List<SetCookieField> buildCookies(HttpServletRequest request) {
 		javax.servlet.http.Cookie[] servletCookies = request.getCookies();
 		final List<SetCookieField> cookies;
@@ -93,7 +99,7 @@ public class HttpServletRequestUtil {
 				String fValue = request.getHeader(name);
 				fields.add(new CookieField(fValue));
 			}else{
-				fields.add(new OtherHeaderField(name, request.getHeader(name)));
+				fields.add(new GenericHeaderField(name, request.getHeader(name)));
 			}
 		}
 		return new RequestHeader(fields);

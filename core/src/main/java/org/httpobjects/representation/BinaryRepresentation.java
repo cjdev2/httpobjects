@@ -64,7 +64,11 @@ public class BinaryRepresentation implements Representation {
 		try {
 			byte[] buffer = new byte[1024];
 			for(int x=data.read(buffer);x!=-1;x=data.read(buffer)){
-				out.write(buffer, 0, x);
+				try{
+				    out.write(buffer, 0, x);
+				}catch(Exception err){
+				    throw new RuntimeException("Error writing representation.  This is probably because the connection to the remote host was closed.", err);
+				}
 			}
 			data.close();
 		} catch (IOException e) {

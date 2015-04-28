@@ -60,19 +60,18 @@ public class SetCookieField extends HeaderField {
 					secure = true;
 				}else{
 					NameValue property = NameValue.parse(next.trim());
-					String name = property.name;
+					String name = property.name.toLowerCase();
 
-					if(name.equals("Domain")){
+					if(name.equals("domain")){
 						domain = property.value;
-					}else if(name.equals("Path")){
+					}else if(name.equals("path")){
 						path = property.value;
-					}else if(name.equals("Expires")){
+					}else if(name.equals("expires")){
 						expiration = property.value;
 					}
 				}
 			}
 		}
-
 		return new SetCookieField(nameValue.name, nameValue.value, domain, path, expiration, secure);
 	}
 
@@ -82,6 +81,9 @@ public class SetCookieField extends HeaderField {
 				int pos = nameValue.indexOf('=');
 				String name = nameValue.substring(0, pos);
 				String value = nameValue.substring(pos + 1);
+				if(value.startsWith("\"") && value.endsWith("\"")){
+				    value = value.substring(1, value.length()-1);
+				}
 				return new NameValue(name, value);
 			} catch (Exception e) {
 				throw new RuntimeException("Error parsing " + nameValue);

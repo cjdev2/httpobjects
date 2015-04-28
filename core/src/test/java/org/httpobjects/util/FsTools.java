@@ -37,7 +37,6 @@
  */
 package org.httpobjects.util;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;

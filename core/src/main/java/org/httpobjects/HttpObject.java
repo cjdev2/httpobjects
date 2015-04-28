@@ -38,32 +38,45 @@
 package org.httpobjects;
 
 import org.httpobjects.path.PathPattern;
+import org.httpobjects.path.SimplePathPattern;
 
 public class HttpObject extends DSL{
 
-	private final PathPattern pathPattern;
-	private final Response defaultResponse;
+    private final PathPattern pathPattern;
+    private final Response defaultResponse;
 
-	public HttpObject(String pathPattern, Response defaultResponse) {
-		super();
-		this.pathPattern = new PathPattern(pathPattern);
-		this.defaultResponse = defaultResponse;
-	}
-	
-	public HttpObject(String pathPattern) {
-		this(pathPattern, METHOD_NOT_ALLOWED());
-	}
-	
-	public PathPattern pattern() {
-		return pathPattern;
-	}
-	
-	public Response delete(Request req){return defaultResponse;}
-	public Response get(Request req){return defaultResponse;}
-	public Response head(Request req){return defaultResponse;}
-	public Response options(Request req){return defaultResponse;}
-	public Response post(Request req){return defaultResponse;}
-	public Response put(Request req){return defaultResponse;}
-	public Response trace(Request req){return defaultResponse;}
-	
+    public HttpObject(PathPattern pathPattern, Response defaultResponse) {
+        super();
+        this.pathPattern = pathPattern;
+        this.defaultResponse = defaultResponse;
+    }
+    
+    public HttpObject(String pathPattern, Response defaultResponse) {
+        this(new SimplePathPattern(pathPattern), defaultResponse);
+    }
+
+    public HttpObject(PathPattern pathPattern) {
+        this(pathPattern, METHOD_NOT_ALLOWED());
+    }
+
+    public HttpObject(String pathPattern) {
+        this(new SimplePathPattern(pathPattern));
+    }
+
+    
+    
+    
+    public PathPattern pattern() {
+        return pathPattern;
+    }
+
+    public Response delete(Request req){return defaultResponse;}
+    public Response get(Request req){return defaultResponse;}
+    public Response head(Request req){return defaultResponse;}
+    public Response options(Request req){return defaultResponse;}
+    public Response post(Request req){return defaultResponse;}
+    public Response put(Request req){return defaultResponse;}
+    public Response trace(Request req){return defaultResponse;}
+    public Response patch(Request req){return defaultResponse;}
+
 }

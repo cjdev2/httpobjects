@@ -1,1 +1,2 @@
-Jenkins Instance: https://httpobjects.ci.cloudbees.com
+
+Go to http://httpobjects.org

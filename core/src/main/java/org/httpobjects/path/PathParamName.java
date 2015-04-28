@@ -48,4 +48,22 @@ public class PathParamName {
 	public PathParam withValue(String value){
 		return new PathParam(this, value);
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+	    if(obj instanceof PathParamName){
+	        return ((PathParamName)obj).name.equals(name);
+	    }
+	    return name.equals(obj);
+	}
+	
+	@Override
+	public int hashCode() {
+	    return name.hashCode();
+	}
+	
+    @Override
+    public String toString() {
+        return name;
+    }
 }

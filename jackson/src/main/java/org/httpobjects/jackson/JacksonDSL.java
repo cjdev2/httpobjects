@@ -37,7 +37,7 @@
  */
 package org.httpobjects.jackson;
 
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.httpobjects.Representation;
 
 import java.io.ByteArrayInputStream;
@@ -45,17 +45,24 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+
 public class JacksonDSL {
 
     public static class RepresentationConverter {
+
         private final Representation representation;
-        private final ObjectMapper objectMapper;
+        private ObjectMapper objectMapper;
         private final ByteArrayOutputStream byteStream;
 
         private RepresentationConverter(Representation representation) {
             this.representation = representation;
             this.objectMapper = new ObjectMapper();
             this.byteStream = new ByteArrayOutputStream();
+        }
+
+        public RepresentationConverter using(ObjectMapper objectMapper) {
+            this.objectMapper = objectMapper;
+            return this;
         }
 
         public <T> T to(Class<T> convertTo) throws IOException {

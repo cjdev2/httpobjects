@@ -37,31 +37,61 @@
  */
 package org.httpobjects.util;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+
 import org.httpobjects.HttpObject;
+import org.httpobjects.Representation;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
 
 public class HttpObjectUtil {
 
-	public static Response invokeMethod(HttpObject object, final Method m, final Request input) {
-		final Response output;
-		switch(m){
-		case GET: 
-			output = object.get(input);
-			break;
-		case DELETE:
-			output = object.delete(input);
-			break;
-		case POST:
-			output = object.post(input);
-			break;
-		case PUT:
-			output = object.put(input);
-			break;
-		default:
-			output = HttpObject.NOT_FOUND();
-		}
-		return output;
-	}
+    public static Response invokeMethod(HttpObject object, final Method m, final Request input) {
+        final Response output;
+        switch(m){
+        case GET: 
+            output = object.get(input);
+            break;
+        case DELETE:
+            output = object.delete(input);
+            break;
+        case POST:
+            output = object.post(input);
+            break;
+        case PUT:
+            output = object.put(input);
+            break;
+        case PATCH:
+            output = object.patch(input);
+            break;
+        case HEAD:
+            output = object.head(input);
+            break;
+        default:
+            output = HttpObject.NOT_FOUND();
+        }
+        return output;
+    }
 
+    public static byte[] toByteArray(Representation r){
+        try {
+            final ByteArrayOutputStream out = new ByteArrayOutputStream();
+            r.write(out);
+            out.close();
+            return out.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String toAscii(Representation r){
+        try {
+            return new String(toByteArray(r), "ascii");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 }

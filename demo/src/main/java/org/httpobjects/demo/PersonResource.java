@@ -49,7 +49,7 @@ public class PersonResource extends HttpObject {
 	
 	@Override
 	public Response get(Request req) {
-		String name = req.pathVars().valueFor("name");
+		String name = req.path().valueFor("name");
 		
 		if(name!=null && name.equals("stu")){
 			return OK(Text(name));

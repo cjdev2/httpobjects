@@ -51,8 +51,8 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.URIException;
-import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
 import org.apache.commons.httpclient.methods.DeleteMethod;
+import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -64,8 +64,8 @@ import org.httpobjects.Representation;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
 import org.httpobjects.ResponseCode;
+import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
-import org.httpobjects.header.OtherHeaderField;
 import org.httpobjects.header.response.LocationField;
 import org.httpobjects.header.response.SetCookieField;
 
@@ -124,12 +124,20 @@ public class Proxy extends HttpObject {
 		return proxyRequest(req, m);
 	}
 	
+	protected String getQuery(Request req){
+	    return req.query().toString();
+	}
+	
+	protected String processUrl(String url){
+	    return url;
+	}
+	
 	protected Response proxyRequest(Request req, final HttpMethodBase method) {
 		method.setFollowRedirects(false);
 		
-		String path = req.pathVars().valueFor("path");
+		String path = req.path().valueFor("path");
 		if(!path.startsWith("/")) path = "/" + path;
-		String query = req.query();
+		String query = getQuery(req);
 		if(query==null){
 			query = "";
 		}else{
@@ -139,7 +147,7 @@ public class Proxy extends HttpObject {
 		log.debug("doing a " + method.getClass().getSimpleName() + " for " + url);
 //		log.debug("Content type is " + req.representation().contentType());
 		try {
-			method.setURI(new URI(url, true));
+			method.setURI(new URI(processUrl(url), true));
 		} catch (URIException e1) {
 			throw new RuntimeException("Error with uri: " + url, e1);
 		}
@@ -191,6 +199,8 @@ public class Proxy extends HttpObject {
         }
     }
 
+    
+    
     protected List<HeaderField> extractResponseHeaders(HttpMethodBase method) {
         List<HeaderField> headersReturned = new ArrayList<HeaderField>();
         for(Header h : method.getResponseHeaders()){
@@ -202,14 +212,19 @@ public class Proxy extends HttpObject {
                 log.debug("Cookie found: " + setCookieField);
                 headersReturned.add(setCookieField);
             }else if(name.equals("Location")){
-                String a = value.replaceAll(Pattern.quote(base), me);
+                String a = processRedirect(value);
                 log.debug("Redirecting to " + a);
                 headersReturned.add(new LocationField(a));
             }else {
-                headersReturned.add(new OtherHeaderField(name, value));
+                headersReturned.add(new GenericHeaderField(name, value));
             }
         }
         return headersReturned;
+    }
+
+    protected String processRedirect(String url) {
+        String a = url.replaceAll(Pattern.quote(base), me);
+        return a;
     }
 
     protected Response createResponse(final HttpMethodBase method, ResponseCode responseCode, List<HeaderField> headersReturned) {
@@ -230,7 +245,6 @@ public class Proxy extends HttpObject {
                 		for(int x=in.read(buffer);x!=-1;x=in.read(buffer)){
                 			out.write(buffer, 0, x);
                 		}
-//                		IOUtils.copy(method.getResponseBodyAsStream(), out);
                 	}
                 		
                 } catch (IOException e) {

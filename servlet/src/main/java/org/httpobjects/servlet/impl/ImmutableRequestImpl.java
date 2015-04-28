@@ -37,59 +37,34 @@
  */
 package org.httpobjects.servlet.impl;
 
-import java.io.UnsupportedEncodingException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 
+import org.httpobjects.ConnectionInfo;
+import org.httpobjects.Query;
 import org.httpobjects.Representation;
 import org.httpobjects.Request;
 import org.httpobjects.header.request.RequestHeader;
-import org.httpobjects.header.response.SetCookieField;
-import org.httpobjects.path.PathVariables;
-import org.httpobjects.util.RequestQueryUtil;
+import org.httpobjects.path.Path;
 
 public class ImmutableRequestImpl implements Request {
-	private final PathVariables vars;
+	private final Path vars;
 	private final String contentType;
-	private final List<SetCookieField> cookies;
 	private final String query;
-	private final Map<String, String> parameters;
 	private final RequestHeader header;
 	private final Representation representation;
+	private final ConnectionInfo connectionInfo;
 	
-	public ImmutableRequestImpl(PathVariables vars, HttpServletRequest request) {
-
-
-
+	public ImmutableRequestImpl(Path vars, HttpServletRequest request) {
 		this.vars = vars;
 		this.contentType = request.getContentType();
-		this.cookies = Collections.unmodifiableList(HttpServletRequestUtil.buildCookies(request));
-
-
-
 		this.query = request.getQueryString();
-
-
-        try {
-            this.parameters = Collections.unmodifiableMap(RequestQueryUtil.getUrlParameters(request.getQueryString()));
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-
-
+		this.connectionInfo = HttpServletRequestUtil.connectionInfo(request);
         this.header = HttpServletRequestUtil.buildHeader(request);
-
-
-
 		this.representation = new ImmutableHttpServletRequestRepresentation(request);
 	}
 
-
 	@Override
-	public PathVariables pathVars() {
+	public Path path() {
 		return vars;
 	}
 	
@@ -101,27 +76,16 @@ public class ImmutableRequestImpl implements Request {
 	public boolean hasRepresentation() {
 		return true;
 	}
-	@Override
-	public List<SetCookieField> cookies() {
-		return cookies;
-	}
 	
 	@Override
-	public String query(){
-		return query;
+	public Query query(){
+		return new Query(query);
 	}
-	
-	@Override
-	public String getParameter(String name) {
-		return parameters.get(name);
-	}
-	
 	
 	@Override
 	public RequestHeader header() {
 		return header;
 	}
-	
 	
 	@Override
 	public Representation representation() {
@@ -131,5 +95,10 @@ public class ImmutableRequestImpl implements Request {
 	@Override
 	public Request immutableCopy() {
 		return this;
+	}
+	
+	@Override
+	public ConnectionInfo connectionInfo() {
+	    return connectionInfo;
 	}
 }

@@ -42,9 +42,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.httpobjects.Response;
+import org.httpobjects.StandardCharset;
 import org.httpobjects.header.DefaultHeaderFieldVisitor;
+import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
-import org.httpobjects.header.OtherHeaderField;
 import org.httpobjects.header.response.LocationField;
 import org.httpobjects.header.response.SetCookieField;
 
@@ -130,7 +131,7 @@ public class HttpObjectAssert {
 			for(HeaderField h : response.header()){
 				boolean matches = h.accept(new DefaultHeaderFieldVisitor<Boolean>(){
 					@Override
-					public Boolean visit(OtherHeaderField custom) {
+					public Boolean visit(GenericHeaderField custom) {
 						return custom.name().equals(name) && custom.value().equals(value);
 					}
 					@Override
@@ -186,10 +187,14 @@ public class HttpObjectAssert {
 			this.response = response;
 		}
 
-		public boolean isPlainText() {
+		public boolean isPlainTextWithDefaultHttpEncoding() {
 			return response.hasRepresentation() && response.representation().contentType().equals("text/plain");
 		}
-		
+
+        public boolean isPlainTextWithEncoding(String encodingName) {
+            return response.hasRepresentation() && response.representation().contentType().equals("text/plain; charset=" + encodingName);
+        }
+
 		public void assertIs(String expectation){
 			String value = toString();
 			if(
@@ -204,6 +209,7 @@ public class HttpObjectAssert {
 			return response.hasRepresentation() ? response.representation().contentType():"";
 		}
 	}
+	
 	public static class Representation {
 		private final Response response; 
 		
@@ -222,7 +228,7 @@ public class HttpObjectAssert {
 			return new String(out.toByteArray());
 		}
 
-		public Object asString() {
+		public String asString() {
 			return response.hasRepresentation()?textOf(response.representation()):null;
 		}
 	}

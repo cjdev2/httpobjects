@@ -39,6 +39,7 @@ package org.httpobjects.header;
 
 import org.httpobjects.header.request.AuthorizationField;
 import org.httpobjects.header.request.CookieField;
+import org.httpobjects.header.response.AllowField;
 import org.httpobjects.header.response.LocationField;
 import org.httpobjects.header.response.SetCookieField;
 import org.httpobjects.header.response.WWWAuthenticateField;
@@ -62,11 +63,16 @@ public class DefaultHeaderFieldVisitor<T> implements HeaderFieldVisitor<T> {
 	}
 	
 	@Override
-	public T visit(OtherHeaderField other) {
+	public T visit(GenericHeaderField other) {
 		return defaultValue();
 	}
-	
-	@Override
+
+    @Override
+    public T visit(AllowField allowField) {
+        return defaultValue();
+    }
+
+    @Override
 	public T visit(CookieField cookieField) {
 		return defaultValue();
 	}

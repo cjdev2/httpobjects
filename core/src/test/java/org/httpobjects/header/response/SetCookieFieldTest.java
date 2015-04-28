@@ -37,13 +37,46 @@
  */
 package org.httpobjects.header.response;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
-import org.httpobjects.header.response.SetCookieField;
 import org.junit.Test;
 
 public class SetCookieFieldTest {
-	
+
+    @Test
+    public void valuesMayBeQuoted(){
+
+        // given
+        String value = "foo=\"bar baz\"; path=\"/xyz\"; domain=\"xyz.com\"; Expires=\"Wed, 13-Jan-2021 22:23:01 GMT\"";
+        // when
+        SetCookieField c = SetCookieField.fromHeaderValue(value);
+
+        // then
+        Assert.assertEquals("foo", c.name);
+        Assert.assertEquals("bar baz", c.value);
+        Assert.assertEquals("/xyz", c.path);
+        Assert.assertEquals("xyz.com", c.domain);
+        Assert.assertEquals("Wed, 13-Jan-2021 22:23:01 GMT", c.expiration);
+    }
+
+    @Test
+    public void attributeNamesAreCaseInsentitive(){
+        
+        // given
+        String[] caseVariations = {"path", "PATH", "pAtH", "PaTh"};
+        
+        for(String pathAttributeName : caseVariations){
+            
+            // when
+            SetCookieField c = SetCookieField.fromHeaderValue("foo=bar; " + pathAttributeName + "=/");
+            
+            // then
+            Assert.assertEquals("foo", c.name);
+            Assert.assertEquals("bar", c.value);
+            Assert.assertEquals("/", c.path);
+        }
+    }
+    
 	@Test
 	public void basicNameValueSetCookieField(){
 		SetCookieField c = SetCookieField.fromHeaderValue("name=value");

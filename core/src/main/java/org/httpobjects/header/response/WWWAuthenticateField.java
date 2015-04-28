@@ -70,6 +70,6 @@ public class WWWAuthenticateField extends HeaderField {
 
     @Override
     public String value() {
-        return  method.name() + " realm=" + realmName + "";
+        return  method.name() + " realm=" + realmName;
     }
 }

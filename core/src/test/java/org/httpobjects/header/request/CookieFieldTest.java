@@ -37,10 +37,8 @@
  */
 package org.httpobjects.header.request;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
-import org.httpobjects.header.request.Cookie;
-import org.httpobjects.header.request.CookieField;
 import org.junit.Test;
 
 public class CookieFieldTest {

@@ -37,7 +37,8 @@ exception statement from your version.
  */
 package org.httpobjects.multipart;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.httpobjects.multipart.header.ContentDisposition;
 import org.httpobjects.multipart.header.ContentDisposition.ParseTool;
