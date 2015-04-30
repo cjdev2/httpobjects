@@ -37,17 +37,24 @@
  */
 package org.httpobjects;
 
+import static org.httpobjects.util.FutureUtil.waitFor;
 import static org.junit.Assert.*;
 
 import org.httpobjects.test.MockRequest;
 import org.httpobjects.util.ClasspathResourcesObject;
+import org.httpobjects.util.FutureUtil;
 import org.httpobjects.util.HttpObjectUtil;
 import org.junit.Test;
+import scala.concurrent.Await;
+import scala.concurrent.Future;
+import scala.concurrent.duration.Duration;
+
+import java.util.concurrent.TimeUnit;
 
 public class DSLTest {
 
     @Test
-    public void builderHappyPath(){
+    public void builderHappyPath() throws Exception {
     	// given/when
     	ClasspathResourcesObject object = DSL
     			.classpathResourcesAt("/org/httpobjects/util/ClasspathResourcesObjectTest")
@@ -55,12 +62,12 @@ public class DSLTest {
     		
     	// then
     	assertEquals("/{resource*}", object.pattern().raw());
-    	Response response = object.get(new MockRequest(object, "/a.txt"));
-    	assertEquals("hello", HttpObjectUtil.toAscii(response.representation()));
+    	Future<Response> response = object.get(new MockRequest(object, "/a.txt"));
+    	assertEquals("hello", HttpObjectUtil.toAscii(waitFor(response).representation()));
     }
     
     @Test
-    public void builderWithDifferentServiceRoot(){
+    public void builderWithDifferentServiceRoot() throws Exception {
     	// given/when
     	ClasspathResourcesObject object = DSL
     			.classpathResourcesAt("/org/httpobjects/util/ClasspathResourcesObjectTest")
@@ -68,8 +75,8 @@ public class DSLTest {
     		
     	// then
     	assertEquals("/bar/{resource*}", object.pattern().raw());
-    	Response response = object.get(new MockRequest(object, "/bar/a.txt"));
-    	assertEquals("hello", HttpObjectUtil.toAscii(response.representation()));
+    	Future<Response> response = object.get(new MockRequest(object, "/bar/a.txt"));
+    	assertEquals("hello", HttpObjectUtil.toAscii(waitFor(response).representation()));
     }
     
     @Test
@@ -81,7 +88,7 @@ public class DSLTest {
     		
     	// then
     	assertEquals("/bar/{resource*}", object.pattern().raw());
-    	Response response = object.get(new MockRequest(object, "/bar/util/ClasspathResourcesObjectTest/a.txt"));
-    	assertEquals("hello", HttpObjectUtil.toAscii(response.representation()));
+    	Future<Response> response = object.get(new MockRequest(object, "/bar/util/ClasspathResourcesObjectTest/a.txt"));
+    	assertEquals("hello", HttpObjectUtil.toAscii(waitFor(response).representation()));
     }
 }

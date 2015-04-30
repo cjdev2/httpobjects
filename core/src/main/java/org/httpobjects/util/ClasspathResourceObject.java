@@ -40,6 +40,7 @@ package org.httpobjects.util;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
+import scala.concurrent.Future;
 
 public class ClasspathResourceObject extends HttpObject {
 	private final Class<?> clazz;
@@ -57,8 +58,8 @@ public class ClasspathResourceObject extends HttpObject {
 	}
 
 	@Override
-	public Response get(Request req) {
-		return OK(FromClasspath(contentType, resourceName, clazz));
+	public Future<Response> get(Request req) {
+		return OK(FromClasspath(contentType, resourceName, clazz)).toFuture();
 	}
 
 }

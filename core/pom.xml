@@ -10,5 +10,12 @@
   <artifactId>httpobjects</artifactId>
   
   <name>${artifactId}</name>
-  
+
+  <dependencies>
+    <dependency>
+      <groupId>com.typesafe.akka</groupId>
+      <artifactId>akka-actor_2.11</artifactId>
+      <version>2.3.10</version>
+    </dependency>
+  </dependencies>
 </project>

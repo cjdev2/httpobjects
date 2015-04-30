@@ -46,6 +46,7 @@ import java.io.InputStream;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
+import scala.concurrent.Future;
 
 public class FilesystemResourcesObject  extends HttpObject {
 	private final File relativeTo;
@@ -56,7 +57,7 @@ public class FilesystemResourcesObject  extends HttpObject {
 	}
 	
 	@Override
-	public Response get(Request req) {
+	public Future<Response> get(Request req) {
 		final String resource = req.path().valueFor("resource");
 		if(isNullOrEmpty(resource) ||  resource.endsWith("/")) return null;
 		
@@ -67,7 +68,7 @@ public class FilesystemResourcesObject  extends HttpObject {
 		}
 		
 		if(path.exists() && path.isFile()){
-			return OK(Bytes(mimeTypeFor(resource), openStream(path)));
+			return OK(Bytes(mimeTypeFor(resource), openStream(path))).toFuture();
 		}else{
 			return null;
 		}

@@ -37,14 +37,14 @@
  */
 package org.httpobjects.tck;
 
-import org.apache.commons.httpclient.*;
+import akka.dispatch.ExecutionContexts;
+import akka.dispatch.Futures;
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.*;
-import org.apache.commons.httpclient.params.HttpParams;
-import org.httpobjects.ConnectionInfo;
-import org.httpobjects.HttpObject;
-import org.httpobjects.Query;
-import org.httpobjects.Request;
-import org.httpobjects.Response;
+import org.httpobjects.*;
 import org.httpobjects.header.DefaultHeaderFieldVisitor;
 import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
@@ -60,12 +60,13 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import scala.concurrent.Future;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.util.*;
-import java.util.regex.Matcher;
+import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
 
 import static org.httpobjects.util.HttpObjectUtil.toAscii;
@@ -83,174 +84,179 @@ public abstract class IntegrationTest {
     @Before
     public void setup(){
 
+        ExecutionContexts.fromExecutor(Executors.newSingleThreadExecutor());
 
         serve(8080,
-        new HttpObject("/app/inbox"){
-            public Response post(Request req) {
-                return OK(Text("Message Received"));
-            }
-        },
-        new HttpObject("/app/inbox/abc"){
-            public Response put(Request req) {
-                return OK(req.representation());
-            }
-        },
-        new HttpObject("/app"){
-            public Response get(Request req) {
-                return OK(Text("Welcome to the app"));
-            }
-        },
-        new HttpObject("/app/message"){
-            public Response post(Request req) {
-                return SEE_OTHER(Location("/app"), SetCookie("name", "frank"));
-            }
-        },
-        new HttpObject("/nothing", null){},
-        new HttpObject("/secure"){
-            public Response get(Request req) {
-                AuthorizationField authorization = req.header().authorization();
-                if(authorization!=null && authorization.method()==Method.Basic){
+               new HttpObject("/app/inbox") {
+                   public Future<Response> post(Request req) {
+                       return OK(Text("Message Received")).toFuture();
+                   }
+               },
+               new HttpObject("/app/inbox/abc") {
+                   public Future<Response> put(Request req) {
+                       return OK(req.representation()).toFuture();
+                   }
+               },
+               new HttpObject("/app") {
+                   public Future<Response> get(Request req) {
+                       return OK(Text("Welcome to the app")).toFuture();
+                   }
+               },
+               new HttpObject("/app/message") {
+                   public Future<Response> post(Request req) {
+                       return SEE_OTHER(Location("/app"), SetCookie("name", "frank")).toFuture();
+                   }
+               },
+               new HttpObject("/nothing", null) {
+               },
+               new HttpObject("/secure") {
+                   public Future<Response> get(Request req) {
+                       AuthorizationField authorization = req.header().authorization();
+                       if (authorization != null && authorization.method() == Method.Basic) {
 
-                    BasicCredentials creds = authorization.basicCredentials();
-                    if(creds.user().equals("Aladdin")&& creds.password().equals("open sesame")){
-                        return OK(Text("You're In!"));
-                    }
-                }
-                return UNAUTHORIZED(BasicAuthentication("secure area"), Text("You must first log-in"));
-            }
-        },
-        new HttpObject("/echoUrl/{id}/{name}"){
-            @Override
-            public Response get(Request req) {
-                try {
-                    final String query = req.query().toString();
-                    return OK(Text(req.path().toString() + query));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return INTERNAL_SERVER_ERROR(e);
-                }
-            }
-        },
-        new HttpObject("/echoQuery"){
-            @Override
-            public Response get(Request req) {
-                final StringBuffer text = new StringBuffer();
-                final Query query = req.query();
-                for(String name : query.paramNames()){
-                    if(text.length()>0){
-                        text.append('\n');
-                    }
-                    text.append(name + "=" + query.valueFor(name));
-                }
-                return OK(Text(text.toString()));
-            }
-        },
-        new HttpObject("/echoCookies"){
-            public Response get(Request req) {
+                           BasicCredentials creds = authorization.basicCredentials();
+                           if (creds.user().equals("Aladdin") && creds.password().equals("open sesame")) {
+                               return OK(Text("You're In!")).toFuture();
+                           }
+                       }
+                       return UNAUTHORIZED(BasicAuthentication("secure area"), Text("You must first log-in")).toFuture();
+                   }
+               },
+               new HttpObject("/echoUrl/{id}/{name}") {
+                   @Override
+                   public Future<Response> get(Request req) {
+                       try {
+                           final String query = req.query().toString();
+                           return OK(Text(req.path().toString() + query)).toFuture();
+                       } catch (Exception e) {
+                           e.printStackTrace();
+                           return INTERNAL_SERVER_ERROR(e).toFuture();
+                       }
+                   }
+               },
+               new HttpObject("/echoQuery") {
+                   @Override
+                   public Future<Response> get(Request req) {
+                       final StringBuffer text = new StringBuffer();
+                       final Query query = req.query();
+                       for (String name : query.paramNames()) {
+                           if (text.length() > 0) {
+                               text.append('\n');
+                           }
+                           text.append(name + "=" + query.valueFor(name));
+                       }
+                       return OK(Text(text.toString())).toFuture();
+                   }
+               },
+               new HttpObject("/echoCookies") {
+                   public Future<Response> get(Request req) {
 
-                final StringBuffer text = new StringBuffer();
-                for(HeaderField next : req.header().fields()){
-                    next.accept(new DefaultHeaderFieldVisitor<Void>(){
-                        @Override
-                        public Void visit(CookieField cookieField) {
-                            for(Cookie cookie : cookieField.cookies()){
-                                text.append(cookie.name + "=" + cookie.value);
-                            }
-                            return null;
-                        }
-                    });
-                }
+                       final StringBuffer text = new StringBuffer();
+                       for (HeaderField next : req.header().fields()) {
+                           next.accept(new DefaultHeaderFieldVisitor<Void>() {
+                               @Override
+                               public Void visit(CookieField cookieField) {
+                                   for (Cookie cookie : cookieField.cookies()) {
+                                       text.append(cookie.name + "=" + cookie.value);
+                                   }
+                                   return null;
+                               }
+                           });
+                       }
 
-                return OK(Text(text.toString()));
-            }
-        },
-        new HttpObject("/cookieSetter"){
-            public Response get(Request req){
-                return OK(
-                        Text("Here are some cookies!"), 
-                        new SetCookieField("name", "cookie monster", "sesamestreet.com"),
-                        new SetCookieField("specialGuest", "mr rogers", "mrrogers.com", "/myNeighborhood", "Wed, 13-Jan-2021 22:23:01 GMT", true),
-                        new SetCookieField("oldInsecureCookie", "yes", "the90sIntranet.com", "/images/animatedGifs", "Wed, 13-Jan-1999 22:23:01 GMT", false));
-            }
-        },
-        new HttpObject("/subpathEcho/{subPath*}"){
-            @Override
-            public Response get(Request req) {
-                return OK(Text(req.path().valueFor("subPath")));
-            }
-        },
-        new HttpObject("/echoHasRepresentation"){
-            @Override
-            public Response post(Request req) {
-                return OK(Text(req.hasRepresentation() ? "yes" : "no"));
-            }
-        },
-        new HttpObject("/pows/{name}/{rank}/{serialnumber}"){
-            @Override
-            public Response get(Request req) {
-                final Path path = req.path();
-                return OK(Text(
-                        path.valueFor("rank") + " " + 
-                        path.valueFor("name") + ", " + 
-                        path.valueFor("serialnumber")));
-            }
-        },
-        new HttpObject("/immutablecopy/{subpath*}"){
-            @Override
-            public Response post(Request req) {
-                Request r = req.immutableCopy();
-                final String firstPass = toString(r);
-                final String secondPass = toString(r);
-                return OK(Text(secondPass));
-            }  
-            
-            class HeadersByName implements Comparator<HeaderField>{
-                @Override
-                public int compare(HeaderField o1, HeaderField o2) {
-                    return o1.name().compareTo(o2.name());
-                }
-            }
-            private <T> List<T> sorted(List<T> items, Comparator<T> comparator){
-                List<T> sorted = new ArrayList<T>(items);
-                Collections.sort(sorted, comparator);
-                return sorted;
-            }
-            private String toString(Request r){
-                return "URI: " + r.path().toString() + "?" + r.query().toString() + "\n" + 
-                        toString(r.header().fields()) + 
-                        toAscii(r.representation());
-            }
-            private String toString(List<HeaderField> fields){
-                StringBuffer text = new StringBuffer();
-                for(HeaderField field : sorted(fields, new HeadersByName())){
-                    text.append(field.name() + "=" + field.value() + "\n");
-                }
-                return text.toString();
-            }
-        },
-        new HttpObject("/patchme"){
-            public org.httpobjects.Response patch(org.httpobjects.Request req) {
-                try {
-                    final String input = new String(HttpObjectUtil.toByteArray(req.representation()), "UTF-8");
-                    return OK(Text("You told me to patch!" + input));
-                } catch (UnsupportedEncodingException e) {
-                    return INTERNAL_SERVER_ERROR(e);
-                }
-            }
-        }, 
-        new HttpObject("/connectionInfo"){
-            public Response get(Request req) {
-                final ConnectionInfo connection = req.connectionInfo();
-                return OK(Text("Local " + connection.localAddress + ":" + connection.localPort + ", " + 
-                               "Remote " + connection.remoteAddress + ":" + connection.remotePort));
-            }
-        },
-        new HttpObject("/head"){
-        	@Override
-        	public Response head(Request req) {
-        		return OK(Text(""), new GenericHeaderField("foo", "bar"));
-        	}
-        });
+                       return OK(Text(text.toString())).toFuture();
+                   }
+               },
+               new HttpObject("/cookieSetter") {
+                   public Future<Response> get(Request req) {
+                       return OK(
+                                  Text("Here are some cookies!"),
+                                  new SetCookieField("name", "cookie monster", "sesamestreet.com"),
+                                  new SetCookieField("specialGuest", "mr rogers", "mrrogers.com", "/myNeighborhood", "Wed, 13-Jan-2021 22:23:01 GMT", true),
+                                  new SetCookieField("oldInsecureCookie", "yes", "the90sIntranet.com", "/images/animatedGifs", "Wed, 13-Jan-1999 22:23:01 GMT", false)).toFuture();
+                   }
+               },
+               new HttpObject("/subpathEcho/{subPath*}") {
+                   @Override
+                   public Future<Response> get(Request req) {
+                       return OK(Text(req.path().valueFor("subPath"))).toFuture();
+                   }
+               },
+               new HttpObject("/echoHasRepresentation") {
+                   @Override
+                   public Future<Response> post(Request req) {
+                       return OK(Text(req.hasRepresentation() ? "yes" : "no")).toFuture();
+                   }
+               },
+               new HttpObject("/pows/{name}/{rank}/{serialnumber}") {
+                   @Override
+                   public Future<Response> get(Request req) {
+                       final Path path = req.path();
+                       return OK(Text(
+                                       path.valueFor("rank") + " " +
+                                         path.valueFor("name") + ", " +
+                                         path.valueFor("serialnumber"))).toFuture();
+                   }
+               },
+               new HttpObject("/immutablecopy/{subpath*}") {
+                   @Override
+                   public Future<Response> post(Request req) {
+                       Request r = req.immutableCopy();
+                       final String firstPass = toString(r);
+                       final String secondPass = toString(r);
+                       return OK(Text(secondPass)).toFuture();
+                   }
+
+                   class HeadersByName implements Comparator<HeaderField> {
+                       @Override
+                       public int compare(HeaderField o1, HeaderField o2) {
+                           return o1.name().compareTo(o2.name());
+                       }
+                   }
+
+                   private <T> List<T> sorted(List<T> items, Comparator<T> comparator) {
+                       List<T> sorted = new ArrayList<T>(items);
+                       Collections.sort(sorted, comparator);
+                       return sorted;
+                   }
+
+                   private String toString(Request r) {
+                       return "URI: " + r.path().toString() + "?" + r.query().toString() + "\n" +
+                                toString(r.header().fields()) +
+                                toAscii(r.representation());
+                   }
+
+                   private String toString(List<HeaderField> fields) {
+                       StringBuffer text = new StringBuffer();
+                       for (HeaderField field : sorted(fields, new HeadersByName())) {
+                           text.append(field.name() + "=" + field.value() + "\n");
+                       }
+                       return text.toString();
+                   }
+               },
+               new HttpObject("/patchme") {
+                   public Future<Response> patch(org.httpobjects.Request req) {
+                       try {
+                           final String input = new String(HttpObjectUtil.toByteArray(req.representation()), "UTF-8");
+                           return OK(Text("You told me to patch!" + input)).toFuture();
+                       } catch (UnsupportedEncodingException e) {
+                           return INTERNAL_SERVER_ERROR(e).toFuture();
+                       }
+                   }
+               },
+               new HttpObject("/connectionInfo") {
+                   public Future<Response> get(Request req) {
+                       final ConnectionInfo connection = req.connectionInfo();
+                       return OK(Text("Local " + connection.localAddress + ":" + connection.localPort + ", " +
+                                        "Remote " + connection.remoteAddress + ":" + connection.remotePort)).toFuture();
+                   }
+               },
+               new HttpObject("/head") {
+                   @Override
+                   public Future<Response> head(Request req) {
+                       return OK(Text(""), new GenericHeaderField("foo", "bar")).toFuture();
+                   }
+               });
     }
 
     class PatchMethod extends EntityEnclosingMethod {

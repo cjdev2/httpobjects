@@ -46,6 +46,7 @@ import org.httpobjects.impl.fn.FunctionalJava;
 import org.httpobjects.util.impl.ClassResourceLoader;
 import org.httpobjects.util.impl.ResourceLoader;
 import org.httpobjects.util.impl.WrapperForInsecureClassloader;
+import scala.concurrent.Future;
 
 public class ClasspathResourcesObject  extends HttpObject {
     private static final String PATH_VAR_NAME = "resource";
@@ -77,14 +78,14 @@ public class ClasspathResourcesObject  extends HttpObject {
 	}
 
 	@Override
-	public Response get(Request req) {
+	public Future<Response> get(Request req) {
 		final String resource = req.path().valueFor(PATH_VAR_NAME);
 		if(isNullOrEmpty(resource) ||  resource.endsWith("/")) return null;
 		
 		final InputStream data = loader.getResourceAsStream(prefix + resource);
 		
 		if(data!=null){
-			return OK(Bytes(mimeTypeFor(resource), data));
+			return OK(Bytes(mimeTypeFor(resource), data)).toFuture();
 		}else{
 			return null;
 		}

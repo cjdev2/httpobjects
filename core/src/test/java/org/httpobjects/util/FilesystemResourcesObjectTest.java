@@ -43,11 +43,13 @@ import org.httpobjects.test.MockRequest;
 import org.httpobjects.util.FsTools.*;
 import org.junit.Assert;
 import org.junit.Test;
+import scala.concurrent.Future;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 
 import static org.httpobjects.util.FsTools.*;
+import static org.httpobjects.util.FutureUtil.waitFor;
 
 public class FilesystemResourcesObjectTest {
     @Test
@@ -64,11 +66,11 @@ public class FilesystemResourcesObjectTest {
         MockRequest req = new MockRequest(testSubject, "/misc-files/stuff.txt");
         
         // when
-        Response result = testSubject.get(req);
+        Future<Response> result = testSubject.get(req);
 
         // then
         Assert.assertNotNull(result);
-        Assert.assertEquals("some stuff", toString(result.representation()));
+        Assert.assertEquals("some stuff", toString(waitFor(result).representation()));
     }
     
     @Test
@@ -86,7 +88,7 @@ public class FilesystemResourcesObjectTest {
         MockRequest req = new MockRequest(testSubject, "/../hidden.txt");
         
         // when
-        Response result = testSubject.get(req);
+        Future<Response> result = testSubject.get(req);
 
         // then
         Assert.assertNull(result);

@@ -45,12 +45,16 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
 import org.httpobjects.test.MockRequest;
 import org.junit.Test;
+import scala.concurrent.Await;
+import scala.concurrent.Future;
+import scala.concurrent.duration.Duration;
 
 public class HttpObjectUtilTest {
 
@@ -64,14 +68,14 @@ public class HttpObjectUtilTest {
         }
 
         @Override
-        public Response patch(Request req) {
+        public Future<Response> patch(Request req) {
             requestsRecieved.add(req);
-            return response;
+            return response.toFuture();
         }
     }
     
     @Test
-    public void pipesInputsAndOutputsToThePatchMethod() {
+    public void pipesInputsAndOutputsToThePatchMethod() throws Exception {
         // given
         final Response expectedResponse = OK(Text("Hello WOrld"));
         final PatchTestingObject o = new PatchTestingObject("/foo", expectedResponse);
@@ -79,11 +83,11 @@ public class HttpObjectUtilTest {
         final Request input = new MockRequest(o, "/foo");
         
         // when
-        Response result = HttpObjectUtil.invokeMethod(o, Method.PATCH, input);
+        Future<Response> result = HttpObjectUtil.invokeMethod(o, Method.PATCH, input);
         
         // then
         assertNotNull(result);
-        assertTrue(expectedResponse == result);
+        assertTrue(expectedResponse == FutureUtil.waitFor(result));
         assertEquals(1, o.requestsRecieved.size());
         assertTrue(input == o.requestsRecieved.get(0));
         

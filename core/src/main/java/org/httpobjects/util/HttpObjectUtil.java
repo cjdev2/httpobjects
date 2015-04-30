@@ -45,11 +45,12 @@ import org.httpobjects.HttpObject;
 import org.httpobjects.Representation;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
+import scala.concurrent.Future;
 
 public class HttpObjectUtil {
 
-    public static Response invokeMethod(HttpObject object, final Method m, final Request input) {
-        final Response output;
+    public static Future<Response> invokeMethod(HttpObject object, final Method m, final Request input) {
+        final Future<Response> output;
         switch(m){
         case GET: 
             output = object.get(input);
@@ -70,7 +71,7 @@ public class HttpObjectUtil {
             output = object.head(input);
             break;
         default:
-            output = HttpObject.NOT_FOUND();
+            output = HttpObject.NOT_FOUND().toFuture();
         }
         return output;
     }

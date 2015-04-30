@@ -61,6 +61,7 @@ import org.httpobjects.header.response.WWWAuthenticateField;
 import org.httpobjects.servlet.impl.LazyRequestImpl;
 import org.httpobjects.util.HttpObjectUtil;
 import org.httpobjects.util.Method;
+import scala.concurrent.Future;
 
 public class ServletMethodInvoker {
 	private final HttpObject[] objects;
@@ -87,7 +88,8 @@ public class ServletMethodInvoker {
     }
 
     public boolean invokeFirstPathMatchIfAble(String path, HttpServletRequest r, HttpServletResponse httpResponse) {
-        Response lastResponse = null;
+        Future<Response> lastResponse = null;
+				
         for (HttpObject next : objects) {
             pathMatchObserver.checkingPathAgainstPattern(path, next.pattern());
             if (next.pattern().matches(path)) {
@@ -110,7 +112,7 @@ public class ServletMethodInvoker {
         }
     }
 
-    private Response invoke(HttpServletRequest r, HttpServletResponse httpResponse, HttpObject object) {
+    private Future<Response> invoke(HttpServletRequest r, HttpServletResponse httpResponse, HttpObject object) {
 		final Method m = Method.fromString(r.getMethod());
 		final Request input = new LazyRequestImpl(object.pattern().match(r.getRequestURI()), r);
 

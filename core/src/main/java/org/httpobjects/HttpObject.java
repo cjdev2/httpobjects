@@ -37,18 +37,26 @@
  */
 package org.httpobjects;
 
+import akka.dispatch.ExecutionContexts;
+import akka.dispatch.Futures;
 import org.httpobjects.path.PathPattern;
 import org.httpobjects.path.SimplePathPattern;
+import scala.concurrent.ExecutionContext;
+import scala.concurrent.ExecutionContextExecutor;
+import scala.concurrent.Future;
 
-public class HttpObject extends DSL{
+public class HttpObject extends DSL {
 
     private final PathPattern pathPattern;
-    private final Response defaultResponse;
+    private final Future<Response> defaultResponse;
+    private final ExecutionContextExecutor ctx;
+    private ExecutionContext executionContext;
 
     public HttpObject(PathPattern pathPattern, Response defaultResponse) {
         super();
+        this.ctx = ExecutionContexts.global();
         this.pathPattern = pathPattern;
-        this.defaultResponse = defaultResponse;
+        this.defaultResponse = Futures.successful(defaultResponse);
     }
     
     public HttpObject(String pathPattern, Response defaultResponse) {
@@ -63,20 +71,24 @@ public class HttpObject extends DSL{
         this(new SimplePathPattern(pathPattern));
     }
 
-    
-    
-    
     public PathPattern pattern() {
         return pathPattern;
     }
 
-    public Response delete(Request req){return defaultResponse;}
-    public Response get(Request req){return defaultResponse;}
-    public Response head(Request req){return defaultResponse;}
-    public Response options(Request req){return defaultResponse;}
-    public Response post(Request req){return defaultResponse;}
-    public Response put(Request req){return defaultResponse;}
-    public Response trace(Request req){return defaultResponse;}
-    public Response patch(Request req){return defaultResponse;}
+    public Future<Response> delete(Request req){return defaultResponse;}
+    public Future<Response> get(Request req){return defaultResponse;}
+    public Future<Response> head(Request req){return defaultResponse;}
+    public Future<Response> options(Request req){return defaultResponse;}
+    public Future<Response> post(Request req){return defaultResponse;}
+    public Future<Response> put(Request req){return defaultResponse;}
+    public Future<Response> trace(Request req){return defaultResponse;}
+    public Future<Response> patch(Request req){return defaultResponse;}
 
+    public ExecutionContext getExecutionContext() {
+        return executionContext;
+    }
+
+    public void setExecutionContext(ExecutionContext executionContext) {
+        this.executionContext = executionContext;
+    }
 }

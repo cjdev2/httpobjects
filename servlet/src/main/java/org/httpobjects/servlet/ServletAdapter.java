@@ -47,17 +47,20 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import akka.dispatch.OnComplete;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
+import scala.concurrent.ExecutionContext;
+import scala.concurrent.Future;
 
 @SuppressWarnings("serial")
 public final class ServletAdapter extends HttpServlet {
 	private HttpObject p;
-	
 	public ServletAdapter(HttpObject p) {
 		this.p = p;
 	}
+
 
 	private void returnResponse(Response r, HttpServletResponse resp) throws IOException {
 		
@@ -69,9 +72,22 @@ public final class ServletAdapter extends HttpServlet {
 			out.close();
 		}
 	}
+
+	private void returnResponse(Future<Response> futureResponse, final HttpServletResponse resp, ExecutionContext ctx) throws ServletException, IOException  {
+		futureResponse.onComplete(new OnComplete<Response>() {
+			@Override
+			public void onComplete(Throwable failure, Response r) throws Throwable {
+				if (null == failure)
+					returnResponse(r, resp);
+				else
+					throw failure;
+			}
+		}, ctx);
+	}
+
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		returnResponse(p.get(wrap(req)), resp);
+	protected void doGet(HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+		returnResponse(p.get(wrap(req)), resp, p.getExecutionContext());
 	}
 
 	@Override
@@ -82,32 +98,32 @@ public final class ServletAdapter extends HttpServlet {
 
 	@Override
 	protected void doHead(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		returnResponse(p.head(wrap(req)), resp);
+		returnResponse(p.head(wrap(req)), resp, p.getExecutionContext());
 	}
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		returnResponse(p.post(wrap(req)), resp);
+		returnResponse(p.post(wrap(req)), resp, p.getExecutionContext());
 	}
 
 	@Override
 	protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		returnResponse(p.put(wrap(req)), resp);
+		returnResponse(p.put(wrap(req)), resp, p.getExecutionContext());
 	}
 
 	@Override
 	protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		returnResponse(p.delete(wrap(req)), resp);
+		returnResponse(p.delete(wrap(req)), resp, p.getExecutionContext());
 	}
 
 	@Override
 	protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		returnResponse(p.options(wrap(req)), resp);
+		returnResponse(p.options(wrap(req)), resp, p.getExecutionContext());
 	}
 
 	@Override
 	protected void doTrace(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		returnResponse(p.trace(wrap(req)), resp);
+		returnResponse(p.trace(wrap(req)), resp, p.getExecutionContext());
 	}
 	
 	private Request wrap(HttpServletRequest req){
