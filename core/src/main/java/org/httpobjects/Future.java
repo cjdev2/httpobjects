@@ -38,7 +38,18 @@
 package org.httpobjects;
 
 public interface Future<V> {
-    void onComplete(Action<V> action, ActionExecutor executor);
+    /**
+     * Executes the callback upon resolution of this Future.  The callback is executed using the specified executor.
+     */
+    void onComplete(Action<V> callback, ActionExecutor executor);
+
+    /**
+     * Immediately returns the result of this future, if currently resolved, otherwise null.
+     */
     V getOrNull();
+
+    /**
+     * Blocks the current thread until this Future is resolved, returning the result.
+     */
     V get();
 }
