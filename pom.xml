@@ -95,6 +95,7 @@
         <module>netty-3</module>
         <module>test</module>
         <module>multipart</module>
+        <module>scala-2.11</module>
     </modules>
 
     <dependencies>
