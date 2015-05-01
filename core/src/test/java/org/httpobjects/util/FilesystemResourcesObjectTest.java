@@ -43,13 +43,12 @@ import org.httpobjects.test.MockRequest;
 import org.httpobjects.util.FsTools.*;
 import org.junit.Assert;
 import org.junit.Test;
-import scala.concurrent.Future;
+import org.httpobjects.Future;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 
 import static org.httpobjects.util.FsTools.*;
-import static org.httpobjects.util.FutureUtil.waitFor;
 
 public class FilesystemResourcesObjectTest {
     @Test
@@ -70,7 +69,7 @@ public class FilesystemResourcesObjectTest {
 
         // then
         Assert.assertNotNull(result);
-        Assert.assertEquals("some stuff", toString(waitFor(result).representation()));
+        Assert.assertEquals("some stuff", toString(result.get().representation()));
     }
     
     @Test

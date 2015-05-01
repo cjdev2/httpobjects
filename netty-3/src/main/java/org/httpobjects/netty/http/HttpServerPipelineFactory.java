@@ -17,21 +17,21 @@ package org.httpobjects.netty.http;
 
 import static org.jboss.netty.channel.Channels.pipeline;
 
+import org.httpobjects.ActionExecutor;
 import org.httpobjects.netty.http.HttpChannelHandler.RequestHandler;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.handler.codec.http.HttpContentCompressor;
 import org.jboss.netty.handler.codec.http.HttpRequestDecoder;
 import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
-import scala.concurrent.ExecutionContext;
 
 public class HttpServerPipelineFactory implements ChannelPipelineFactory {
 	
 	private final RequestHandler handler;
 	private final ByteAccumulatorFactory accumulatorFactory;
-    private final ExecutionContext executionContext;
+    private final ActionExecutor executionContext;
 	
-    public HttpServerPipelineFactory(ExecutionContext executionContext, RequestHandler handler, ByteAccumulatorFactory accumulatorFactory) {
+    public HttpServerPipelineFactory(ActionExecutor executionContext, RequestHandler handler, ByteAccumulatorFactory accumulatorFactory) {
 		super();
         this.executionContext = executionContext;
         this.handler = handler;

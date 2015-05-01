@@ -42,12 +42,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
-import akka.dispatch.ExecutionContexts;
+import org.httpobjects.ActionExecutor;
+import org.httpobjects.DSL;
 import org.httpobjects.HttpObject;
 import org.httpobjects.netty.http.FilesystemByteAccumulatorFactory;
 import org.httpobjects.tck.IntegrationTest;
 import org.jboss.netty.channel.Channel;
-import scala.concurrent.ExecutionContext;
 
 public class NettyIntegrationWithFilesystemBuffersTest extends IntegrationTest {
 	Channel server;
@@ -55,8 +55,9 @@ public class NettyIntegrationWithFilesystemBuffersTest extends IntegrationTest {
 	@Override
 	protected void serve(int port, HttpObject... objects) {
 	    File tempDir = tempDir();
-        final ExecutionContext context = ExecutionContexts.global();
-        server = HttpobjectsNettySupport.serve(context, port, Arrays.asList(objects), new FilesystemByteAccumulatorFactory(tempDir));
+
+        final ActionExecutor executor = DSL.syncronousExecutor();
+        server = HttpobjectsNettySupport.serve(executor, port, Arrays.asList(objects), new FilesystemByteAccumulatorFactory(tempDir));
 	}
 	
 	@Override

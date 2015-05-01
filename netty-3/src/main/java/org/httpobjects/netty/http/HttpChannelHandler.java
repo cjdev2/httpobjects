@@ -33,9 +33,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Set;
 
-import akka.dispatch.OnComplete;
-import org.httpobjects.ConnectionInfo;
-import org.httpobjects.Response;
+import org.httpobjects.*;
 import org.httpobjects.header.HeaderField;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
@@ -56,22 +54,9 @@ import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import scala.Function1;
-import scala.concurrent.ExecutionContext;
-import scala.concurrent.Future;
-import scala.runtime.BoxedUnit;
 
 public class HttpChannelHandler extends SimpleChannelUpstreamHandler {
 
-//	public static class FutureAndContext<T> {
-//        Future<T> future;
-//        ExecutionContext context;
-//
-//        public FutureAndContext(Future<T> future, ExecutionContext context) {
-//            this.future = future;
-//            this.context = context;
-//        }
-//    }
 	public static interface RequestHandler {
         Future<Response> respond(HttpRequest request, HttpChunkTrailer lastChunk, ByteAccumulator body, ConnectionInfo connectionInfo);
 	}
@@ -80,9 +65,9 @@ public class HttpChannelHandler extends SimpleChannelUpstreamHandler {
 	private final ByteAccumulator contentAccumulator;
     private HttpRequest request;
     private boolean readingChunks;
-    private final ExecutionContext executionContext;
+    private final ActionExecutor executionContext;
     
-    public HttpChannelHandler(ExecutionContext executionContext, RequestHandler handler, ByteAccumulator contentAccumulator) {
+    public HttpChannelHandler(ActionExecutor executionContext, RequestHandler handler, ByteAccumulator contentAccumulator) {
         this.executionContext = executionContext;
         this.handler = handler;
 		this.contentAccumulator = contentAccumulator;
@@ -154,10 +139,8 @@ public class HttpChannelHandler extends SimpleChannelUpstreamHandler {
         // Decide whether to close the connection or not.
         final boolean keepAlive = isKeepAlive(request);
 
-        futureResponse.onComplete(new OnComplete<Response>() {
-            @Override
-            public void onComplete(Throwable failure, Response r) throws Throwable {
-                if(failure!=null) throw new RuntimeException("error!", failure);
+        futureResponse.onComplete(new Action<Response>() {
+            public void exec(Response r) {
                 // Build the response object.
                 HttpResponseStatus status = HttpResponseStatus.valueOf(r.code().value());
 

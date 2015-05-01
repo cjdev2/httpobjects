@@ -35,21 +35,10 @@
  * obligated to do so.  If you do not wish to do so, delete this
  * exception statement from your version.
  */
-package org.httpobjects.util;
+package org.httpobjects;
 
-import scala.concurrent.Await;
-import scala.concurrent.Future;
-import scala.concurrent.duration.Duration;
-
-public class FutureUtil {
-  public static <T> T waitFor(Future<T> f) {
-    return waitFor(f, Duration.Undefined());
-  }
-  public static <T> T waitFor(Future<T> f, Duration d) {
-    try {
-      return Await.result(f, d);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
+public interface Future<V> {
+    void onComplete(Action<V> action, ActionExecutor executor);
+    V getOrNull();
+    V get();
 }

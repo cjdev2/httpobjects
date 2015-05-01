@@ -37,6 +37,7 @@
  */
 package org.httpobjects.servlet;
 
+import org.httpobjects.Future;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
@@ -52,9 +53,6 @@ import org.httpobjects.header.response.WWWAuthenticateField;
 import org.httpobjects.servlet.impl.LazyRequestImpl;
 import org.httpobjects.util.HttpObjectUtil;
 import org.httpobjects.util.Method;
-import scala.concurrent.Await;
-import scala.concurrent.Future;
-import scala.concurrent.duration.Duration;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -123,7 +121,7 @@ public class ServletMethodInvoker {
 
     private void returnResponse(Future<Response> futureResponse, final HttpServletResponse resp) {
         try {
-            Response result = Await.result(futureResponse, Duration.create(1, TimeUnit.DAYS));
+            Response result = futureResponse.get();
             returnResponse(result, resp);
         } catch (Exception e) {
             throw new RuntimeException(e);

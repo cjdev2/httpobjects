@@ -40,7 +40,7 @@ package org.httpobjects.demo;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
-import scala.concurrent.Future;
+import org.httpobjects.Future;
 
 public class PersonResource extends HttpObject {
 	

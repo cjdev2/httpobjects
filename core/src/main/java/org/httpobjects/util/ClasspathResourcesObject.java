@@ -41,12 +41,12 @@ import java.io.InputStream;
 
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
+import org.httpobjects.Future;
 import org.httpobjects.Response;
 import org.httpobjects.impl.fn.FunctionalJava;
 import org.httpobjects.util.impl.ClassResourceLoader;
 import org.httpobjects.util.impl.ResourceLoader;
 import org.httpobjects.util.impl.WrapperForInsecureClassloader;
-import scala.concurrent.Future;
 
 public class ClasspathResourcesObject  extends HttpObject {
     private static final String PATH_VAR_NAME = "resource";

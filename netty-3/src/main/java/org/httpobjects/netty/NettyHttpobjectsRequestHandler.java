@@ -8,13 +8,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.httpobjects.ConnectionInfo;
-import org.httpobjects.DSL;
-import org.httpobjects.HttpObject;
-import org.httpobjects.Query;
-import org.httpobjects.Representation;
-import org.httpobjects.Request;
-import org.httpobjects.Response;
+import org.httpobjects.*;
 import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.request.AuthorizationField;
@@ -29,8 +23,6 @@ import org.httpobjects.util.Method;
 import org.jboss.netty.handler.codec.http.HttpChunkTrailer;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpRequest;
-import scala.concurrent.ExecutionContext;
-import scala.concurrent.Future;
 
 public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.RequestHandler {
 	private final List<HttpObject> objects;

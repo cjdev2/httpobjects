@@ -45,16 +45,13 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
+import org.httpobjects.Future;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
 import org.httpobjects.test.MockRequest;
 import org.junit.Test;
-import scala.concurrent.Await;
-import scala.concurrent.Future;
-import scala.concurrent.duration.Duration;
 
 public class HttpObjectUtilTest {
 
@@ -87,7 +84,7 @@ public class HttpObjectUtilTest {
         
         // then
         assertNotNull(result);
-        assertTrue(expectedResponse == FutureUtil.waitFor(result));
+        assertTrue(expectedResponse == result.get());
         assertEquals(1, o.requestsRecieved.size());
         assertTrue(input == o.requestsRecieved.get(0));
         

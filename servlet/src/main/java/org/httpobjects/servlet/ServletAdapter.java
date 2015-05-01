@@ -37,11 +37,10 @@
  */
 package org.httpobjects.servlet;
 
+import org.httpobjects.Future;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
-import org.httpobjects.util.FutureUtil;
-import scala.concurrent.Future;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -61,7 +60,7 @@ public final class ServletAdapter extends HttpServlet {
 
 
 	private void returnResponse(Future<Response> futureResult, HttpServletResponse resp) throws IOException {
-        final Response r = FutureUtil.waitFor(futureResult);
+        final Response r = futureResult.get();
 
         resp.setStatus(r.code().value());
 

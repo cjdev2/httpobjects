@@ -67,7 +67,39 @@ public class DSL {
     public static final StandardCharset MOST_WIDELY_SUPPORTED_ENCODING = StandardCharset.UTF_8;
     public static final StandardCharset DEFAULT_HTTP_ENCODING = StandardCharset.ISO_8859_1;
     
-    
+
+    /*
+     * ########################################################
+     * ## Future
+     * ########################################################
+     */
+
+    public static <V> Future<V> now(final V value){
+        return new Future<V>(){
+            @Override
+            public V get() {
+                return value;
+            }
+            @Override
+            public V getOrNull() {
+                return value;
+            }
+            @Override
+            public void onComplete(Action<V> action, ActionExecutor executor) {
+                executor.execute(action, value);
+            }
+        };
+    }
+
+    public static ActionExecutor syncronousExecutor() {
+        return new ActionExecutor() {
+            @Override
+            public <T> void execute(Action<T> a, T value) {
+                a.exec(value);
+            }
+        };
+    }
+
     /*
      * ########################################################
      * ## Convenience builders

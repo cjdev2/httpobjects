@@ -37,9 +37,8 @@
  */
 package org.httpobjects;
 
-import akka.dispatch.Futures;
 import org.httpobjects.header.HeaderField;
-import scala.concurrent.Future;
+import org.httpobjects.Future;
 
 public final class Response {
 	
@@ -55,7 +54,7 @@ public final class Response {
 	}
 
 	public Future<Response> toFuture() {
-		return Futures.successful(this);
+		return DSL.now(this);
 	}
 	
 	public boolean hasRepresentation(){

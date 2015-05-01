@@ -59,16 +59,11 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.httpobjects.HttpObject;
-import org.httpobjects.Representation;
-import org.httpobjects.Request;
-import org.httpobjects.Response;
-import org.httpobjects.ResponseCode;
+import org.httpobjects.*;
 import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.response.LocationField;
 import org.httpobjects.header.response.SetCookieField;
-import scala.concurrent.Future;
 
 public class Proxy extends HttpObject {
 	private final Log log = LogFactory.getLog(getClass());

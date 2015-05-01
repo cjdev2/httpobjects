@@ -57,12 +57,10 @@ import org.httpobjects.header.request.RequestHeader;
 import org.httpobjects.jetty.HttpObjectsJettyHandler;
 import org.httpobjects.test.HttpObjectAssert;
 import org.httpobjects.test.MockRequest;
-import org.httpobjects.util.FutureUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mortbay.jetty.Server;
-import scala.concurrent.Future;
 
 public class ProxyTest {
 	Server jetty;
@@ -193,7 +191,7 @@ public class ProxyTest {
 		HttpObject subject = new Proxy("http://localhost:8080", "http://me.com");
 		
 		// WHEN: proxying a request for url with an encoded value in the query string
-		Response output = FutureUtil.waitFor(subject.get(new MockRequest(subject, "/queryStringEcho", new Query("?name=beforeTab%09afterTab"))));
+		Response output = subject.get(new MockRequest(subject, "/queryStringEcho", new Query("?name=beforeTab%09afterTab"))).get();
 		
 		// THEN: The url should come through unmolested
 		assertEquals("?name=beforeTab%09afterTab", bodyOf(output).asString());
@@ -207,7 +205,7 @@ public class ProxyTest {
 		Request input = new MockRequest(subject, "/echo", utf8Bytes("hi"));
 		
 		// when
-		Response output = FutureUtil.waitFor(subject.get(input));
+		Response output = subject.get(input).get();
 		
 		// then
 		responseCodeOf(output).assertIs(ResponseCode.OK);
@@ -227,7 +225,7 @@ public class ProxyTest {
 		Request input = new MockRequest(subject, "/contentTypeEcho");
 		
 		// when
-		Response output = FutureUtil.waitFor(subject.get(input));
+		Response output = subject.get(input).get();
 		
 		// then
 		assertEquals("null", bodyOf(output).asString());
@@ -246,7 +244,7 @@ public class ProxyTest {
 		};
 		
 		// when
-		Response output = FutureUtil.waitFor(subject.get(input));
+		Response output = subject.get(input).get();
 		
 		// then
 		responseCodeOf(output).assertIs(ResponseCode.OK);
@@ -260,7 +258,7 @@ public class ProxyTest {
 		Request input = new MockRequest(subject, "/setcookies");
 		
 		// when
-		Response output = FutureUtil.waitFor(subject.get(input));
+		Response output = subject.get(input).get();
 		
 		// then
 		responseCodeOf(output).assertIs(ResponseCode.OK);
@@ -279,7 +277,7 @@ public class ProxyTest {
 		Request input = new MockRequest(subject, "/frog");
 		
 		// when
-		Response output = FutureUtil.waitFor(subject.get(input));
+		Response output = subject.get(input).get();
 		
 		// then
 		responseCodeOf(output).assertIs(ResponseCode.OK);
@@ -295,7 +293,7 @@ public class ProxyTest {
 		Request input = new MockRequest(subject, "/frog", new Query("?name=kermit&property=value"));
 		
 		// when
-		Response output = FutureUtil.waitFor(subject.get(input));
+		Response output = subject.get(input).get();
 		
 		// then
 		assertTrue(responseCodeOf(output).isOK_200());
@@ -312,7 +310,7 @@ public class ProxyTest {
 		Request input = new MockRequest(subject, "/characters", HttpObject.Text("Oh, kermie!"));
 		
 		// when
-		Response output = FutureUtil.waitFor(subject.post(input));
+		Response output = subject.post(input).get();
 		
 		// then
 		responseCodeOf(output).assertIs(ResponseCode.SEE_OTHER);
@@ -329,7 +327,7 @@ public class ProxyTest {
 		Request input = new MockRequest(subject, "/frog", HttpObject.Text("Kermie"));
 		
 		// when
-		Response output = FutureUtil.waitFor(subject.put(input));
+		Response output = subject.put(input).get();
 		
 		// then
 		responseCodeOf(output).assertIs(ResponseCode.OK);
@@ -345,7 +343,7 @@ public class ProxyTest {
 		Request input = new MockRequest(subject, "/frog");
 		
 		// when
-		Response output = FutureUtil.waitFor(subject.get(input));
+		Response output = subject.get(input).get();
 		
 		// then
 		responseCodeOf(output).assertIsOK_200();
@@ -361,7 +359,7 @@ public class ProxyTest {
 		Request input = new MockRequest(subject, "/notme");
 		
 		// when
-		Response output = FutureUtil.waitFor(subject.get(input));
+		Response output = subject.get(input).get();
 		
 		// then
 
@@ -378,7 +376,7 @@ public class ProxyTest {
 		Request input = new MockRequest(subject, "/noresponse", HttpObject.Text("Kermie"));
 		
 		// when
-		Response output = FutureUtil.waitFor(subject.put(input));
+		Response output = subject.put(input).get();
 		
 		// then
 		assertEquals("", bodyOf(output).asString());

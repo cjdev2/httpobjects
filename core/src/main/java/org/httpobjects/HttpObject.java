@@ -37,24 +37,18 @@
  */
 package org.httpobjects;
 
-import akka.dispatch.ExecutionContexts;
-import akka.dispatch.Futures;
 import org.httpobjects.path.PathPattern;
 import org.httpobjects.path.SimplePathPattern;
-import scala.concurrent.ExecutionContext;
-import scala.concurrent.ExecutionContextExecutor;
-import scala.concurrent.Future;
 
 public class HttpObject extends DSL {
 
     private final PathPattern pathPattern;
     private final Future<Response> defaultResponse;
-    private ExecutionContext executionContext;
 
     public HttpObject(PathPattern pathPattern, Response defaultResponse) {
         super();
         this.pathPattern = pathPattern;
-        this.defaultResponse = defaultResponse == null ? null : Futures.successful(defaultResponse);
+        this.defaultResponse = defaultResponse == null ? null : now(defaultResponse);
     }
     
     public HttpObject(String pathPattern, Response defaultResponse) {

@@ -48,7 +48,6 @@ import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
 import org.httpobjects.test.MockRequest;
-import org.httpobjects.util.FutureUtil;
 import org.junit.Test;
 
 public class PersonResourceTest {
@@ -89,7 +88,7 @@ public class PersonResourceTest {
 		Request input = new MockRequest(subject, "/people/stu");
 		
 		// when
-		Response output = FutureUtil.waitFor(subject.get(input));
+		Response output = subject.get(input).get();
 		
 		// then
 		assertTrue(responseCodeOf(output).isOK_200());
@@ -104,7 +103,7 @@ public class PersonResourceTest {
 		Request input = new MockRequest(subject, "/people/");
 		
 		// when
-		Response output = FutureUtil.waitFor(subject.get(input));
+		Response output = subject.get(input).get();
 		
 		// then
 		assertTrue(responseCodeOf(output).isNOT_FOUND());

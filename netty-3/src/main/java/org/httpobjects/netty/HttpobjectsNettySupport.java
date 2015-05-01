@@ -5,28 +5,23 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
 
-import akka.dispatch.ExecutionContexts;
-import org.httpobjects.HttpObject;
-import org.httpobjects.Request;
-import org.httpobjects.Response;
+import org.httpobjects.*;
 import org.httpobjects.netty.http.ByteAccumulatorFactory;
 import org.httpobjects.netty.http.HttpServerPipelineFactory;
 import org.httpobjects.netty.http.InMemoryByteAccumulatorFactory;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
-import scala.concurrent.ExecutionContext;
-import scala.concurrent.Future;
 
 public class HttpobjectsNettySupport {
 
           
-      public static Channel serve(ExecutionContext context, int port, List<HttpObject> objects) {
+      public static Channel serve(ActionExecutor context, int port, List<HttpObject> objects) {
           ByteAccumulatorFactory buffers = new InMemoryByteAccumulatorFactory();
           return serve(context, port, objects, buffers);
       }
 
-      public static Channel serve(ExecutionContext context, int port, List<HttpObject> objects, ByteAccumulatorFactory buffers) {
+      public static Channel serve(ActionExecutor context, int port, List<HttpObject> objects, ByteAccumulatorFactory buffers) {
           // Configure the server.
           ServerBootstrap bootstrap = new ServerBootstrap(
                   new NioServerSocketChannelFactory(
@@ -48,9 +43,9 @@ public class HttpobjectsNettySupport {
               port = 8080;
           }
 
-          ExecutionContext context = ExecutionContexts.global();
+          ActionExecutor executor = DSL.syncronousExecutor();
 
-          HttpobjectsNettySupport.serve(context, port, Arrays.<HttpObject>asList(
+          HttpobjectsNettySupport.serve(executor, port, Arrays.<HttpObject>asList(
         		  new HttpObject("/") {
         				public Future<Response> get(Request req) {
         					return OK(Html("<html><body>Welcome.  Click <a href=\"/yo\">here</a> for a special message.</body></html>")).toFuture();

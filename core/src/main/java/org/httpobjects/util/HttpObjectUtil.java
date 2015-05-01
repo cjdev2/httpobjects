@@ -45,7 +45,7 @@ import org.httpobjects.HttpObject;
 import org.httpobjects.Representation;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
-import scala.concurrent.Future;
+import org.httpobjects.Future;
 
 public class HttpObjectUtil {
 

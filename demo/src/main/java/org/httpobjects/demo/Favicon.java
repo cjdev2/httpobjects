@@ -37,10 +37,10 @@
  */
 package org.httpobjects.demo;
 
+import org.httpobjects.Future;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
-import scala.concurrent.Future;
 
 public class Favicon extends HttpObject {
 

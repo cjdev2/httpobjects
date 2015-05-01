@@ -37,8 +37,6 @@
  */
 package org.httpobjects.tck;
 
-import akka.dispatch.ExecutionContexts;
-import akka.dispatch.Futures;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
@@ -60,7 +58,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import scala.concurrent.Future;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -83,8 +80,6 @@ public abstract class IntegrationTest {
 
     @Before
     public void setup(){
-
-        ExecutionContexts.fromExecutor(Executors.newSingleThreadExecutor());
 
         serve(8080,
                new HttpObject("/app/inbox") {

@@ -35,28 +35,8 @@
  * obligated to do so.  If you do not wish to do so, delete this
  * exception statement from your version.
  */
+package org.httpobjects;
 
-package org.httpobjects.netty;
-
-import java.util.Arrays;
-
-import org.httpobjects.ActionExecutor;
-import org.httpobjects.DSL;
-import org.httpobjects.HttpObject;
-import org.httpobjects.tck.IntegrationTest;
-import org.jboss.netty.channel.Channel;
-
-public class NettyIntegrationTest extends IntegrationTest {
-	Channel server;
-	
-	@Override
-	protected void serve(int port, HttpObject... objects) {
-        final ActionExecutor executor = DSL.syncronousExecutor();
-        server = HttpobjectsNettySupport.serve(executor, port, Arrays.asList(objects));
-	}
-	
-	@Override
-	protected void stopServing() {
-		server.unbind().awaitUninterruptibly();
-	}
+public interface Action<Value> {
+    void exec(Value value);
 }

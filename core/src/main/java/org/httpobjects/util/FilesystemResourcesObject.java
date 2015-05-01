@@ -43,10 +43,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.httpobjects.Future;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
-import scala.concurrent.Future;
 
 public class FilesystemResourcesObject  extends HttpObject {
 	private final File relativeTo;
