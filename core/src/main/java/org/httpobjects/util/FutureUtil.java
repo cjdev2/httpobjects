@@ -35,51 +35,21 @@
  * obligated to do so.  If you do not wish to do so, delete this
  * exception statement from your version.
  */
-package org.httpobjects;
+package org.httpobjects.util;
 
-import akka.dispatch.ExecutionContexts;
-import akka.dispatch.Futures;
-import org.httpobjects.path.PathPattern;
-import org.httpobjects.path.SimplePathPattern;
-import scala.concurrent.ExecutionContext;
-import scala.concurrent.ExecutionContextExecutor;
+import scala.concurrent.Await;
 import scala.concurrent.Future;
+import scala.concurrent.duration.Duration;
 
-public class HttpObject extends DSL {
-
-    private final PathPattern pathPattern;
-    private final Future<Response> defaultResponse;
-    private ExecutionContext executionContext;
-
-    public HttpObject(PathPattern pathPattern, Response defaultResponse) {
-        super();
-        this.pathPattern = pathPattern;
-        this.defaultResponse = defaultResponse == null ? null : Futures.successful(defaultResponse);
+public class FutureUtil {
+  public static <T> T waitFor(Future<T> f) {
+    return waitFor(f, Duration.Undefined());
+  }
+  public static <T> T waitFor(Future<T> f, Duration d) {
+    try {
+      return Await.result(f, d);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
-    
-    public HttpObject(String pathPattern, Response defaultResponse) {
-        this(new SimplePathPattern(pathPattern), defaultResponse);
-    }
-
-    public HttpObject(PathPattern pathPattern) {
-        this(pathPattern, METHOD_NOT_ALLOWED());
-    }
-
-    public HttpObject(String pathPattern) {
-        this(new SimplePathPattern(pathPattern));
-    }
-
-    public PathPattern pattern() {
-        return pathPattern;
-    }
-
-    public Future<Response> delete(Request req){return defaultResponse;}
-    public Future<Response> get(Request req){return defaultResponse;}
-    public Future<Response> head(Request req){return defaultResponse;}
-    public Future<Response> options(Request req){return defaultResponse;}
-    public Future<Response> post(Request req){return defaultResponse;}
-    public Future<Response> put(Request req){return defaultResponse;}
-    public Future<Response> trace(Request req){return defaultResponse;}
-    public Future<Response> patch(Request req){return defaultResponse;}
-
+  }
 }

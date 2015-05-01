@@ -23,15 +23,18 @@ import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.handler.codec.http.HttpContentCompressor;
 import org.jboss.netty.handler.codec.http.HttpRequestDecoder;
 import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
+import scala.concurrent.ExecutionContext;
 
 public class HttpServerPipelineFactory implements ChannelPipelineFactory {
 	
 	private final RequestHandler handler;
 	private final ByteAccumulatorFactory accumulatorFactory;
+    private final ExecutionContext executionContext;
 	
-    public HttpServerPipelineFactory(RequestHandler handler, ByteAccumulatorFactory accumulatorFactory) {
+    public HttpServerPipelineFactory(ExecutionContext executionContext, RequestHandler handler, ByteAccumulatorFactory accumulatorFactory) {
 		super();
-		this.handler = handler;
+        this.executionContext = executionContext;
+        this.handler = handler;
 		this.accumulatorFactory = accumulatorFactory;
 	}
 
@@ -50,7 +53,7 @@ public class HttpServerPipelineFactory implements ChannelPipelineFactory {
         pipeline.addLast("encoder", new HttpResponseEncoder());
         // Remove the following line if you don't want automatic content compression.
         pipeline.addLast("deflater", new HttpContentCompressor());
-        pipeline.addLast("handler", new HttpChannelHandler(handler, accumulatorFactory.newAccumulator()));
+        pipeline.addLast("handler", new HttpChannelHandler(executionContext, handler, accumulatorFactory.newAccumulator()));
         return pipeline;
     }
 }

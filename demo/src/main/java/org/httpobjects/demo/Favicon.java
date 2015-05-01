@@ -40,6 +40,7 @@ package org.httpobjects.demo;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
+import scala.concurrent.Future;
 
 public class Favicon extends HttpObject {
 
@@ -48,8 +49,8 @@ public class Favicon extends HttpObject {
 	}
 	
 	@Override
-	public Response get(Request req) {
-		return OK(File("image/x-icon", new java.io.File("favicon.ico")));
+	public Future<Response> get(Request req) {
+		return OK(File("image/x-icon", new java.io.File("favicon.ico"))).toFuture();
 	}
 	
 }

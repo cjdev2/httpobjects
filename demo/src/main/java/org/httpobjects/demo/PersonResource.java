@@ -40,6 +40,7 @@ package org.httpobjects.demo;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
+import scala.concurrent.Future;
 
 public class PersonResource extends HttpObject {
 	
@@ -48,13 +49,13 @@ public class PersonResource extends HttpObject {
 	}
 	
 	@Override
-	public Response get(Request req) {
+	public Future<Response> get(Request req) {
 		String name = req.path().valueFor("name");
 		
 		if(name!=null && name.equals("stu")){
-			return OK(Text(name));
+			return OK(Text(name)).toFuture();
 		}else{
-			return NOT_FOUND(Text("No such person"));
+			return NOT_FOUND(Text("No such person")).toFuture();
 		}
 	}
 	

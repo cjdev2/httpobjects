@@ -37,13 +37,13 @@
  */
 package org.httpobjects.servlet.impl;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.httpobjects.Query;
 import org.httpobjects.Representation;
 import org.httpobjects.Request;
 import org.httpobjects.header.request.RequestHeader;
 import org.httpobjects.path.Path;
+
+import javax.servlet.http.HttpServletRequest;
 
 public class LazyRequestImpl implements Request {
 	private final HttpServletRequest request;

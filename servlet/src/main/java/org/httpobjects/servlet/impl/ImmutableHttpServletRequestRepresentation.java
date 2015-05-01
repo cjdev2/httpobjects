@@ -37,15 +37,10 @@
  */
 package org.httpobjects.servlet.impl;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import org.httpobjects.Representation;
 
 import javax.servlet.http.HttpServletRequest;
-
-import org.httpobjects.Representation;
+import java.io.*;
 
 public class ImmutableHttpServletRequestRepresentation implements Representation {
 	private final String contentType;

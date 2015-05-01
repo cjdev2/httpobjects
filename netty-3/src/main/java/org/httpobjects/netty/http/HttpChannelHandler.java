@@ -63,26 +63,28 @@ import scala.runtime.BoxedUnit;
 
 public class HttpChannelHandler extends SimpleChannelUpstreamHandler {
 
-	public class FutureAndContext<T> {
-        Future<T> future;
-        ExecutionContext context;
-
-        public FutureAndContext(Future<T> future, ExecutionContext context) {
-            this.future = future;
-            this.context = context;
-        }
-    }
+//	public static class FutureAndContext<T> {
+//        Future<T> future;
+//        ExecutionContext context;
+//
+//        public FutureAndContext(Future<T> future, ExecutionContext context) {
+//            this.future = future;
+//            this.context = context;
+//        }
+//    }
 	public static interface RequestHandler {
-        FutureAndContext<Response> respond(HttpRequest request, HttpChunkTrailer lastChunk, ByteAccumulator body, ConnectionInfo connectionInfo);
+        Future<Response> respond(HttpRequest request, HttpChunkTrailer lastChunk, ByteAccumulator body, ConnectionInfo connectionInfo);
 	}
 	
 	private final RequestHandler handler;
 	private final ByteAccumulator contentAccumulator;
     private HttpRequest request;
     private boolean readingChunks;
+    private final ExecutionContext executionContext;
     
-    public HttpChannelHandler(RequestHandler handler, ByteAccumulator contentAccumulator) {
-		this.handler = handler;
+    public HttpChannelHandler(ExecutionContext executionContext, RequestHandler handler, ByteAccumulator contentAccumulator) {
+        this.executionContext = executionContext;
+        this.handler = handler;
 		this.contentAccumulator = contentAccumulator;
 	}
 
@@ -147,14 +149,15 @@ public class HttpChannelHandler extends SimpleChannelUpstreamHandler {
             throw new RuntimeException(e);
         }
     }
-    private void writeResponse(/*MessageEvent e*/ final Channel sink, final FutureAndContext<Response> futureResponseAndContext) {
+    private void writeResponse(/*MessageEvent e*/ final Channel sink, final Future<Response> futureResponse) {
     	
         // Decide whether to close the connection or not.
         final boolean keepAlive = isKeepAlive(request);
 
-        futureResponseAndContext.future.onComplete(new OnComplete<Response>() {
+        futureResponse.onComplete(new OnComplete<Response>() {
             @Override
             public void onComplete(Throwable failure, Response r) throws Throwable {
+                if(failure!=null) throw new RuntimeException("error!", failure);
                 // Build the response object.
                 HttpResponseStatus status = HttpResponseStatus.valueOf(r.code().value());
 
@@ -201,7 +204,7 @@ public class HttpChannelHandler extends SimpleChannelUpstreamHandler {
                 }
 
             }
-        }, futureResponseAndContext.context);
+        }, executionContext);
 
     }
 

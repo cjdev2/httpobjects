@@ -57,10 +57,12 @@ import org.httpobjects.header.request.RequestHeader;
 import org.httpobjects.jetty.HttpObjectsJettyHandler;
 import org.httpobjects.test.HttpObjectAssert;
 import org.httpobjects.test.MockRequest;
+import org.httpobjects.util.FutureUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mortbay.jetty.Server;
+import scala.concurrent.Future;
 
 public class ProxyTest {
 	Server jetty;
@@ -73,26 +75,26 @@ public class ProxyTest {
 	public void launch(){
 		jetty = HttpObjectsJettyHandler.launchServer(8080, new HttpObject[]{
 				new HttpObject("/frog"){
-					public Response get(Request req) {
+					public Future<Response> get(Request req) {
 						String response = "Kermit";
 						String q = req.query().toString();
 						if(q!=null){
 							response += q;
 						}
-						return OK(Text(response));
+						return OK(Text(response)).toFuture();
 					};
 					
 					@Override
-					public Response put(Request req) {
+					public Future<Response> put(Request req) {
 						ByteArrayOutputStream out = new ByteArrayOutputStream();
 						req.representation().write(out);
 						String textualRepresentation = new String(out.toByteArray());
-						return OK(Text(textualRepresentation));
+						return OK(Text(textualRepresentation)).toFuture();
 					}
 				},
 				new HttpObject("/requirescustomheader"){
 					@Override
-					public Response get(Request req) {
+					public Future<Response> get(Request req) {
 						boolean hasIt = false;
 						for(HeaderField field : req.header().fields()){
 							boolean found = field.accept(new DefaultHeaderFieldVisitor<Boolean>(){
@@ -110,65 +112,65 @@ public class ProxyTest {
 						}
 						
 						if(hasIt){
-							return OK(Text("Found it"));
+							return OK(Text("Found it")).toFuture();
 						}else{
-							return BAD_REQUEST();
+							return BAD_REQUEST().toFuture();
 						}
 					}
 				},
 				new HttpObject("/notme"){
-					public Response get(Request req) {
-						return SEE_OTHER(Location("/me"));
+					public Future<Response> get(Request req) {
+						return SEE_OTHER(Location("/me")).toFuture();
 					};
 				},
 				new HttpObject("/me"){
-					public Response get(Request req) {
-						return OK(Text("It's me!"));
+					public Future<Response> get(Request req) {
+						return OK(Text("It's me!")).toFuture();
 					};
 				},
 				new HttpObject("/setcookies"){
-					public Response get(Request req) {
-						return OK(Text("Here is a tasty cookie"), HttpObject.SetCookie("id", "1234"));
+					public Future<Response> get(Request req) {
+						return OK(Text("Here is a tasty cookie"), HttpObject.SetCookie("id", "1234")).toFuture();
 					};
 				},
 				new HttpObject("/piggy"){
-					public Response get(Request req) {
-						return OK(Text("Oh, kermie!"));
+					public Future<Response> get(Request req) {
+						return OK(Text("Oh, kermie!")).toFuture();
 					};
 				},
 				new HttpObject("/echo"){
-					public Response get(Request req) {
-						return OK(Bytes(req.representation().contentType(), new byte[]{}));
+					public Future<Response> get(Request req) {
+						return OK(Bytes(req.representation().contentType(), new byte[]{})).toFuture();
 					};
 				},
 				new HttpObject("/noresponse"){
 					@Override
-					public Response put(Request req) {
-						return new Response(ResponseCode.NO_CONTENT, null);
+					public Future<Response> put(Request req) {
+						return new Response(ResponseCode.NO_CONTENT, null).toFuture();
 					};
 				},
 				new HttpObject("/characters"){
-					public Response post(Request req) {
+					public Future<Response> post(Request req) {
 						ByteArrayOutputStream out = new ByteArrayOutputStream();
 						req.representation().write(out);
 						String textualRepresentation = new String(out.toByteArray());
 						if(textualRepresentation.equals("Oh, kermie!")){
-							return SEE_OTHER(Location("/piggy"), Text(textualRepresentation));
+							return SEE_OTHER(Location("/piggy"), Text(textualRepresentation)).toFuture();
 						}else{
 							return null;
 						}
 					};
 				},
 				new HttpObject("/queryStringEcho"){
-					public Response get(Request req) {
-						return OK(Text(req.query().toString()));
+					public Future<Response> get(Request req) {
+						return OK(Text(req.query().toString())).toFuture();
 					};
 				},
 				new HttpObject("/contentTypeEcho"){
-					public Response get(Request req) {
+					public Future<Response> get(Request req) {
 						String requestContentType = req.representation().contentType();
 						
-						return OK(Text(requestContentType == null ? "null" : requestContentType));
+						return OK(Text(requestContentType == null ? "null" : requestContentType)).toFuture();
 					};
 				}
 				
@@ -191,7 +193,7 @@ public class ProxyTest {
 		HttpObject subject = new Proxy("http://localhost:8080", "http://me.com");
 		
 		// WHEN: proxying a request for url with an encoded value in the query string
-		Response output = subject.get(new MockRequest(subject, "/queryStringEcho", new Query("?name=beforeTab%09afterTab")));
+		Response output = FutureUtil.waitFor(subject.get(new MockRequest(subject, "/queryStringEcho", new Query("?name=beforeTab%09afterTab"))));
 		
 		// THEN: The url should come through unmolested
 		assertEquals("?name=beforeTab%09afterTab", bodyOf(output).asString());
@@ -205,7 +207,7 @@ public class ProxyTest {
 		Request input = new MockRequest(subject, "/echo", utf8Bytes("hi"));
 		
 		// when
-		Response output = subject.get(input);
+		Response output = FutureUtil.waitFor(subject.get(input));
 		
 		// then
 		responseCodeOf(output).assertIs(ResponseCode.OK);
@@ -225,7 +227,7 @@ public class ProxyTest {
 		Request input = new MockRequest(subject, "/contentTypeEcho");
 		
 		// when
-		Response output = subject.get(input);
+		Response output = FutureUtil.waitFor(subject.get(input));
 		
 		// then
 		assertEquals("null", bodyOf(output).asString());
@@ -244,7 +246,7 @@ public class ProxyTest {
 		};
 		
 		// when
-		Response output = subject.get(input);
+		Response output = FutureUtil.waitFor(subject.get(input));
 		
 		// then
 		responseCodeOf(output).assertIs(ResponseCode.OK);
@@ -258,7 +260,7 @@ public class ProxyTest {
 		Request input = new MockRequest(subject, "/setcookies");
 		
 		// when
-		Response output = subject.get(input);
+		Response output = FutureUtil.waitFor(subject.get(input));
 		
 		// then
 		responseCodeOf(output).assertIs(ResponseCode.OK);
@@ -277,7 +279,7 @@ public class ProxyTest {
 		Request input = new MockRequest(subject, "/frog");
 		
 		// when
-		Response output = subject.get(input);
+		Response output = FutureUtil.waitFor(subject.get(input));
 		
 		// then
 		responseCodeOf(output).assertIs(ResponseCode.OK);
@@ -293,7 +295,7 @@ public class ProxyTest {
 		Request input = new MockRequest(subject, "/frog", new Query("?name=kermit&property=value"));
 		
 		// when
-		Response output = subject.get(input);
+		Response output = FutureUtil.waitFor(subject.get(input));
 		
 		// then
 		assertTrue(responseCodeOf(output).isOK_200());
@@ -310,7 +312,7 @@ public class ProxyTest {
 		Request input = new MockRequest(subject, "/characters", HttpObject.Text("Oh, kermie!"));
 		
 		// when
-		Response output = subject.post(input);
+		Response output = FutureUtil.waitFor(subject.post(input));
 		
 		// then
 		responseCodeOf(output).assertIs(ResponseCode.SEE_OTHER);
@@ -327,7 +329,7 @@ public class ProxyTest {
 		Request input = new MockRequest(subject, "/frog", HttpObject.Text("Kermie"));
 		
 		// when
-		Response output = subject.put(input);
+		Response output = FutureUtil.waitFor(subject.put(input));
 		
 		// then
 		responseCodeOf(output).assertIs(ResponseCode.OK);
@@ -343,7 +345,7 @@ public class ProxyTest {
 		Request input = new MockRequest(subject, "/frog");
 		
 		// when
-		Response output = subject.get(input);
+		Response output = FutureUtil.waitFor(subject.get(input));
 		
 		// then
 		responseCodeOf(output).assertIsOK_200();
@@ -359,7 +361,7 @@ public class ProxyTest {
 		Request input = new MockRequest(subject, "/notme");
 		
 		// when
-		Response output = subject.get(input);
+		Response output = FutureUtil.waitFor(subject.get(input));
 		
 		// then
 
@@ -376,7 +378,7 @@ public class ProxyTest {
 		Request input = new MockRequest(subject, "/noresponse", HttpObject.Text("Kermie"));
 		
 		// when
-		Response output = subject.put(input);
+		Response output = FutureUtil.waitFor(subject.put(input));
 		
 		// then
 		assertEquals("", bodyOf(output).asString());

@@ -37,13 +37,12 @@
  */
 package org.httpobjects.servlet.impl;
 
+import org.httpobjects.Representation;
+
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.httpobjects.Representation;
 
 public class LazyHttpServletRequestRepresentation implements Representation {
 	private final HttpServletRequest request;

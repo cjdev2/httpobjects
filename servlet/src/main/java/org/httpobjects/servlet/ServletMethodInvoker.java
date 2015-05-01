@@ -37,18 +37,6 @@
  */
 package org.httpobjects.servlet;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import akka.dispatch.OnComplete;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
@@ -64,12 +52,18 @@ import org.httpobjects.header.response.WWWAuthenticateField;
 import org.httpobjects.servlet.impl.LazyRequestImpl;
 import org.httpobjects.util.HttpObjectUtil;
 import org.httpobjects.util.Method;
-import scala.Option;
 import scala.concurrent.Await;
-import scala.concurrent.ExecutionContext;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
-import scala.util.Try;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class ServletMethodInvoker {
 	private final HttpObject[] objects;
@@ -104,7 +98,7 @@ public class ServletMethodInvoker {
                 lastResponse = invoke(r, httpResponse, next);
                 if (lastResponse != null) {
                     pathMatchObserver.pathMatchedPattern(path, next.pattern());
-                    returnResponse(lastResponse, httpResponse, next.getExecutionContext());
+                    returnResponse(lastResponse, httpResponse);
                     break;
                 }
             }
@@ -127,7 +121,7 @@ public class ServletMethodInvoker {
 		return HttpObjectUtil.invokeMethod(object, m, input);
 	}
 
-    private void returnResponse(Future<Response> futureResponse, final HttpServletResponse resp, ExecutionContext foo) {
+    private void returnResponse(Future<Response> futureResponse, final HttpServletResponse resp) {
         try {
             Response result = Await.result(futureResponse, Duration.create(1, TimeUnit.DAYS));
             returnResponse(result, resp);

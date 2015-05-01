@@ -37,18 +37,12 @@
  */
 package org.httpobjects.servlet;
 
-import java.io.IOException;
+import org.httpobjects.HttpObject;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.httpobjects.HttpObject;
+import java.io.IOException;
 
 public class ServletFilter implements Filter{
 	private final ServletMethodInvoker invoker;

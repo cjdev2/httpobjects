@@ -50,7 +50,8 @@ public class NettyIntegrationTest extends IntegrationTest {
 	Channel server;
 	
 	@Override
-	protected void serve(ExecutionContext context, int port, HttpObject... objects) {
+	protected void serve(int port, HttpObject... objects) {
+        final ExecutionContext context = ExecutionContexts.global();
         server = HttpobjectsNettySupport.serve(context, port, Arrays.asList(objects));
 	}
 	

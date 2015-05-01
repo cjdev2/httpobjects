@@ -37,13 +37,6 @@
  */
 package org.httpobjects.servlet.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.httpobjects.ConnectionInfo;
 import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
@@ -51,6 +44,12 @@ import org.httpobjects.header.request.AuthorizationField;
 import org.httpobjects.header.request.CookieField;
 import org.httpobjects.header.request.RequestHeader;
 import org.httpobjects.header.response.SetCookieField;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
 
 public class HttpServletRequestUtil {
 

@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
 
+import akka.dispatch.ExecutionContexts;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
@@ -33,7 +34,7 @@ public class HttpobjectsNettySupport {
                           Executors.newCachedThreadPool()));
   
           // Set up the event pipeline factory.
-          bootstrap.setPipelineFactory(new HttpServerPipelineFactory(new NettyHttpobjectsRequestHandler(objects), buffers));
+          bootstrap.setPipelineFactory(new HttpServerPipelineFactory(context, new NettyHttpobjectsRequestHandler(objects), buffers));
   
           // Bind and start to accept incoming connections.
           return bootstrap.bind(new InetSocketAddress(port));
@@ -46,7 +47,10 @@ public class HttpobjectsNettySupport {
           } else {
               port = 8080;
           }
-          HttpobjectsNettySupport.serve(port, Arrays.<HttpObject>asList(
+
+          ExecutionContext context = ExecutionContexts.global();
+
+          HttpobjectsNettySupport.serve(context, port, Arrays.<HttpObject>asList(
         		  new HttpObject("/") {
         				public Future<Response> get(Request req) {
         					return OK(Html("<html><body>Welcome.  Click <a href=\"/yo\">here</a> for a special message.</body></html>")).toFuture();

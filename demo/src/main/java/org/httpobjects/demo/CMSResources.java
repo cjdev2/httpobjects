@@ -45,7 +45,7 @@ import java.io.InputStream;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
-
+import scala.concurrent.Future;
 
 
 public class CMSResources extends HttpObject {
@@ -57,7 +57,7 @@ public class CMSResources extends HttpObject {
 	}
 	
 	@Override
-	public Response get(Request req) {
+	public Future<Response> get(Request req) {
 		String cid = req.path().valueFor("cid");
 		String path = req.path().valueFor("path");
 		File localPath = (path==null || path.isEmpty())?root:new File(root, path);
@@ -69,11 +69,11 @@ public class CMSResources extends HttpObject {
 			String contentType = contentTypeOf(localPath);
 			InputStream data = FileInputStream(localPath);
 			
-			return OK(Bytes(contentType, data));
+			return OK(Bytes(contentType, data)).toFuture();
 		} else if(localPath.isDirectory()){
-			return OK(Html(directoryListing(cid, localPath)));
+			return OK(Html(directoryListing(cid, localPath))).toFuture();
 		} else {
-			return NOT_FOUND();
+			return NOT_FOUND().toFuture();
 		}
 	}
 	
