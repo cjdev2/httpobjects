@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.httpobjects.outcome.Outcome;
 import org.httpobjects.outcome.OutcomeHandlerExecutor;
 import org.httpobjects.outcome.OutcomeHandler;
 import org.httpobjects.header.HeaderField;
@@ -113,7 +114,7 @@ public class DSL {
     public static OutcomeHandlerExecutor syncronousExecutor() {
         return new OutcomeHandlerExecutor() {
             @Override
-            public <T> void execute(OutcomeHandler<T> a, Eventual<T> resolved) {
+            public <T> void execute(OutcomeHandler<T> a, Outcome<T> resolved) {
                 a.exec(resolved);
             }
         };

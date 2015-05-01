@@ -69,7 +69,7 @@ object ScalaDSL {
   implicit def asScalaExecutionContext(executor:OutcomeHandlerExecutor):ExecutionContext = new ActionExecutorWrapper(executor)
   implicit def asHttpobjectsActionExecutor(ec:ExecutionContext):OutcomeHandlerExecutor = {
     new OutcomeHandlerExecutor {
-      override def execute[T](a: OutcomeHandler[T], resolved:HFuture[T]): Unit = {
+      override def execute[T](a: OutcomeHandler[T], resolved:Outcome[T]): Unit = {
         ec.execute(new Runnable {
           override def run(): Unit = a.exec(resolved)
         })

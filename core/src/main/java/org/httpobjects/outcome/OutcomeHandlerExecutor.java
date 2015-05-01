@@ -40,5 +40,5 @@ package org.httpobjects.outcome;
 import org.httpobjects.Eventual;
 
 public interface OutcomeHandlerExecutor {
-    <T> void execute(OutcomeHandler<T> a, Eventual<T> resolved);
+    <T> void execute(OutcomeHandler<T> a, Outcome<T> resolved);
 }
