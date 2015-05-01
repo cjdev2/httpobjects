@@ -40,16 +40,18 @@ package org.httpobjects.netty;
 
 import java.util.Arrays;
 
+import akka.dispatch.ExecutionContexts;
 import org.httpobjects.HttpObject;
 import org.httpobjects.tck.IntegrationTest;
 import org.jboss.netty.channel.Channel;
+import scala.concurrent.ExecutionContext;
 
 public class NettyIntegrationTest extends IntegrationTest {
 	Channel server;
 	
 	@Override
-	protected void serve(int port, HttpObject... objects) {
-		server = HttpobjectsNettySupport.serve(port, Arrays.asList(objects));
+	protected void serve(ExecutionContext context, int port, HttpObject... objects) {
+        server = HttpobjectsNettySupport.serve(context, port, Arrays.asList(objects));
 	}
 	
 	@Override

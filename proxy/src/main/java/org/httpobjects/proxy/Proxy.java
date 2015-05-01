@@ -68,6 +68,7 @@ import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.response.LocationField;
 import org.httpobjects.header.response.SetCookieField;
+import scala.concurrent.Future;
 
 public class Proxy extends HttpObject {
 	private final Log log = LogFactory.getLog(getClass());
@@ -93,21 +94,21 @@ public class Proxy extends HttpObject {
     }
 
 	@Override
-	public Response get(Request req) {
-		return proxyRequest(req, new GetMethod());
+	public Future<Response> get(Request req) {
+		return proxyRequest(req, new GetMethod()).toFuture();
 	}
 
     @Override
-	public Response delete(Request req){
-		return proxyRequest(req, new DeleteMethod());
+	public Future<Response> delete(Request req){
+		return proxyRequest(req, new DeleteMethod()).toFuture();
     }
 
 	@Override
-	public Response put(Request req) {
+	public Future<Response> put(Request req) {
 		PutMethod m = new PutMethod();
 
 		setRequestRepresentation(req, m);
-		return proxyRequest(req, m);
+		return proxyRequest(req, m).toFuture();
 	}
 
 	protected void setRequestRepresentation(Request req, EntityEnclosingMethod method){
@@ -117,11 +118,11 @@ public class Proxy extends HttpObject {
 	}
 	
 	@Override
-	public Response post(Request req) {
+	public Future<Response> post(Request req) {
 		PostMethod m = new PostMethod();
 
 		setRequestRepresentation(req, m);
-		return proxyRequest(req, m);
+		return proxyRequest(req, m).toFuture();
 	}
 	
 	protected String getQuery(Request req){

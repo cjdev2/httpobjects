@@ -33,6 +33,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Set;
 
+import akka.dispatch.OnComplete;
 import org.httpobjects.ConnectionInfo;
 import org.httpobjects.Response;
 import org.httpobjects.header.HeaderField;
@@ -55,11 +56,24 @@ import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
+import scala.Function1;
+import scala.concurrent.ExecutionContext;
+import scala.concurrent.Future;
+import scala.runtime.BoxedUnit;
 
 public class HttpChannelHandler extends SimpleChannelUpstreamHandler {
-	
+
+	public class FutureAndContext<T> {
+        Future<T> future;
+        ExecutionContext context;
+
+        public FutureAndContext(Future<T> future, ExecutionContext context) {
+            this.future = future;
+            this.context = context;
+        }
+    }
 	public static interface RequestHandler {
-		Response respond(HttpRequest request, HttpChunkTrailer lastChunk, ByteAccumulator body, ConnectionInfo connection);
+        FutureAndContext<Response> respond(HttpRequest request, HttpChunkTrailer lastChunk, ByteAccumulator body, ConnectionInfo connectionInfo);
 	}
 	
 	private final RequestHandler handler;
@@ -133,55 +147,62 @@ public class HttpChannelHandler extends SimpleChannelUpstreamHandler {
             throw new RuntimeException(e);
         }
     }
-    private void writeResponse(/*MessageEvent e*/ Channel sink, Response r) {
+    private void writeResponse(/*MessageEvent e*/ final Channel sink, final FutureAndContext<Response> futureResponseAndContext) {
     	
         // Decide whether to close the connection or not.
-        boolean keepAlive = isKeepAlive(request);
+        final boolean keepAlive = isKeepAlive(request);
 
-        // Build the response object.
-        HttpResponseStatus status = HttpResponseStatus.valueOf(r.code().value());
-        
-        HttpResponse response = new DefaultHttpResponse(HTTP_1_1, status);
-        if(r.hasRepresentation()){
-        	response.setContent(ChannelBuffers.copiedBuffer(read(r)));
-        	if(r.representation().contentType() != null)
-        		response.headers().set(CONTENT_TYPE, r.representation().contentType());
-        }
-        
-        for(HeaderField field : r.header()){
-            response.headers().add(field.name(), field.value());
-        }
+        futureResponseAndContext.future.onComplete(new OnComplete<Response>() {
+            @Override
+            public void onComplete(Throwable failure, Response r) throws Throwable {
+                // Build the response object.
+                HttpResponseStatus status = HttpResponseStatus.valueOf(r.code().value());
 
-        if (keepAlive) {
-            // Add 'Content-Length' header only for a keep-alive connection.
-            response.headers().set(CONTENT_LENGTH, response.getContent().readableBytes());
-            // Add keep alive header as per:
-            // - http://www.w3.org/Protocols/HTTP/1.1/draft-ietf-http-v11-spec-01.html#Connection
-            response.headers().set(CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
-        }
-
-        // Encode the cookie.
-        String cookieString = request.headers().get(COOKIE);
-        if (cookieString != null) {
-            CookieDecoder cookieDecoder = new CookieDecoder();
-            Set<Cookie> cookies = cookieDecoder.decode(cookieString);
-            if (!cookies.isEmpty()) {
-                // Reset the cookies if necessary.
-                CookieEncoder cookieEncoder = new CookieEncoder(true);
-                for (Cookie cookie : cookies) {
-                    cookieEncoder.addCookie(cookie);
-                    response.headers().add(SET_COOKIE, cookieEncoder.encode());
+                HttpResponse response = new DefaultHttpResponse(HTTP_1_1, status);
+                if (r.hasRepresentation()) {
+                    response.setContent(ChannelBuffers.copiedBuffer(read(r)));
+                    if (r.representation().contentType() != null)
+                        response.headers().set(CONTENT_TYPE, r.representation().contentType());
                 }
+
+                for (HeaderField field : r.header()) {
+                    response.headers().add(field.name(), field.value());
+                }
+
+                if (keepAlive) {
+                    // Add 'Content-Length' header only for a keep-alive connection.
+                    response.headers().set(CONTENT_LENGTH, response.getContent().readableBytes());
+                    // Add keep alive header as per:
+                    // - http://www.w3.org/Protocols/HTTP/1.1/draft-ietf-http-v11-spec-01.html#Connection
+                    response.headers().set(CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
+                }
+
+                // Encode the cookie.
+                String cookieString = request.headers().get(COOKIE);
+                if (cookieString != null) {
+                    CookieDecoder cookieDecoder = new CookieDecoder();
+                    Set<Cookie> cookies = cookieDecoder.decode(cookieString);
+                    if (!cookies.isEmpty()) {
+                        // Reset the cookies if necessary.
+                        CookieEncoder cookieEncoder = new CookieEncoder(true);
+                        for (Cookie cookie : cookies) {
+                            cookieEncoder.addCookie(cookie);
+                            response.headers().add(SET_COOKIE, cookieEncoder.encode());
+                        }
+                    }
+                }
+
+                // Write the response.
+                ChannelFuture future = sink.write(response);
+
+                // Close the non-keep-alive connection after the write operation is done.
+                if (!keepAlive) {
+                    future.addListener(ChannelFutureListener.CLOSE);
+                }
+
             }
-        }
+        }, futureResponseAndContext.context);
 
-        // Write the response.
-          ChannelFuture future = sink.write(response);
-
-        // Close the non-keep-alive connection after the write operation is done.
-        if (!keepAlive) {
-            future.addListener(ChannelFutureListener.CLOSE);
-        }
     }
 
     private static void send100Continue(MessageEvent e) {

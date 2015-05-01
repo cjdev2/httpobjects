@@ -29,10 +29,11 @@ import org.httpobjects.util.Method;
 import org.jboss.netty.handler.codec.http.HttpChunkTrailer;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpRequest;
+import scala.concurrent.Future;
 
 public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.RequestHandler {
 	private final List<HttpObject> objects;
-    private final Response defaultResponse = DSL.NOT_FOUND();
+    private final Future<Response> defaultResponse = DSL.NOT_FOUND().toFuture();
     
 	public NettyHttpobjectsRequestHandler(List<HttpObject> objects) {
 		super();
@@ -40,7 +41,7 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 	}
 	
 	@Override
-	public Response respond(HttpRequest request, HttpChunkTrailer lastChunk, ByteAccumulator body, ConnectionInfo connectionInfo) {
+	public HttpChannelHandler.FutureAndContext<Response> respond(HttpRequest request, HttpChunkTrailer lastChunk, ByteAccumulator body, ConnectionInfo connectionInfo) {
 		
 		final String uri = request.getUri();
 		
@@ -51,8 +52,8 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 				match = next;
 				Request in = readRequest(pattern, request, lastChunk, body, connectionInfo);
 				Method m = Method.fromString(request.getMethod().getName());
-				Response out = HttpObjectUtil.invokeMethod(match, m, in);
-				if(out!=null) return out;
+				Future<Response> out = HttpObjectUtil.invokeMethod(match, m, in);
+				if(out!=null) return new HttpChannelHandler.FutureAndContext<Response>()
 			}
 		}
 		

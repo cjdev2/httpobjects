@@ -14,16 +14,18 @@ import org.httpobjects.netty.http.InMemoryByteAccumulatorFactory;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
+import scala.concurrent.ExecutionContext;
+import scala.concurrent.Future;
 
 public class HttpobjectsNettySupport {
 
           
-      public static Channel serve(int port, List<HttpObject> objects) {
+      public static Channel serve(ExecutionContext context, int port, List<HttpObject> objects) {
           ByteAccumulatorFactory buffers = new InMemoryByteAccumulatorFactory();
-          return serve(port, objects, buffers);
+          return serve(context, port, objects, buffers);
       }
 
-      public static Channel serve(int port, List<HttpObject> objects, ByteAccumulatorFactory buffers) {
+      public static Channel serve(ExecutionContext context, int port, List<HttpObject> objects, ByteAccumulatorFactory buffers) {
           // Configure the server.
           ServerBootstrap bootstrap = new ServerBootstrap(
                   new NioServerSocketChannelFactory(
@@ -46,13 +48,13 @@ public class HttpobjectsNettySupport {
           }
           HttpobjectsNettySupport.serve(port, Arrays.<HttpObject>asList(
         		  new HttpObject("/") {
-        				public Response get(Request req) {
-        					return OK(Html("<html><body>Welcome.  Click <a href=\"/yo\">here</a> for a special message.</body></html>"));
+        				public Future<Response> get(Request req) {
+        					return OK(Html("<html><body>Welcome.  Click <a href=\"/yo\">here</a> for a special message.</body></html>")).toFuture();
         				}
         			},
             		new HttpObject("/yo") {
-          				public Response get(Request req) {
-          					return OK(Text("Hello world"));
+          				public Future<Response> get(Request req) {
+          					return OK(Text("Hello world")).toFuture();
           				}
           			}
               		));
