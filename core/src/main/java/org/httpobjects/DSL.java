@@ -42,6 +42,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.httpobjects.outcome.OutcomeHandlerExecutor;
+import org.httpobjects.outcome.OutcomeHandler;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.response.AllowField;
 import org.httpobjects.header.response.LocationField;
@@ -85,17 +87,34 @@ public class DSL {
                 return value;
             }
             @Override
-            public void onComplete(Action<V> action, ActionExecutor executor) {
-                executor.execute(action, value, null);
+            public void onComplete(OutcomeHandler<V> action, OutcomeHandlerExecutor executor) {
+                executor.execute(action, this);
             }
         };
     }
 
-    public static ActionExecutor syncronousExecutor() {
-        return new ActionExecutor() {
+    public static <V> Eventual<V> error(final Throwable err){
+        return new Eventual<V>(){
             @Override
-            public <T> void execute(Action<T> a, T value, Throwable err) {
-                a.exec(value, err);
+            public V get() {
+                throw new RuntimeException(err);
+            }
+            @Override
+            public V getOrNull() {
+                throw new RuntimeException(err);
+            }
+            @Override
+            public void onComplete(OutcomeHandler<V> action, OutcomeHandlerExecutor executor) {
+                executor.execute(action, this);
+            }
+        };
+    }
+
+    public static OutcomeHandlerExecutor syncronousExecutor() {
+        return new OutcomeHandlerExecutor() {
+            @Override
+            public <T> void execute(OutcomeHandler<T> a, Eventual<T> resolved) {
+                a.exec(resolved);
             }
         };
     }

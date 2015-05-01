@@ -37,7 +37,8 @@
  */
 package org.httpobjects.scala
 
-import org.httpobjects.{Eventual=>HFuture, Response, DSL, ActionExecutor, Action}
+import org.httpobjects.outcome.{OutcomeHandler, OutcomeHandlerExecutor, Outcome}
+import org.httpobjects.{Eventual=>HFuture, Response, DSL}
 
 
 import scala.concurrent.duration.Duration
@@ -65,12 +66,12 @@ object ScalaDSL {
   /*
    * Conversions to/from scala.concurrent.ExceutionContext
    */
-  implicit def asScalaExecutionContext(executor:ActionExecutor):ExecutionContext = new ActionExecutorWrapper(executor)
-  implicit def asHttpobjectsActionExecutor(ec:ExecutionContext):ActionExecutor = {
-    new ActionExecutor {
-      override def execute[T](a: Action[T], value: T, err:Throwable): Unit = {
+  implicit def asScalaExecutionContext(executor:OutcomeHandlerExecutor):ExecutionContext = new ActionExecutorWrapper(executor)
+  implicit def asHttpobjectsActionExecutor(ec:ExecutionContext):OutcomeHandlerExecutor = {
+    new OutcomeHandlerExecutor {
+      override def execute[T](a: OutcomeHandler[T], resolved:HFuture[T]): Unit = {
         ec.execute(new Runnable {
-          override def run(): Unit = a.exec(value, err)
+          override def run(): Unit = a.exec(resolved)
         })
       }
     }
@@ -79,14 +80,8 @@ object ScalaDSL {
   /*
    * Conversions to org.httpobject.Action
    */
-  implicit def toAction[T](fn:Try[T]=>_):Action[T] = new Action[T](){
-    def exec(value: T, err:Throwable) = {
-      val valueOrErr = (value, err) match {
-        case (value, null) => Success(value)
-        case (null, err) => Failure(err)
-      }
-      fn(valueOrErr)
-    }
+  implicit def toAction[T](fn:Try[T]=>_):OutcomeHandler[T] = new OutcomeHandler[T](){
+    def exec(resolved:Outcome[T]) = Try(resolved.get)
   }
 
 

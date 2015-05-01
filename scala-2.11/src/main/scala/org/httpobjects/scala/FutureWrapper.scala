@@ -37,7 +37,8 @@
  */
 package org.httpobjects.scala
 
-import org.httpobjects.{ActionExecutor, Action, Eventual=>HFuture}
+import org.httpobjects.outcome.{OutcomeHandler, OutcomeHandlerExecutor}
+import org.httpobjects.{Eventual=>HFuture}
 
 import scala.concurrent.{Future => SFuture, Await}
 import scala.concurrent.duration.Duration
@@ -45,13 +46,16 @@ import scala.util.{Failure, Success}
 
 class FutureWrapper[T <: AnyRef](val scalaFuture:SFuture[T]) extends HFuture[T] {
 
-  override def get(): T = Await.result(scalaFuture, Duration.Inf)
+  override def get(): T = {
+    Await.result(scalaFuture, Duration.Inf)
+    scalaFuture.value.get.get
+  }
 
-  override def onComplete(action: Action[T], executor: ActionExecutor): Unit = {
+  override def onComplete(action: OutcomeHandler[T], executor: OutcomeHandlerExecutor): Unit = {
     val ec = ScalaDSL.asScalaExecutionContext(executor)
     scalaFuture.onComplete{
-      case Failure(t)=> action.exec(null.asInstanceOf[T], t)
-      case Success(value) => action.exec(value, null)
+      case Failure(t)=> action.exec(this)
+      case Success(value) => action.exec(this)
     }(ec)
   }
 

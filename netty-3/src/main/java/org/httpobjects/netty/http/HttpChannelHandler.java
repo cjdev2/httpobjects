@@ -31,6 +31,9 @@ import java.net.InetSocketAddress;
 import java.util.Set;
 
 import org.httpobjects.*;
+import org.httpobjects.outcome.OutcomeHandlerExecutor;
+import org.httpobjects.outcome.Outcome;
+import org.httpobjects.outcome.OutcomeHandler;
 import org.httpobjects.header.HeaderField;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
@@ -62,9 +65,9 @@ public class HttpChannelHandler extends SimpleChannelUpstreamHandler {
 	private final ByteAccumulator contentAccumulator;
     private HttpRequest request;
     private boolean readingChunks;
-    private final ActionExecutor executionContext;
+    private final OutcomeHandlerExecutor executionContext;
     
-    public HttpChannelHandler(ActionExecutor executionContext, RequestHandler handler, ByteAccumulator contentAccumulator) {
+    public HttpChannelHandler(OutcomeHandlerExecutor executionContext, RequestHandler handler, ByteAccumulator contentAccumulator) {
         this.executionContext = executionContext;
         this.handler = handler;
 		this.contentAccumulator = contentAccumulator;
@@ -136,8 +139,10 @@ public class HttpChannelHandler extends SimpleChannelUpstreamHandler {
         // Decide whether to close the connection or not.
         final boolean keepAlive = isKeepAlive(request);
 
-        futureResponse.onComplete(new Action<Response>() {
-            public void exec(Response r, Throwable err) {
+        futureResponse.onComplete(new OutcomeHandler<Response>() {
+            public void exec(Outcome<Response> result) {
+                final Response r = result.get();
+
                 // Build the response object.
                 HttpResponseStatus status = HttpResponseStatus.valueOf(r.code().value());
 

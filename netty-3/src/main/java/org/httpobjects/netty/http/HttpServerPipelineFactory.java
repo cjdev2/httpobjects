@@ -17,7 +17,7 @@ package org.httpobjects.netty.http;
 
 import static org.jboss.netty.channel.Channels.pipeline;
 
-import org.httpobjects.ActionExecutor;
+import org.httpobjects.outcome.OutcomeHandlerExecutor;
 import org.httpobjects.netty.http.HttpChannelHandler.RequestHandler;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
@@ -29,9 +29,9 @@ public class HttpServerPipelineFactory implements ChannelPipelineFactory {
 	
 	private final RequestHandler handler;
 	private final ByteAccumulatorFactory accumulatorFactory;
-    private final ActionExecutor executionContext;
+    private final OutcomeHandlerExecutor executionContext;
 	
-    public HttpServerPipelineFactory(ActionExecutor executionContext, RequestHandler handler, ByteAccumulatorFactory accumulatorFactory) {
+    public HttpServerPipelineFactory(OutcomeHandlerExecutor executionContext, RequestHandler handler, ByteAccumulatorFactory accumulatorFactory) {
 		super();
         this.executionContext = executionContext;
         this.handler = handler;

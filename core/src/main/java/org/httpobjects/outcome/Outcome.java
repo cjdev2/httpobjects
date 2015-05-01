@@ -35,31 +35,12 @@
  * obligated to do so.  If you do not wish to do so, delete this
  * exception statement from your version.
  */
-package org.httpobjects;
+package org.httpobjects.outcome;
 
-import org.httpobjects.outcome.OutcomeHandlerExecutor;
-import org.httpobjects.outcome.Outcome;
-import org.httpobjects.outcome.OutcomeHandler;
-
-/**
- * http://en.wikipedia.org/wiki/Futures_and_promises
- */
-public interface Eventual<V> extends Outcome<V> {
+public interface Outcome<V> {
     /**
-     * Executes the callback upon resolution of this Future.  The callback is executed using the specified executor.
-     */
-    void onComplete(OutcomeHandler<V> callback, OutcomeHandlerExecutor executor);
-
-    /**
-     * Immediately returns the result of this future, if currently resolved, otherwise null.
-     * Throws an exception if the Future resolved with an exception
-     */
-    V getOrNull();
-
-    /**
-     * Blocks the current thread until this Future is resolved, returning the result.
-     * Throws an exception if the Future resolved with an exception
+     * Blocks the current thread, returning the result.
+     * Throws an exception if the outcome was an exception
      */
     V get();
-
 }

@@ -35,8 +35,10 @@
  * obligated to do so.  If you do not wish to do so, delete this
  * exception statement from your version.
  */
-package org.httpobjects;
+package org.httpobjects.outcome;
 
-public interface ActionExecutor {
-    <T> void execute(Action<T> a, T value,  Throwable err);
+import org.httpobjects.Eventual;
+
+public interface OutcomeHandlerExecutor {
+    <T> void execute(OutcomeHandler<T> a, Eventual<T> resolved);
 }

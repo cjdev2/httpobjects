@@ -35,8 +35,8 @@
  * obligated to do so.  If you do not wish to do so, delete this
  * exception statement from your version.
  */
-package org.httpobjects;
+package org.httpobjects.outcome;
 
-public interface Action<Value> {
-    void exec(Value value, Throwable failure);
+public interface OutcomeHandler<Value> {
+    void exec(Outcome<Value> result);
 }

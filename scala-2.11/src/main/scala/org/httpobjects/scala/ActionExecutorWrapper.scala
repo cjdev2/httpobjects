@@ -37,12 +37,12 @@
  */
 package org.httpobjects.scala
 
-import org.httpobjects.{Action, ActionExecutor}
+import org.httpobjects.outcome.{OutcomeHandler, OutcomeHandlerExecutor}
 
 import scala.concurrent.ExecutionContext
 import scala.util.Try
 
-class ActionExecutorWrapper(ac:ActionExecutor) extends ExecutionContext{
+class ActionExecutorWrapper(ac:OutcomeHandlerExecutor) extends ExecutionContext{
 
   override def execute(runnable: Runnable): Unit = {
 
@@ -50,7 +50,7 @@ class ActionExecutorWrapper(ac:ActionExecutor) extends ExecutionContext{
       runnable.run()
     }
 
-    ac.execute(action, null, null)
+    ac.execute(action, null)
   }
 
   override def reportFailure(cause: Throwable): Unit = {

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.concurrent.Executors;
 
 import org.httpobjects.*;
+import org.httpobjects.outcome.OutcomeHandlerExecutor;
 import org.httpobjects.netty.http.ByteAccumulatorFactory;
 import org.httpobjects.netty.http.HttpServerPipelineFactory;
 import org.httpobjects.netty.http.InMemoryByteAccumulatorFactory;
@@ -16,12 +17,12 @@ import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 public class HttpobjectsNettySupport {
 
           
-      public static Channel serve(ActionExecutor context, int port, List<HttpObject> objects) {
+      public static Channel serve(OutcomeHandlerExecutor context, int port, List<HttpObject> objects) {
           ByteAccumulatorFactory buffers = new InMemoryByteAccumulatorFactory();
           return serve(context, port, objects, buffers);
       }
 
-      public static Channel serve(ActionExecutor context, int port, List<HttpObject> objects, ByteAccumulatorFactory buffers) {
+      public static Channel serve(OutcomeHandlerExecutor context, int port, List<HttpObject> objects, ByteAccumulatorFactory buffers) {
           // Configure the server.
           ServerBootstrap bootstrap = new ServerBootstrap(
                   new NioServerSocketChannelFactory(
@@ -43,7 +44,7 @@ public class HttpobjectsNettySupport {
               port = 8080;
           }
 
-          ActionExecutor executor = DSL.syncronousExecutor();
+          OutcomeHandlerExecutor executor = DSL.syncronousExecutor();
 
           HttpobjectsNettySupport.serve(executor, port, Arrays.<HttpObject>asList(
         		  new HttpObject("/") {

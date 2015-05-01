@@ -40,7 +40,7 @@ package org.httpobjects.netty;
 
 import java.util.Arrays;
 
-import org.httpobjects.ActionExecutor;
+import org.httpobjects.outcome.OutcomeHandlerExecutor;
 import org.httpobjects.DSL;
 import org.httpobjects.HttpObject;
 import org.httpobjects.tck.IntegrationTest;
@@ -51,7 +51,7 @@ public class NettyIntegrationTest extends IntegrationTest {
 	
 	@Override
 	protected void serve(int port, HttpObject... objects) {
-        final ActionExecutor executor = DSL.syncronousExecutor();
+        final OutcomeHandlerExecutor executor = DSL.syncronousExecutor();
         server = HttpobjectsNettySupport.serve(executor, port, Arrays.asList(objects));
 	}
 	

@@ -42,7 +42,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
-import org.httpobjects.ActionExecutor;
+import org.httpobjects.outcome.OutcomeHandlerExecutor;
 import org.httpobjects.DSL;
 import org.httpobjects.HttpObject;
 import org.httpobjects.netty.http.FilesystemByteAccumulatorFactory;
@@ -56,7 +56,7 @@ public class NettyIntegrationWithFilesystemBuffersTest extends IntegrationTest {
 	protected void serve(int port, HttpObject... objects) {
 	    File tempDir = tempDir();
 
-        final ActionExecutor executor = DSL.syncronousExecutor();
+        final OutcomeHandlerExecutor executor = DSL.syncronousExecutor();
         server = HttpobjectsNettySupport.serve(executor, port, Arrays.asList(objects), new FilesystemByteAccumulatorFactory(tempDir));
 	}
 	
