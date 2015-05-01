@@ -42,6 +42,17 @@ import org.httpobjects.outcome.Outcome;
 import org.httpobjects.outcome.OutcomeHandler;
 
 /**
+ * Lightweight implementation of a Future.
+ *
+ *   Q: Yet another Future implementation?
+ *   A: Yes, but there's a good reason!
+ *     - given our design goal of zero external dependencies in the core api, we can't use some other library
+ *     - given our design goal of jdk6 compatibility, we are restricted to what's avail in jdk6
+ *     - there's nothing suitable in jdk6
+ *
+ *   Q: Why not use java.util.concurrent.Future?
+ *   A: java.util.concurrent.Future doesn't have a callback mechanism
+ *
  * http://en.wikipedia.org/wiki/Futures_and_promises
  */
 public interface Eventual<V> extends Outcome<V> {
