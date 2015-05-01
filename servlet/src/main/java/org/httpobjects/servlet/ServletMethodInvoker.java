@@ -37,7 +37,7 @@
  */
 package org.httpobjects.servlet;
 
-import org.httpobjects.Future;
+import org.httpobjects.Eventual;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
@@ -61,7 +61,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class ServletMethodInvoker {
 	private final HttpObject[] objects;
@@ -88,7 +87,7 @@ public class ServletMethodInvoker {
     }
 
     public boolean invokeFirstPathMatchIfAble(String path, HttpServletRequest r, HttpServletResponse httpResponse) {
-        Future<Response> lastResponse = null;
+        Eventual<Response> lastResponse = null;
 				
         for (HttpObject next : objects) {
             pathMatchObserver.checkingPathAgainstPattern(path, next.pattern());
@@ -112,14 +111,14 @@ public class ServletMethodInvoker {
         }
     }
 
-    private Future<Response> invoke(HttpServletRequest r, HttpServletResponse httpResponse, HttpObject object) {
+    private Eventual<Response> invoke(HttpServletRequest r, HttpServletResponse httpResponse, HttpObject object) {
 		final Method m = Method.fromString(r.getMethod());
 		final Request input = new LazyRequestImpl(object.pattern().match(r.getRequestURI()), r);
 
 		return HttpObjectUtil.invokeMethod(object, m, input);
 	}
 
-    private void returnResponse(Future<Response> futureResponse, final HttpServletResponse resp) {
+    private void returnResponse(Eventual<Response> futureResponse, final HttpServletResponse resp) {
         try {
             Response result = futureResponse.get();
             returnResponse(result, resp);

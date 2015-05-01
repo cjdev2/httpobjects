@@ -43,7 +43,7 @@ import org.httpobjects.path.SimplePathPattern;
 public class HttpObject extends DSL {
 
     private final PathPattern pathPattern;
-    private final Future<Response> defaultResponse;
+    private final Eventual<Response> defaultResponse;
 
     public HttpObject(PathPattern pathPattern, Response defaultResponse) {
         super();
@@ -67,13 +67,13 @@ public class HttpObject extends DSL {
         return pathPattern;
     }
 
-    public Future<Response> delete(Request req){return defaultResponse;}
-    public Future<Response> get(Request req){return defaultResponse;}
-    public Future<Response> head(Request req){return defaultResponse;}
-    public Future<Response> options(Request req){return defaultResponse;}
-    public Future<Response> post(Request req){return defaultResponse;}
-    public Future<Response> put(Request req){return defaultResponse;}
-    public Future<Response> trace(Request req){return defaultResponse;}
-    public Future<Response> patch(Request req){return defaultResponse;}
+    public Eventual<Response> delete(Request req){return defaultResponse;}
+    public Eventual<Response> get(Request req){return defaultResponse;}
+    public Eventual<Response> head(Request req){return defaultResponse;}
+    public Eventual<Response> options(Request req){return defaultResponse;}
+    public Eventual<Response> post(Request req){return defaultResponse;}
+    public Eventual<Response> put(Request req){return defaultResponse;}
+    public Eventual<Response> trace(Request req){return defaultResponse;}
+    public Eventual<Response> patch(Request req){return defaultResponse;}
 
 }

@@ -27,10 +27,7 @@ import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.Inet4Address;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.util.Set;
 
 import org.httpobjects.*;
@@ -58,7 +55,7 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 public class HttpChannelHandler extends SimpleChannelUpstreamHandler {
 
 	public static interface RequestHandler {
-        Future<Response> respond(HttpRequest request, HttpChunkTrailer lastChunk, ByteAccumulator body, ConnectionInfo connectionInfo);
+        Eventual<Response> respond(HttpRequest request, HttpChunkTrailer lastChunk, ByteAccumulator body, ConnectionInfo connectionInfo);
 	}
 	
 	private final RequestHandler handler;
@@ -134,7 +131,7 @@ public class HttpChannelHandler extends SimpleChannelUpstreamHandler {
             throw new RuntimeException(e);
         }
     }
-    private void writeResponse(/*MessageEvent e*/ final Channel sink, final Future<Response> futureResponse) {
+    private void writeResponse(/*MessageEvent e*/ final Channel sink, final Eventual<Response> futureResponse) {
     	
         // Decide whether to close the connection or not.
         final boolean keepAlive = isKeepAlive(request);

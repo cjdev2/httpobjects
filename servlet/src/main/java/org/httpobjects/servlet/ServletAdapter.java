@@ -37,7 +37,7 @@
  */
 package org.httpobjects.servlet;
 
-import org.httpobjects.Future;
+import org.httpobjects.Eventual;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
@@ -59,7 +59,7 @@ public final class ServletAdapter extends HttpServlet {
 	}
 
 
-	private void returnResponse(Future<Response> futureResult, HttpServletResponse resp) throws IOException {
+	private void returnResponse(Eventual<Response> futureResult, HttpServletResponse resp) throws IOException {
         final Response r = futureResult.get();
 
         resp.setStatus(r.code().value());

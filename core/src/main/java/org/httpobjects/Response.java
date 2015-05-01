@@ -38,7 +38,6 @@
 package org.httpobjects;
 
 import org.httpobjects.header.HeaderField;
-import org.httpobjects.Future;
 
 public final class Response {
 	
@@ -53,7 +52,7 @@ public final class Response {
 		this.header = header;
 	}
 
-	public Future<Response> toFuture() {
+	public Eventual<Response> toFuture() {
 		return DSL.now(this);
 	}
 	

@@ -37,7 +37,7 @@
  */
 package org.httpobjects.demo;
 
-import org.httpobjects.Future;
+import org.httpobjects.Eventual;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
@@ -49,7 +49,7 @@ public class Favicon extends HttpObject {
 	}
 	
 	@Override
-	public Future<Response> get(Request req) {
+	public Eventual<Response> get(Request req) {
 		return OK(File("image/x-icon", new java.io.File("favicon.ico"))).toFuture();
 	}
 	

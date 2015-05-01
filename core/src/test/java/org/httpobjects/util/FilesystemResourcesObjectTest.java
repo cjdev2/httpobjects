@@ -43,7 +43,7 @@ import org.httpobjects.test.MockRequest;
 import org.httpobjects.util.FsTools.*;
 import org.junit.Assert;
 import org.junit.Test;
-import org.httpobjects.Future;
+import org.httpobjects.Eventual;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -65,7 +65,7 @@ public class FilesystemResourcesObjectTest {
         MockRequest req = new MockRequest(testSubject, "/misc-files/stuff.txt");
         
         // when
-        Future<Response> result = testSubject.get(req);
+        Eventual<Response> result = testSubject.get(req);
 
         // then
         Assert.assertNotNull(result);
@@ -87,7 +87,7 @@ public class FilesystemResourcesObjectTest {
         MockRequest req = new MockRequest(testSubject, "/../hidden.txt");
         
         // when
-        Future<Response> result = testSubject.get(req);
+        Eventual<Response> result = testSubject.get(req);
 
         // then
         Assert.assertNull(result);

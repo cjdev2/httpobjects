@@ -37,7 +37,7 @@
  */
 package org.httpobjects.scala
 
-import org.httpobjects.{Future=>HFuture, Response, DSL, ActionExecutor, Action}
+import org.httpobjects.{Eventual=>HFuture, Response, DSL, ActionExecutor, Action}
 
 
 import scala.concurrent.duration.Duration

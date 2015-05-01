@@ -89,17 +89,17 @@ public class Proxy extends HttpObject {
     }
 
 	@Override
-	public Future<Response> get(Request req) {
+	public Eventual<Response> get(Request req) {
 		return proxyRequest(req, new GetMethod()).toFuture();
 	}
 
     @Override
-	public Future<Response> delete(Request req){
+	public Eventual<Response> delete(Request req){
 		return proxyRequest(req, new DeleteMethod()).toFuture();
     }
 
 	@Override
-	public Future<Response> put(Request req) {
+	public Eventual<Response> put(Request req) {
 		PutMethod m = new PutMethod();
 
 		setRequestRepresentation(req, m);
@@ -113,7 +113,7 @@ public class Proxy extends HttpObject {
 	}
 	
 	@Override
-	public Future<Response> post(Request req) {
+	public Eventual<Response> post(Request req) {
 		PostMethod m = new PostMethod();
 
 		setRequestRepresentation(req, m);

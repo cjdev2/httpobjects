@@ -45,12 +45,12 @@ import org.httpobjects.HttpObject;
 import org.httpobjects.Representation;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
-import org.httpobjects.Future;
+import org.httpobjects.Eventual;
 
 public class HttpObjectUtil {
 
-    public static Future<Response> invokeMethod(HttpObject object, final Method m, final Request input) {
-        final Future<Response> output;
+    public static Eventual<Response> invokeMethod(HttpObject object, final Method m, final Request input) {
+        final Eventual<Response> output;
         switch(m){
         case GET: 
             output = object.get(input);

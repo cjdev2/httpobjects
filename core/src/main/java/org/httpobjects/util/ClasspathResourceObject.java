@@ -40,7 +40,7 @@ package org.httpobjects.util;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
-import org.httpobjects.Future;
+import org.httpobjects.Eventual;
 
 public class ClasspathResourceObject extends HttpObject {
 	private final Class<?> clazz;
@@ -58,7 +58,7 @@ public class ClasspathResourceObject extends HttpObject {
 	}
 
 	@Override
-	public Future<Response> get(Request req) {
+	public Eventual<Response> get(Request req) {
 		return OK(FromClasspath(contentType, resourceName, clazz)).toFuture();
 	}
 

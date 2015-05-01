@@ -45,7 +45,7 @@ import java.io.InputStream;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
-import org.httpobjects.Future;
+import org.httpobjects.Eventual;
 
 
 public class CMSResources extends HttpObject {
@@ -57,7 +57,7 @@ public class CMSResources extends HttpObject {
 	}
 	
 	@Override
-	public Future<Response> get(Request req) {
+	public Eventual<Response> get(Request req) {
 		String cid = req.path().valueFor("cid");
 		String path = req.path().valueFor("path");
 		File localPath = (path==null || path.isEmpty())?root:new File(root, path);

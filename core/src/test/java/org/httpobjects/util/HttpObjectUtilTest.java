@@ -46,7 +46,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.httpobjects.Future;
+import org.httpobjects.Eventual;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
@@ -65,7 +65,7 @@ public class HttpObjectUtilTest {
         }
 
         @Override
-        public Future<Response> patch(Request req) {
+        public Eventual<Response> patch(Request req) {
             requestsRecieved.add(req);
             return response.toFuture();
         }
@@ -80,7 +80,7 @@ public class HttpObjectUtilTest {
         final Request input = new MockRequest(o, "/foo");
         
         // when
-        Future<Response> result = HttpObjectUtil.invokeMethod(o, Method.PATCH, input);
+        Eventual<Response> result = HttpObjectUtil.invokeMethod(o, Method.PATCH, input);
         
         // then
         assertNotNull(result);

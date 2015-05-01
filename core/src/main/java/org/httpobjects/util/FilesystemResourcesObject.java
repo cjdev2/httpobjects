@@ -43,7 +43,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.httpobjects.Future;
+import org.httpobjects.Eventual;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
@@ -57,7 +57,7 @@ public class FilesystemResourcesObject  extends HttpObject {
 	}
 	
 	@Override
-	public Future<Response> get(Request req) {
+	public Eventual<Response> get(Request req) {
 		final String resource = req.path().valueFor("resource");
 		if(isNullOrEmpty(resource) ||  resource.endsWith("/")) return null;
 		

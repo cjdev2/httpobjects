@@ -44,8 +44,6 @@ import org.httpobjects.util.ClasspathResourcesObject;
 import org.httpobjects.util.HttpObjectUtil;
 import org.junit.Test;
 
-import java.util.concurrent.TimeUnit;
-
 public class DSLTest {
 
     @Test
@@ -57,7 +55,7 @@ public class DSLTest {
     		
     	// then
     	assertEquals("/{resource*}", object.pattern().raw());
-    	Future<Response> response = object.get(new MockRequest(object, "/a.txt"));
+    	Eventual<Response> response = object.get(new MockRequest(object, "/a.txt"));
     	assertEquals("hello", HttpObjectUtil.toAscii(response.get().representation()));
     }
     
@@ -70,7 +68,7 @@ public class DSLTest {
     		
     	// then
     	assertEquals("/bar/{resource*}", object.pattern().raw());
-    	Future<Response> response = object.get(new MockRequest(object, "/bar/a.txt"));
+    	Eventual<Response> response = object.get(new MockRequest(object, "/bar/a.txt"));
     	assertEquals("hello", HttpObjectUtil.toAscii(response.get().representation()));
     }
     
@@ -83,7 +81,7 @@ public class DSLTest {
     		
     	// then
     	assertEquals("/bar/{resource*}", object.pattern().raw());
-    	Future<Response> response = object.get(new MockRequest(object, "/bar/util/ClasspathResourcesObjectTest/a.txt"));
+    	Eventual<Response> response = object.get(new MockRequest(object, "/bar/util/ClasspathResourcesObjectTest/a.txt"));
     	assertEquals("hello", HttpObjectUtil.toAscii(response.get().representation()));
     }
 }

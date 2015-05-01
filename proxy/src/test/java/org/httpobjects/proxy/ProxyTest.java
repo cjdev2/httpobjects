@@ -73,7 +73,7 @@ public class ProxyTest {
 	public void launch(){
 		jetty = HttpObjectsJettyHandler.launchServer(8080, new HttpObject[]{
 				new HttpObject("/frog"){
-					public Future<Response> get(Request req) {
+					public Eventual<Response> get(Request req) {
 						String response = "Kermit";
 						String q = req.query().toString();
 						if(q!=null){
@@ -83,7 +83,7 @@ public class ProxyTest {
 					};
 					
 					@Override
-					public Future<Response> put(Request req) {
+					public Eventual<Response> put(Request req) {
 						ByteArrayOutputStream out = new ByteArrayOutputStream();
 						req.representation().write(out);
 						String textualRepresentation = new String(out.toByteArray());
@@ -92,7 +92,7 @@ public class ProxyTest {
 				},
 				new HttpObject("/requirescustomheader"){
 					@Override
-					public Future<Response> get(Request req) {
+					public Eventual<Response> get(Request req) {
 						boolean hasIt = false;
 						for(HeaderField field : req.header().fields()){
 							boolean found = field.accept(new DefaultHeaderFieldVisitor<Boolean>(){
@@ -117,38 +117,38 @@ public class ProxyTest {
 					}
 				},
 				new HttpObject("/notme"){
-					public Future<Response> get(Request req) {
+					public Eventual<Response> get(Request req) {
 						return SEE_OTHER(Location("/me")).toFuture();
 					};
 				},
 				new HttpObject("/me"){
-					public Future<Response> get(Request req) {
+					public Eventual<Response> get(Request req) {
 						return OK(Text("It's me!")).toFuture();
 					};
 				},
 				new HttpObject("/setcookies"){
-					public Future<Response> get(Request req) {
+					public Eventual<Response> get(Request req) {
 						return OK(Text("Here is a tasty cookie"), HttpObject.SetCookie("id", "1234")).toFuture();
 					};
 				},
 				new HttpObject("/piggy"){
-					public Future<Response> get(Request req) {
+					public Eventual<Response> get(Request req) {
 						return OK(Text("Oh, kermie!")).toFuture();
 					};
 				},
 				new HttpObject("/echo"){
-					public Future<Response> get(Request req) {
+					public Eventual<Response> get(Request req) {
 						return OK(Bytes(req.representation().contentType(), new byte[]{})).toFuture();
 					};
 				},
 				new HttpObject("/noresponse"){
 					@Override
-					public Future<Response> put(Request req) {
+					public Eventual<Response> put(Request req) {
 						return new Response(ResponseCode.NO_CONTENT, null).toFuture();
 					};
 				},
 				new HttpObject("/characters"){
-					public Future<Response> post(Request req) {
+					public Eventual<Response> post(Request req) {
 						ByteArrayOutputStream out = new ByteArrayOutputStream();
 						req.representation().write(out);
 						String textualRepresentation = new String(out.toByteArray());
@@ -160,12 +160,12 @@ public class ProxyTest {
 					};
 				},
 				new HttpObject("/queryStringEcho"){
-					public Future<Response> get(Request req) {
+					public Eventual<Response> get(Request req) {
 						return OK(Text(req.query().toString())).toFuture();
 					};
 				},
 				new HttpObject("/contentTypeEcho"){
-					public Future<Response> get(Request req) {
+					public Eventual<Response> get(Request req) {
 						String requestContentType = req.representation().contentType();
 						
 						return OK(Text(requestContentType == null ? "null" : requestContentType)).toFuture();

@@ -74,8 +74,8 @@ public class DSL {
      * ########################################################
      */
 
-    public static <V> Future<V> now(final V value){
-        return new Future<V>(){
+    public static <V> Eventual<V> now(final V value){
+        return new Eventual<V>(){
             @Override
             public V get() {
                 return value;

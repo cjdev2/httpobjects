@@ -37,7 +37,10 @@
  */
 package org.httpobjects;
 
-public interface Future<V> {
+/**
+ * http://en.wikipedia.org/wiki/Futures_and_promises
+ */
+public interface Eventual<V> {
     /**
      * Executes the callback upon resolution of this Future.  The callback is executed using the specified executor.
      */

@@ -26,7 +26,7 @@ import org.jboss.netty.handler.codec.http.HttpRequest;
 
 public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.RequestHandler {
 	private final List<HttpObject> objects;
-    private final Future<Response> defaultResponse = DSL.NOT_FOUND().toFuture();
+    private final Eventual<Response> defaultResponse = DSL.NOT_FOUND().toFuture();
 
 	public NettyHttpobjectsRequestHandler(List<HttpObject> objects) {
 		super();
@@ -34,7 +34,7 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 	}
 	
 	@Override
-	public Future<Response> respond(HttpRequest request, HttpChunkTrailer lastChunk, ByteAccumulator body, ConnectionInfo connectionInfo) {
+	public Eventual<Response> respond(HttpRequest request, HttpChunkTrailer lastChunk, ByteAccumulator body, ConnectionInfo connectionInfo) {
 		
 		final String uri = request.getUri();
 		
@@ -45,7 +45,7 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 				match = next;
 				Request in = readRequest(pattern, request, lastChunk, body, connectionInfo);
 				Method m = Method.fromString(request.getMethod().getName());
-				Future<Response> out = HttpObjectUtil.invokeMethod(match, m, in);
+				Eventual<Response> out = HttpObjectUtil.invokeMethod(match, m, in);
 				if(out!=null) return out;
 			}
 		}

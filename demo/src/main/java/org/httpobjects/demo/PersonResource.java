@@ -40,7 +40,7 @@ package org.httpobjects.demo;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
-import org.httpobjects.Future;
+import org.httpobjects.Eventual;
 
 public class PersonResource extends HttpObject {
 	
@@ -49,7 +49,7 @@ public class PersonResource extends HttpObject {
 	}
 	
 	@Override
-	public Future<Response> get(Request req) {
+	public Eventual<Response> get(Request req) {
 		String name = req.path().valueFor("name");
 		
 		if(name!=null && name.equals("stu")){

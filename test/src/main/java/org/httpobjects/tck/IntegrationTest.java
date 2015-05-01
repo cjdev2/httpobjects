@@ -63,7 +63,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.util.*;
-import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
 
 import static org.httpobjects.util.HttpObjectUtil.toAscii;
@@ -83,29 +82,29 @@ public abstract class IntegrationTest {
 
         serve(8080,
                new HttpObject("/app/inbox") {
-                   public Future<Response> post(Request req) {
+                   public Eventual<Response> post(Request req) {
                        return OK(Text("Message Received")).toFuture();
                    }
                },
                new HttpObject("/app/inbox/abc") {
-                   public Future<Response> put(Request req) {
+                   public Eventual<Response> put(Request req) {
                        return OK(req.representation()).toFuture();
                    }
                },
                new HttpObject("/app") {
-                   public Future<Response> get(Request req) {
+                   public Eventual<Response> get(Request req) {
                        return OK(Text("Welcome to the app")).toFuture();
                    }
                },
                new HttpObject("/app/message") {
-                   public Future<Response> post(Request req) {
+                   public Eventual<Response> post(Request req) {
                        return SEE_OTHER(Location("/app"), SetCookie("name", "frank")).toFuture();
                    }
                },
                new HttpObject("/nothing", null) {
                },
                new HttpObject("/secure") {
-                   public Future<Response> get(Request req) {
+                   public Eventual<Response> get(Request req) {
                        AuthorizationField authorization = req.header().authorization();
                        if (authorization != null && authorization.method() == Method.Basic) {
 
@@ -119,7 +118,7 @@ public abstract class IntegrationTest {
                },
                new HttpObject("/echoUrl/{id}/{name}") {
                    @Override
-                   public Future<Response> get(Request req) {
+                   public Eventual<Response> get(Request req) {
                        try {
                            final String query = req.query().toString();
                            return OK(Text(req.path().toString() + query)).toFuture();
@@ -131,7 +130,7 @@ public abstract class IntegrationTest {
                },
                new HttpObject("/echoQuery") {
                    @Override
-                   public Future<Response> get(Request req) {
+                   public Eventual<Response> get(Request req) {
                        final StringBuffer text = new StringBuffer();
                        final Query query = req.query();
                        for (String name : query.paramNames()) {
@@ -144,7 +143,7 @@ public abstract class IntegrationTest {
                    }
                },
                new HttpObject("/echoCookies") {
-                   public Future<Response> get(Request req) {
+                   public Eventual<Response> get(Request req) {
 
                        final StringBuffer text = new StringBuffer();
                        for (HeaderField next : req.header().fields()) {
@@ -163,7 +162,7 @@ public abstract class IntegrationTest {
                    }
                },
                new HttpObject("/cookieSetter") {
-                   public Future<Response> get(Request req) {
+                   public Eventual<Response> get(Request req) {
                        return OK(
                                   Text("Here are some cookies!"),
                                   new SetCookieField("name", "cookie monster", "sesamestreet.com"),
@@ -173,19 +172,19 @@ public abstract class IntegrationTest {
                },
                new HttpObject("/subpathEcho/{subPath*}") {
                    @Override
-                   public Future<Response> get(Request req) {
+                   public Eventual<Response> get(Request req) {
                        return OK(Text(req.path().valueFor("subPath"))).toFuture();
                    }
                },
                new HttpObject("/echoHasRepresentation") {
                    @Override
-                   public Future<Response> post(Request req) {
+                   public Eventual<Response> post(Request req) {
                        return OK(Text(req.hasRepresentation() ? "yes" : "no")).toFuture();
                    }
                },
                new HttpObject("/pows/{name}/{rank}/{serialnumber}") {
                    @Override
-                   public Future<Response> get(Request req) {
+                   public Eventual<Response> get(Request req) {
                        final Path path = req.path();
                        return OK(Text(
                                        path.valueFor("rank") + " " +
@@ -195,7 +194,7 @@ public abstract class IntegrationTest {
                },
                new HttpObject("/immutablecopy/{subpath*}") {
                    @Override
-                   public Future<Response> post(Request req) {
+                   public Eventual<Response> post(Request req) {
                        Request r = req.immutableCopy();
                        final String firstPass = toString(r);
                        final String secondPass = toString(r);
@@ -230,7 +229,7 @@ public abstract class IntegrationTest {
                    }
                },
                new HttpObject("/patchme") {
-                   public Future<Response> patch(org.httpobjects.Request req) {
+                   public Eventual<Response> patch(org.httpobjects.Request req) {
                        try {
                            final String input = new String(HttpObjectUtil.toByteArray(req.representation()), "UTF-8");
                            return OK(Text("You told me to patch!" + input)).toFuture();
@@ -240,7 +239,7 @@ public abstract class IntegrationTest {
                    }
                },
                new HttpObject("/connectionInfo") {
-                   public Future<Response> get(Request req) {
+                   public Eventual<Response> get(Request req) {
                        final ConnectionInfo connection = req.connectionInfo();
                        return OK(Text("Local " + connection.localAddress + ":" + connection.localPort + ", " +
                                         "Remote " + connection.remoteAddress + ":" + connection.remotePort)).toFuture();
@@ -248,7 +247,7 @@ public abstract class IntegrationTest {
                },
                new HttpObject("/head") {
                    @Override
-                   public Future<Response> head(Request req) {
+                   public Eventual<Response> head(Request req) {
                        return OK(Text(""), new GenericHeaderField("foo", "bar")).toFuture();
                    }
                });
