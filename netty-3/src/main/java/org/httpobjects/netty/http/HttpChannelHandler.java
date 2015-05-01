@@ -140,7 +140,7 @@ public class HttpChannelHandler extends SimpleChannelUpstreamHandler {
         final boolean keepAlive = isKeepAlive(request);
 
         futureResponse.onComplete(new Action<Response>() {
-            public void exec(Response r) {
+            public void exec(Response r, Throwable err) {
                 // Build the response object.
                 HttpResponseStatus status = HttpResponseStatus.valueOf(r.code().value());
 

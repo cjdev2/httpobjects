@@ -86,7 +86,7 @@ public class DSL {
             }
             @Override
             public void onComplete(Action<V> action, ActionExecutor executor) {
-                executor.execute(action, value);
+                executor.execute(action, value, null);
             }
         };
     }
@@ -94,8 +94,8 @@ public class DSL {
     public static ActionExecutor syncronousExecutor() {
         return new ActionExecutor() {
             @Override
-            public <T> void execute(Action<T> a, T value) {
-                a.exec(value);
+            public <T> void execute(Action<T> a, T value, Throwable err) {
+                a.exec(value, err);
             }
         };
     }

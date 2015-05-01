@@ -38,5 +38,5 @@
 package org.httpobjects;
 
 public interface ActionExecutor {
-    <T> void execute(Action<T> a, T value);
+    <T> void execute(Action<T> a, T value,  Throwable err);
 }
