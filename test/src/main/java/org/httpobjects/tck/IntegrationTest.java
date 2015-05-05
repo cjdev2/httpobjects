@@ -250,6 +250,12 @@ public abstract class IntegrationTest {
         	public Response head(Request req) {
         		return OK(Text(""), new GenericHeaderField("foo", "bar"));
         	}
+        },
+        new HttpObject("/options"){
+            @Override
+            public Response options(Request req) {
+                return OK(Text(""), new GenericHeaderField("foo", "bar"));
+            }
         });
     }
 
@@ -279,7 +285,22 @@ public abstract class IntegrationTest {
         assertEquals(200, responseCode);
         assertEquals("bar", request.getResponseHeader("foo").getValue());
     }
-    
+
+    @Test
+    public void supportsOptions() throws Exception{
+        // given
+        HttpClient client = new HttpClient();
+        OptionsMethod request = new OptionsMethod("http://127.0.0.2:8080/options");
+
+        //when
+        int responseCode = client.executeMethod(request);
+
+        // then
+
+        assertEquals(200, responseCode);
+        assertEquals("bar", request.getResponseHeader("foo").getValue());
+    }
+
     @Test
     public void returnsConnectionInfo() throws Exception {
         // given
