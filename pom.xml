@@ -89,13 +89,13 @@
         <module>servlet</module>
         <module>jetty-6</module>
         <module>jetty-7-and-8</module>
-        <module>demo</module>
         <module>freemarker</module>
         <module>jackson</module>
         <module>netty-3</module>
         <module>test</module>
         <module>multipart</module>
         <module>scala-2.11</module>
+        <module>demos/java-jetty</module>
     </modules>
 
     <dependencies>
