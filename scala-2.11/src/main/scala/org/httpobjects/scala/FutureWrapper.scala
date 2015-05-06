@@ -59,11 +59,4 @@ class FutureWrapper[T <: AnyRef](val scalaFuture:SFuture[T]) extends HFuture[T] 
     }(ec)
   }
 
-  override def getOrNull: T = scalaFuture.value match {
-    case None => null.asInstanceOf[T]
-    case Some(valueOrErr) => valueOrErr match {
-      case Failure(throwable) => throw new Exception("operation failed", throwable)
-      case Success(value)=>value
-    }
-  }
 }

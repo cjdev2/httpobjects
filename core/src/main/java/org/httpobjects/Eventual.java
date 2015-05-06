@@ -61,16 +61,4 @@ public interface Eventual<V> extends Outcome<V> {
      */
     void onComplete(OutcomeHandler<V> callback, OutcomeHandlerExecutor executor);
 
-    /**
-     * Immediately returns the result of this future, if currently resolved, otherwise null.
-     * Throws an exception if the Future resolved with an exception
-     */
-    V getOrNull();
-
-    /**
-     * Blocks the current thread until this Future is resolved, returning the result.
-     * Throws an exception if the Future resolved with an exception
-     */
-    V get();
-
 }

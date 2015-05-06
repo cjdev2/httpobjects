@@ -83,10 +83,7 @@ public class DSL {
             public V get() {
                 return value;
             }
-            @Override
-            public V getOrNull() {
-                return value;
-            }
+
             @Override
             public void onComplete(OutcomeHandler<V> action, OutcomeHandlerExecutor executor) {
                 executor.execute(action, this);
@@ -100,10 +97,7 @@ public class DSL {
             public V get() {
                 throw new RuntimeException(err);
             }
-            @Override
-            public V getOrNull() {
-                throw new RuntimeException(err);
-            }
+            
             @Override
             public void onComplete(OutcomeHandler<V> action, OutcomeHandlerExecutor executor) {
                 executor.execute(action, this);
