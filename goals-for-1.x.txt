@@ -1,0 +1,5 @@
+support for async, nonblocking (nio) request and response handling/streaming
+make requests immutable "values"
+   - re-readable?
+remove impurities in the request model
+   - get rid of path().valueFor()?
