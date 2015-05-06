@@ -70,6 +70,9 @@ public class HttpObjectUtil {
         case HEAD:
             output = object.head(input);
             break;
+        case OPTIONS:
+            output = object.options(input);
+            break;
         default:
             output = HttpObject.NOT_FOUND().toFuture();
         }
