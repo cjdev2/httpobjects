@@ -54,6 +54,8 @@ import org.httpobjects.outcome.OutcomeHandler;
  *   A: java.util.concurrent.Future doesn't have a callback mechanism
  *
  * http://en.wikipedia.org/wiki/Futures_and_promises
+ *
+ * @see  org.httpobjects.outcome.Outcome
  */
 public interface Eventual<V> extends Outcome<V> {
     /**

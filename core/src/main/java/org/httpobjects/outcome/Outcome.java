@@ -37,10 +37,13 @@
  */
 package org.httpobjects.outcome;
 
+/**
+ * Encapsulates the outcome of a (possibly exceptional) operation.
+ */
 public interface Outcome<V> {
     /**
-     * Blocks the current thread, returning the result.
-     * Throws an exception if the outcome was an exception
+     * Returns the encapsulated result.  If the outcome is yet to be determined, this blocks util it is known.
+     * Throws the exception if the outcome was an exception
      */
     V get();
 }
