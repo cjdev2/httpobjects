@@ -52,7 +52,7 @@ public class NettyIntegrationTest extends IntegrationTest {
 	@Override
 	protected void serve(int port, HttpObject... objects) {
         final OutcomeHandlerExecutor executor = DSL.syncronousExecutor();
-        server = HttpobjectsNettySupport.serve(executor, port, Arrays.asList(objects));
+        server = HttpobjectsNettySupport.serve(executor, port, objects);
 	}
 	
 	@Override

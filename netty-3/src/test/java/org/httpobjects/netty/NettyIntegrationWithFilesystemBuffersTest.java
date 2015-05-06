@@ -57,7 +57,7 @@ public class NettyIntegrationWithFilesystemBuffersTest extends IntegrationTest {
 	    File tempDir = tempDir();
 
         final OutcomeHandlerExecutor executor = DSL.syncronousExecutor();
-        server = HttpobjectsNettySupport.serve(executor, port, Arrays.asList(objects), new FilesystemByteAccumulatorFactory(tempDir));
+        server = HttpobjectsNettySupport.serve(executor, new FilesystemByteAccumulatorFactory(tempDir), port, objects);
 	}
 	
 	@Override

@@ -17,12 +17,12 @@ import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 public class HttpobjectsNettySupport {
 
           
-      public static Channel serve(OutcomeHandlerExecutor context, int port, List<HttpObject> objects) {
+      public static Channel serve(OutcomeHandlerExecutor context, int port, HttpObject ... objects) {
           ByteAccumulatorFactory buffers = new InMemoryByteAccumulatorFactory();
-          return serve(context, port, objects, buffers);
+          return serve(context, buffers, port, objects);
       }
 
-      public static Channel serve(OutcomeHandlerExecutor context, int port, List<HttpObject> objects, ByteAccumulatorFactory buffers) {
+      public static Channel serve(OutcomeHandlerExecutor context, ByteAccumulatorFactory buffers, int port, HttpObject ... objects) {
           // Configure the server.
           ServerBootstrap bootstrap = new ServerBootstrap(
                   new NioServerSocketChannelFactory(
@@ -30,7 +30,7 @@ public class HttpobjectsNettySupport {
                           Executors.newCachedThreadPool()));
   
           // Set up the event pipeline factory.
-          bootstrap.setPipelineFactory(new HttpServerPipelineFactory(context, new NettyHttpobjectsRequestHandler(objects), buffers));
+          bootstrap.setPipelineFactory(new HttpServerPipelineFactory(context, new NettyHttpobjectsRequestHandler(Arrays.asList(objects)), buffers));
   
           // Bind and start to accept incoming connections.
           return bootstrap.bind(new InetSocketAddress(port));
@@ -46,7 +46,7 @@ public class HttpobjectsNettySupport {
 
           OutcomeHandlerExecutor executor = DSL.syncronousExecutor();
 
-          HttpobjectsNettySupport.serve(executor, port, Arrays.<HttpObject>asList(
+          HttpobjectsNettySupport.serve(executor, port,
         		  new HttpObject("/") {
         				public Eventual<Response> get(Request req) {
         					return OK(Html("<html><body>Welcome.  Click <a href=\"/yo\">here</a> for a special message.</body></html>")).toFuture();
@@ -57,6 +57,6 @@ public class HttpobjectsNettySupport {
           					return OK(Text("Hello world")).toFuture();
           				}
           			}
-              		));
+              		);
       }
 }
