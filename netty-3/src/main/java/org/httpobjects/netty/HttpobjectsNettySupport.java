@@ -17,7 +17,10 @@ import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 
 public class HttpobjectsNettySupport {
 
-          
+
+      public static Channel serve(int port, HttpObject ... objects) {
+		return serve(port, Arrays.asList(objects));
+      }
       public static Channel serve(int port, List<HttpObject> objects) {
           ByteAccumulatorFactory buffers = new InMemoryByteAccumulatorFactory();
           return serve(port, objects, buffers);

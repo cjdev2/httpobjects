@@ -24,7 +24,7 @@
 					<source>1.6</source>
 					<target>1.6</target>
 				</configuration>
-			</plugin>
+            </plugin><!--
 	        <plugin>
 	            <groupId>com.mycila.maven-license-plugin</groupId>
 	            <artifactId>maven-license-plugin</artifactId>
@@ -44,12 +44,14 @@
 	                    </goals>
 	                </execution>
 	            </executions>
-	        </plugin>
+            </plugin>
+            -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
                 <version>2.1</version>
             </plugin>
+
 		</plugins>
 	</build>
 
@@ -84,16 +86,18 @@
 
 	<modules>
 		<module>core</module>
-                <module>proxy</module>
+        <module>proxy</module>
 		<module>servlet</module>
-                <module>jetty-6</module>
-                <module>jetty-7-and-8</module>
+        <module>jetty-6</module>
+        <module>jetty-7-and-8</module>
 		<module>demo</module>
-                <module>freemarker</module>
-                <module>jackson</module>
-                <module>netty-3</module>
-                <module>test</module>
+        <module>freemarker</module>
+        <module>jackson</module>
+        <module>netty-3</module>
+        <module>test</module>
 		<module>multipart</module>
+        <module>client</module>
+        <module>apache-httpclient-4.x</module>
 	</modules>
 	
 	<dependencies>
