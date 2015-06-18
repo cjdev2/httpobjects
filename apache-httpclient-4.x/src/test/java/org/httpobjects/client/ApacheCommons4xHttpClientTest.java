@@ -7,6 +7,7 @@ import org.httpobjects.Representation;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
 import org.httpobjects.ResponseCode;
+import org.httpobjects.client.HttpClient.RemoteObject;
 import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.netty.HttpobjectsNettySupport;
@@ -43,15 +44,14 @@ public class ApacheCommons4xHttpClientTest {
 
 			final HttpClient testSubject = new ApacheCommons4xHttpClient();
 			final ClientRequest request = new ClientRequest(
-								Method.POST, 
-								"http://localhost:" + port + "/echo",
 								DSL.Text("this is my content\nsee it?"),
 								new GenericHeaderField("echo-header-A", "alpha"),
 								new GenericHeaderField("echo-header-B", "beta"));
 			
 			// when
-			final Response response = testSubject.send(request);
-			
+			final Response response = testSubject
+										.resource("http://localhost:" + port + "/echo")
+										.post(request);
 			// then
 			assertEquals(
 					     "/echo\n" +
@@ -78,10 +78,11 @@ public class ApacheCommons4xHttpClientTest {
 		try{
 
 			final HttpClient testSubject = new ApacheCommons4xHttpClient();
-			final ClientRequest request = new ClientRequest(Method.GET, "http://localhost:" + port + "/some/resource/with/headers");
 			
 			// when
-			final Response response = testSubject.send(request);
+			final Response response = testSubject
+										.resource("http://localhost:" + port + "/some/resource/with/headers")
+										.get(new ClientRequest());
 			
 			// then
 			assertEquals(ResponseCode.OK, response.code());
@@ -97,29 +98,20 @@ public class ApacheCommons4xHttpClientTest {
 	}
 	
 	@Test
-	public void supportsAllTheMethods(){
+	public void supportsAllTheMethods() throws Exception{
 		// given
-		final Channel server = HttpobjectsNettySupport.serve(port, new HttpObject("/i-have-all-the-methods"){
-					private Response make(String name){
-						return OK(Text(name), new GenericHeaderField("method-name", name));
-					}
-				    @Override public Response delete(Request req){return make("delete");}
-				    @Override public Response get(Request req){return make("get");}
-				    @Override public Response head(Request req){return make("head");}
-				    @Override public Response options(Request req){return make("options");}
-				    @Override public Response post(Request req){return make("post");}
-				    @Override public Response put(Request req){return make("put");}
-				    @Override public Response trace(Request req){return make("trace");}
-				    @Override public Response patch(Request req){return make("patch");}
-				});
+		final Channel server = HttpobjectsNettySupport.serve(port, new MethodEchoer("/i-have-all-the-methods"));
 		try{
 			for(Method method : Method.values()){
 
 				final HttpClient testSubject = new ApacheCommons4xHttpClient();
-				final ClientRequest request = new ClientRequest(method, "http://localhost:" + port + "/i-have-all-the-methods");
+				final ClientRequest request = new ClientRequest();
+				
+				final java.lang.reflect.Method m = RemoteObject.class.getMethod(method.name().toLowerCase(), ClientRequest.class);
+				final RemoteObject o = testSubject.resource("http://localhost:" + port + "/i-have-all-the-methods");
 				
 				// when
-				final Response response = testSubject.send(request);
+				final Response response = (Response) m.invoke(o, request);
 				
 				// then
 				assertEquals(ResponseCode.OK, response.code());
@@ -131,7 +123,47 @@ public class ApacheCommons4xHttpClientTest {
 		
 	}
 	
+	@Test
+	public void supportsAllTheMethodsWithTheNoArgsConvenienceVersion() throws Exception{
+		// given
+		final Channel server = HttpobjectsNettySupport.serve(port, new MethodEchoer("/i-have-all-the-methods"));
+		try{
+			for(Method method : Method.values()){
+
+				final HttpClient testSubject = new ApacheCommons4xHttpClient();
+				
+				final java.lang.reflect.Method m = RemoteObject.class.getMethod(method.name().toLowerCase());
+				final RemoteObject o = testSubject.resource("http://localhost:" + port + "/i-have-all-the-methods");
+				
+				// when
+				final Response response = (Response) m.invoke(o);
+				
+				// then
+				assertEquals(ResponseCode.OK, response.code());
+				assertEquals(method.name().toLowerCase(), findByName("method-name", response.header()).value());
+			}
+		}finally{
+			server.close();
+		}
+		
+	}
 	
+	private static class MethodEchoer extends HttpObject {
+		public MethodEchoer(String pattern) {
+			super(pattern);
+		}
+		private Response make(String name){
+			return OK(Text(name), new GenericHeaderField("method-name", name));
+		}
+	    @Override public Response delete(Request req){return make("delete");}
+	    @Override public Response get(Request req){return make("get");}
+	    @Override public Response head(Request req){return make("head");}
+	    @Override public Response options(Request req){return make("options");}
+	    @Override public Response post(Request req){return make("post");}
+	    @Override public Response put(Request req){return make("put");}
+	    @Override public Response trace(Request req){return make("trace");}
+	    @Override public Response patch(Request req){return make("patch");}
+	}
 	
 	private HeaderField findByName(String name, HeaderField[] fields){
 		for(HeaderField field: fields){

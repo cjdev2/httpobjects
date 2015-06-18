@@ -9,6 +9,7 @@ import java.net.URI;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
@@ -29,19 +30,115 @@ import org.httpobjects.impl.fn.Fn;
 import org.httpobjects.impl.fn.FunctionalJava;
 import org.httpobjects.impl.fn.Seq;
 import org.httpobjects.util.HttpObjectUtil;
-import org.httpobjects.util.Method;
 
 public class ApacheCommons4xHttpClient implements HttpClient {
 	private final org.apache.http.client.HttpClient client = new DefaultHttpClient();
 	
-	@Override
-	public Response send(ClientRequest request) {
+	private final HttpResponse execute(HttpUriRequest request){
 		try {
-			return translate(client.execute(translate(request)));
+			return client.execute(request);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	@Override
+	public RemoteObject resource(final String uri) {
+		return new RemoteObject() {
+			
+			@Override
+			public Response put() {
+				return put(new ClientRequest());
+			}
+			@Override
+			public Response put(ClientRequest request) {
+				return translate(execute(translate(request, new HttpPut(uri))));
+			}
+			
+			@Override
+			public Response post() {
+				return post(new ClientRequest());
+			}
+			
+			@Override
+			public Response post(ClientRequest request) {
+				return translate(execute(translate(request, new HttpPost(uri))));
+			}
+			
+			@Override
+			public Response patch() {
+				return patch(new ClientRequest());
+			}
+			
+			@Override
+			public Response patch(ClientRequest request) {
+				return translate(execute(translate(request, new HttpPatch(uri))));
+			}
+			
+			@Override
+			public Response options() {
+				return options(new ClientRequest());
+			}
+			
+			@Override
+			public Response options(ClientRequest request) {
+				return translate(execute(translate(request, new HttpOptions(uri))));
+			}
+			
+			@Override
+			public Response head() {
+				return head(new ClientRequest());
+			}
+			
+			@Override
+			public Response head(ClientRequest request) {
+				return translate(execute(translate(request, new HttpHead(uri))));
+			}
+			
+			@Override
+			public Response get() {
+				return get(new ClientRequest());
+			}
+			
+			@Override
+			public Response get(ClientRequest request) {
+				return translate(execute(translate(request, new HttpGet(uri))));
+			}
+			
+			@Override
+			public Response delete() {
+				return delete(new ClientRequest());
+			}
+			
+			@Override
+			public Response delete(ClientRequest request) {
+				return translate(execute(translate(request, new HttpDelete(uri))));
+			}
+		};
+	}
+	
+	/**
+	 * This is missing in apache client 4.0
+	 */
+	private final class HttpPatch extends HttpEntityEnclosingRequestBase {
+		private HttpPatch(final String uri) {
+			setURI(URI.create(uri));
+		}
+
+		@Override
+		public String getMethod() {
+			return "PATCH";
+		}
+	}
+	
+//	@Override
+//	public Response send(ClientRequest request) {
+//		try {
+//			return translate(client.execute(translate(request)));
+//		} catch (Exception e) {
+//			throw new RuntimeException(e);
+//		}
+//	}
 
 	private Response translate(org.apache.http.HttpResponse apache) {
 		final ResponseCode code = ResponseCode.forCode(apache.getStatusLine().getStatusCode());
@@ -102,11 +199,7 @@ public class ApacheCommons4xHttpClient implements HttpClient {
 		};
 	}
 
-	private org.apache.http.client.methods.HttpUriRequest translate(final ClientRequest request) {
-		final Method method = request.method();
-		final String uri = request.uri();
-
-		final HttpUriRequest in = instantiateRequest(method, uri);
+	private org.apache.http.client.methods.HttpUriRequest translate(final ClientRequest request, final HttpUriRequest in) {
 		
 		for(HeaderField field: request.header().fields()){
 			in.addHeader(field.name(), field.value());
@@ -119,50 +212,50 @@ public class ApacheCommons4xHttpClient implements HttpClient {
 		return in;
 	}
 
-	private HttpUriRequest instantiateRequest(final Method method, final String uri) {
-		final org.apache.http.client.methods.HttpUriRequest in;
-		switch(method){
-		case GET: {
-			in = new HttpGet(uri); 
-			break;
-		}
-		case PUT: {
-			in = new HttpPut(uri);
-			 break;
-		}
-		case POST: {
-			in = new HttpPost(uri);
-			break;
-		}
-		case DELETE: {
-			in = new HttpDelete(uri);
-			break;
-		}
-		case HEAD: {
-			in = new HttpHead(uri);
-			break;
-		}
-		case OPTIONS: {
-			in = new HttpOptions(uri);
-			break;
-		}
-		case PATCH: {
-			in = new HttpEntityEnclosingRequestBase() {
-			    {
-			        setURI(URI.create(uri));
-			    }
-
-				@Override
-				public String getMethod() {
-					return "PATCH";
-				}
-			};
-			break;
-		}
-		default: throw new RuntimeException("I don't support '" + method + "' requests.");
-		}
-		return in;
-	}
+//	private HttpUriRequest instantiateRequest(final Method method, final String uri) {
+//		final org.apache.http.client.methods.HttpUriRequest in;
+//		switch(method){
+//		case GET: {
+//			in = new HttpGet(uri); 
+//			break;
+//		}
+//		case PUT: {
+//			in = new HttpPut(uri);
+//			 break;
+//		}
+//		case POST: {
+//			in = new HttpPost(uri);
+//			break;
+//		}
+//		case DELETE: {
+//			in = new HttpDelete(uri);
+//			break;
+//		}
+//		case HEAD: {
+//			in = new HttpHead(uri);
+//			break;
+//		}
+//		case OPTIONS: {
+//			in = new HttpOptions(uri);
+//			break;
+//		}
+//		case PATCH: {
+//			in = new HttpEntityEnclosingRequestBase() {
+//			    {
+//			        setURI(URI.create(uri));
+//			    }
+//
+//				@Override
+//				public String getMethod() {
+//					return "PATCH";
+//				}
+//			};
+//			break;
+//		}
+//		default: throw new RuntimeException("I don't support '" + method + "' requests.");
+//		}
+//		return in;
+//	}
 
 	private AbstractHttpEntity translate(final Representation representation) {
 		final AbstractHttpEntity entity = new ByteArrayEntity(HttpObjectUtil.toByteArray(representation));
