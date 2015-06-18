@@ -32,8 +32,17 @@ import org.httpobjects.impl.fn.Seq;
 import org.httpobjects.util.HttpObjectUtil;
 
 public class ApacheCommons4xHttpClient implements HttpClient {
-	private final org.apache.http.client.HttpClient client = new DefaultHttpClient();
+	private final org.apache.http.client.HttpClient client;
 	
+	public ApacheCommons4xHttpClient() {
+		this(new DefaultHttpClient());
+	}
+	
+	public ApacheCommons4xHttpClient(org.apache.http.client.HttpClient client) {
+		super();
+		this.client = client;
+	}
+
 	private final HttpResponse execute(HttpUriRequest request){
 		try {
 			return client.execute(request);
@@ -131,15 +140,6 @@ public class ApacheCommons4xHttpClient implements HttpClient {
 		}
 	}
 	
-//	@Override
-//	public Response send(ClientRequest request) {
-//		try {
-//			return translate(client.execute(translate(request)));
-//		} catch (Exception e) {
-//			throw new RuntimeException(e);
-//		}
-//	}
-
 	private Response translate(org.apache.http.HttpResponse apache) {
 		final ResponseCode code = ResponseCode.forCode(apache.getStatusLine().getStatusCode());
 		final Seq<HeaderField> headerFields = FunctionalJava.map(asList(apache.getAllHeaders()), new Fn<org.apache.http.Header, HeaderField>() {
@@ -211,51 +211,6 @@ public class ApacheCommons4xHttpClient implements HttpClient {
 		
 		return in;
 	}
-
-//	private HttpUriRequest instantiateRequest(final Method method, final String uri) {
-//		final org.apache.http.client.methods.HttpUriRequest in;
-//		switch(method){
-//		case GET: {
-//			in = new HttpGet(uri); 
-//			break;
-//		}
-//		case PUT: {
-//			in = new HttpPut(uri);
-//			 break;
-//		}
-//		case POST: {
-//			in = new HttpPost(uri);
-//			break;
-//		}
-//		case DELETE: {
-//			in = new HttpDelete(uri);
-//			break;
-//		}
-//		case HEAD: {
-//			in = new HttpHead(uri);
-//			break;
-//		}
-//		case OPTIONS: {
-//			in = new HttpOptions(uri);
-//			break;
-//		}
-//		case PATCH: {
-//			in = new HttpEntityEnclosingRequestBase() {
-//			    {
-//			        setURI(URI.create(uri));
-//			    }
-//
-//				@Override
-//				public String getMethod() {
-//					return "PATCH";
-//				}
-//			};
-//			break;
-//		}
-//		default: throw new RuntimeException("I don't support '" + method + "' requests.");
-//		}
-//		return in;
-//	}
 
 	private AbstractHttpEntity translate(final Representation representation) {
 		final AbstractHttpEntity entity = new ByteArrayEntity(HttpObjectUtil.toByteArray(representation));

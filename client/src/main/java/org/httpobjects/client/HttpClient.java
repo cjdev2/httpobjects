@@ -2,6 +2,9 @@ package org.httpobjects.client;
 
 import org.httpobjects.Response;
 
+/**
+ * WARNING: This API is highly experimental.  This means it should be considered unstable at present; if you build on it, you may have to change your code a lot going forward.
+ */
 public interface HttpClient {
 	RemoteObject resource(String uri);
 	
