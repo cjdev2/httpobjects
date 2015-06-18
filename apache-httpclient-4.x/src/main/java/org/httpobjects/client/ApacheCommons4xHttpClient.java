@@ -56,72 +56,40 @@ public class ApacheCommons4xHttpClient implements HttpClient {
 		return new RemoteObject() {
 			
 			@Override
-			public Response put() {
-				return put(new ClientRequest());
+			public Response put(String query, Representation r, HeaderField ... fields) {
+				return translate(execute(translate(query, r, fields, new HttpPut(uri))));
+			}
+			
+			
+			@Override
+			public Response post(String query, Representation r, HeaderField ... fields) {
+				return translate(execute(translate(query, r, fields, new HttpPost(uri))));
 			}
 			@Override
-			public Response put(ClientRequest request) {
-				return translate(execute(translate(request, new HttpPut(uri))));
+			public Response patch(String query, Representation r, HeaderField ... fields) {
+				return translate(execute(translate(query, r, fields, new HttpPatch(uri))));
 			}
 			
 			@Override
-			public Response post() {
-				return post(new ClientRequest());
+			public Response options(String query, Representation r, HeaderField ... fields) {
+				return translate(execute(translate(query, r, fields, new HttpOptions(uri))));
 			}
 			
 			@Override
-			public Response post(ClientRequest request) {
-				return translate(execute(translate(request, new HttpPost(uri))));
+			public Response head(String query, Representation r, HeaderField ... fields) {
+				return translate(execute(translate(query, r, fields, new HttpHead(uri))));
 			}
 			
-			@Override
-			public Response patch() {
-				return patch(new ClientRequest());
-			}
 			
 			@Override
-			public Response patch(ClientRequest request) {
-				return translate(execute(translate(request, new HttpPatch(uri))));
+			public Response get(String query, Representation r, HeaderField ... fields) {
+				return translate(execute(translate(query, r, fields, new HttpGet(uri))));
 			}
 			
-			@Override
-			public Response options() {
-				return options(new ClientRequest());
-			}
 			
 			@Override
-			public Response options(ClientRequest request) {
-				return translate(execute(translate(request, new HttpOptions(uri))));
-			}
-			
-			@Override
-			public Response head() {
-				return head(new ClientRequest());
-			}
-			
-			@Override
-			public Response head(ClientRequest request) {
-				return translate(execute(translate(request, new HttpHead(uri))));
-			}
-			
-			@Override
-			public Response get() {
-				return get(new ClientRequest());
-			}
-			
-			@Override
-			public Response get(ClientRequest request) {
-				return translate(execute(translate(request, new HttpGet(uri))));
-			}
-			
-			@Override
-			public Response delete() {
-				return delete(new ClientRequest());
-			}
-			
-			@Override
-			public Response delete(ClientRequest request) {
-				return translate(execute(translate(request, new HttpDelete(uri))));
+			public Response delete(String query, Representation r, HeaderField ... fields) {
+				return translate(execute(translate(query, r, fields, new HttpDelete(uri))));
 			}
 		};
 	}
@@ -199,14 +167,14 @@ public class ApacheCommons4xHttpClient implements HttpClient {
 		};
 	}
 
-	private org.apache.http.client.methods.HttpUriRequest translate(final ClientRequest request, final HttpUriRequest in) {
+	private org.apache.http.client.methods.HttpUriRequest translate(String query, Representation r, HeaderField[] fields, final HttpUriRequest in) {
 		
-		for(HeaderField field: request.header().fields()){
+		for(HeaderField field: fields){
 			in.addHeader(field.name(), field.value());
 		}
 		
-		if(request.representation()!=null){
-			((HttpEntityEnclosingRequest)in).setEntity(translate(request.representation()));
+		if(r!=null){
+			((HttpEntityEnclosingRequest)in).setEntity(translate(r));
 		}
 		
 		return in;

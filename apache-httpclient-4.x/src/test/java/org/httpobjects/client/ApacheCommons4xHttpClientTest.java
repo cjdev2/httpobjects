@@ -43,15 +43,13 @@ public class ApacheCommons4xHttpClientTest {
 		try{
 
 			final HttpClient testSubject = new ApacheCommons4xHttpClient();
-			final ClientRequest request = new ClientRequest(
-								DSL.Text("this is my content\nsee it?"),
-								new GenericHeaderField("echo-header-A", "alpha"),
-								new GenericHeaderField("echo-header-B", "beta"));
 			
 			// when
 			final Response response = testSubject
 										.resource("http://localhost:" + port + "/echo")
-										.post(request);
+										.post(DSL.Text("this is my content\nsee it?"),
+												new GenericHeaderField("echo-header-A", "alpha"),
+												new GenericHeaderField("echo-header-B", "beta"));
 			// then
 			assertEquals(
 					     "/echo\n" +
@@ -82,7 +80,7 @@ public class ApacheCommons4xHttpClientTest {
 			// when
 			final Response response = testSubject
 										.resource("http://localhost:" + port + "/some/resource/with/headers")
-										.get(new ClientRequest());
+										.get();
 			
 			// then
 			assertEquals(ResponseCode.OK, response.code());
@@ -105,13 +103,12 @@ public class ApacheCommons4xHttpClientTest {
 			for(Method method : Method.values()){
 
 				final HttpClient testSubject = new ApacheCommons4xHttpClient();
-				final ClientRequest request = new ClientRequest();
 				
-				final java.lang.reflect.Method m = RemoteObject.class.getMethod(method.name().toLowerCase(), ClientRequest.class);
+				final java.lang.reflect.Method m = RemoteObject.class.getMethod(method.name().toLowerCase(), String.class, HeaderField[].class);
 				final RemoteObject o = testSubject.resource("http://localhost:" + port + "/i-have-all-the-methods");
 				
 				// when
-				final Response response = (Response) m.invoke(o, request);
+				final Response response = (Response) m.invoke(o, "?foo=bar", (Object) new HeaderField[]{});
 				
 				// then
 				assertEquals(ResponseCode.OK, response.code());
@@ -132,11 +129,11 @@ public class ApacheCommons4xHttpClientTest {
 
 				final HttpClient testSubject = new ApacheCommons4xHttpClient();
 				
-				final java.lang.reflect.Method m = RemoteObject.class.getMethod(method.name().toLowerCase());
+				final java.lang.reflect.Method m = RemoteObject.class.getMethod(method.name().toLowerCase(), HeaderField[].class);
 				final RemoteObject o = testSubject.resource("http://localhost:" + port + "/i-have-all-the-methods");
 				
 				// when
-				final Response response = (Response) m.invoke(o);
+				final Response response = (Response) m.invoke(o, (Object) new HeaderField[]{});
 				
 				// then
 				assertEquals(ResponseCode.OK, response.code());
