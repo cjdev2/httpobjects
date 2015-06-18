@@ -12,75 +12,112 @@ public interface HttpClient {
 
     public abstract class RemoteObject {
 
+        public abstract Response get(Representation r, String query, HeaderField ... fields);
+        public abstract Response post(Representation r, String query, HeaderField ... fields);
+        public abstract Response put(Representation r, String query, HeaderField ... fields);
+        public abstract Response delete(Representation r, String query, HeaderField ... fields);
+        public abstract Response patch(Representation r, String query, HeaderField ... fields);
+        public abstract Response head(Representation r, String query, HeaderField ... fields);
+        public abstract Response options(Representation r, String query, HeaderField ... fields);
+
+
+        /**
+         * Convenience methods for 'GET'
+         */
+
         public Response get(HeaderField ... fields){
-            return this.get("", null, fields);
+            return this.get(null, "", fields);
         }
         public Response get(String query, HeaderField ... fields){
-            return this.get(query, null, fields);
+            return this.get(null, query, fields);
         }
         public Response get(Representation r, HeaderField ... fields){
-            return this.get("", r, fields);
+            return this.get(r, "", fields);
         }
-        public abstract Response get(String query, Representation r, HeaderField ... fields);
+
+        /**
+         * Convenience methods for 'POST'
+         */
+
         public Response post(HeaderField ... fields){
-            return this.post("", null, fields);
+            return this.post(null, "", fields);
         }
         public Response post(String query, HeaderField ... fields){
-            return this.post(query, null, fields);
+            return this.post(null, query, fields);
         }
         public Response post(Representation r, HeaderField ... fields){
-            return this.post("", r, fields);
+            return this.post(r, "", fields);
         }
-        public abstract Response post(String query, Representation r, HeaderField ... fields);
+
+        /**
+         * Convenience methods for 'PUT'
+         */
+
         public Response put(HeaderField ... fields){
-            return this.put("", null, fields);
+            return this.put(null, "", fields);
         }
         public Response put(String query, HeaderField ... fields){
-            return this.put(query, null, fields);
+            return this.put(null, query, fields);
         }
         public Response put(Representation r, HeaderField ... fields){
-            return this.put("", r, fields);
+            return this.put(r, "", fields);
         }
-        public abstract Response put(String query, Representation r, HeaderField ... fields);
+
+        /**
+         * Convenience methods for 'DELETE'
+         */
+
         public Response delete(HeaderField ... fields){
-            return this.delete("", null, fields);
+            return this.delete(null, "", fields);
         }
         public Response delete(String query, HeaderField ... fields){
-            return this.delete(query, null, fields);
+            return this.delete(null, query, fields);
         }
         public Response delete(Representation r, HeaderField ... fields){
-            return this.delete("", r, fields);
+            return this.delete(r, "", fields);
         }
-        public abstract Response delete(String query, Representation r, HeaderField ... fields);
+
+        /**
+         * Convenience methods for 'PATCH'
+         */
+
         public Response patch(HeaderField ... fields){
-            return this.patch("", null, fields);
+            return this.patch(null, "", fields);
         }
         public Response patch(String query, HeaderField ... fields){
-            return this.patch(query, null, fields);
+            return this.patch(null, query, fields);
         }
         public Response patch(Representation r, HeaderField ... fields){
-            return this.patch("", r, fields);
+            return this.patch(r, "", fields);
         }
-        public abstract Response patch(String query, Representation r, HeaderField ... fields);
+
+        /**
+         * Convenience methods for 'HEAD'
+         */
+
         public Response head(HeaderField ... fields){
-            return this.head("", null, fields);
+            return this.head(null, "", fields);
         }
         public Response head(String query, HeaderField ... fields){
-            return this.head(query, null, fields);
+            return this.head(null, query, fields);
         }
         public Response head(Representation r, HeaderField ... fields){
-            return this.head("", r, fields);
+            return this.head(r, "", fields);
         }
-        public abstract Response head(String query, Representation r, HeaderField ... fields);
+
+        /**
+         * Convenience methods for 'OPTIONS'
+         */
+
         public Response options(HeaderField ... fields){
-            return this.options("", null, fields);
+            return this.options(null, "", fields);
         }
         public Response options(String query, HeaderField ... fields){
-            return this.options(query, null, fields);
+            return this.options(null, query, fields);
         }
         public Response options(Representation r, HeaderField ... fields){
-            return this.options("", r, fields);
+            return this.options(r, "", fields);
         }
-        public abstract Response options(String query, Representation r, HeaderField ... fields);
+
     }
 }

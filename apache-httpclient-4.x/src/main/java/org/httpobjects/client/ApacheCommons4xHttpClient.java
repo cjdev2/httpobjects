@@ -56,42 +56,44 @@ public class ApacheCommons4xHttpClient implements HttpClient {
 		return new RemoteObject() {
 			
 			@Override
-			public Response put(String query, Representation r, HeaderField ... fields) {
-				return translate(execute(translate(query, r, fields, new HttpPut(uri))));
-			}
-			
-			
-			@Override
-			public Response post(String query, Representation r, HeaderField ... fields) {
-				return translate(execute(translate(query, r, fields, new HttpPost(uri))));
-			}
-			@Override
-			public Response patch(String query, Representation r, HeaderField ... fields) {
-				return translate(execute(translate(query, r, fields, new HttpPatch(uri))));
+			public Response put(Representation r, String query, HeaderField ... fields) {
+				return doit(query, r, fields, new HttpPut(uri));
 			}
 			
 			@Override
-			public Response options(String query, Representation r, HeaderField ... fields) {
-				return translate(execute(translate(query, r, fields, new HttpOptions(uri))));
+			public Response post(Representation r, String query, HeaderField ... fields) {
+				return doit(query, r, fields, new HttpPost(uri));
+			}
+			@Override
+			public Response patch(Representation r, String query, HeaderField ... fields) {
+				return doit(query, r, fields, new HttpPatch(uri));
 			}
 			
 			@Override
-			public Response head(String query, Representation r, HeaderField ... fields) {
-				return translate(execute(translate(query, r, fields, new HttpHead(uri))));
+			public Response options(Representation r, String query, HeaderField ... fields) {
+				return doit(query, r, fields, new HttpOptions(uri));
 			}
 			
-			
 			@Override
-			public Response get(String query, Representation r, HeaderField ... fields) {
-				return translate(execute(translate(query, r, fields, new HttpGet(uri))));
+			public Response head(Representation r, String query, HeaderField ... fields) {
+				return doit(query, r, fields, new HttpHead(uri));
 			}
 			
+			@Override
+			public Response get(Representation r, String query, HeaderField ... fields) {
+				return doit(query, r, fields, new HttpGet(uri));
+			}
 			
 			@Override
-			public Response delete(String query, Representation r, HeaderField ... fields) {
-				return translate(execute(translate(query, r, fields, new HttpDelete(uri))));
+			public Response delete(Representation r, String query, HeaderField ... fields) {
+				return doit(query, r, fields, new HttpDelete(uri));
 			}
 		};
+	}
+	
+	
+	private Response doit(String query, Representation r, HeaderField[] fields, final HttpUriRequest in) {
+		return translate(execute(translate(query, r, fields, in)));
 	}
 	
 	/**

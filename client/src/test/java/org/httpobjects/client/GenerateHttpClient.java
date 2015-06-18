@@ -29,24 +29,38 @@ public class GenerateHttpClient {
 
 		
 		
-		
-		final String convenienceBody = "" 
-    			+ "        public Response method(HeaderField ... fields){\n"
-    			+ "            return this.method(\"\", null, fields);\n"
-    			+ "        }\n"
-    			+ "        public Response method(String query, HeaderField ... fields){\n"
-    			+ "            return this.method(query, null, fields);\n"
-    			+ "        }\n"
-    			+ "        public Response method(Representation r, HeaderField ... fields){\n"
-    			+ "            return this.method(\"\", r, fields);\n"
-    			+ "        }\n"
-    			+ "        public abstract Response method(String query, Representation r, HeaderField ... fields);"
-    			;
         for(Method m: Method.values()){
         	final String name = m.name().toLowerCase();
         	
-        	out.println(convenienceBody.replaceAll("method", name));
+        	out.println("        public abstract Response method(Representation r, String query, HeaderField ... fields);".replaceAll("method", name));
         }
+
+        out.println("");
+        out.println("");
+        
+		final String convenienceBody = ""
+				+ "        /**\n"
+				+ "         * Convenience methods for 'METHOD'\n"
+				+ "         */\n"
+				+ "\n" 
+    			+ "        public Response method(HeaderField ... fields){\n"
+    			+ "            return this.method(null, \"\", fields);\n"
+    			+ "        }\n"
+    			+ "        public Response method(String query, HeaderField ... fields){\n"
+    			+ "            return this.method(null, query, fields);\n"
+    			+ "        }\n"
+    			+ "        public Response method(Representation r, HeaderField ... fields){\n"
+    			+ "            return this.method(r, \"\", fields);\n"
+    			+ "        }\n"
+    			;
+        for(Method m: Method.values()){
+        	final String name = m.name();
+        	
+        	out.println(convenienceBody
+        					.replaceAll("method\\(", name.toLowerCase() + "(")
+        					.replaceAll("METHOD", name.toUpperCase()));
+        }
+        
         out.println("    }");
 		out.println("}");
 	}
