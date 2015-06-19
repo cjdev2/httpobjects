@@ -10,13 +10,7 @@ import java.net.URI;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.client.methods.HttpOptions;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.entity.ByteArrayEntity;
@@ -57,56 +51,58 @@ public class ApacheCommons4xHttpClient implements HttpClient {
 			
 			@Override
 			public Response put(Representation r, String query, HeaderField ... fields) {
-				return doit(query, r, fields, new HttpPut(uri));
+				return doit(query, r, fields, "put", uri);
 			}
 			
 			@Override
 			public Response post(Representation r, String query, HeaderField ... fields) {
-				return doit(query, r, fields, new HttpPost(uri));
+				return doit(query, r, fields, "post", uri);
 			}
 			@Override
 			public Response patch(Representation r, String query, HeaderField ... fields) {
-				return doit(query, r, fields, new HttpPatch(uri));
+				return doit(query, r, fields, "patch", uri);
 			}
 			
 			@Override
 			public Response options(Representation r, String query, HeaderField ... fields) {
-				return doit(query, r, fields, new HttpOptions(uri));
+				return doit(query, r, fields, "options", uri);
 			}
 			
 			@Override
 			public Response head(Representation r, String query, HeaderField ... fields) {
-				return doit(query, r, fields, new HttpHead(uri));
+				return doit(query, r, fields, "head", uri);
 			}
 			
 			@Override
 			public Response get(Representation r, String query, HeaderField ... fields) {
-				return doit(query, r, fields, new HttpGet(uri));
+				return doit(query, r, fields, "get", uri);
 			}
 			
 			@Override
 			public Response delete(Representation r, String query, HeaderField ... fields) {
-				return doit(query, r, fields, new HttpDelete(uri));
+				return doit(query, r, fields, "delete", uri);
 			}
 		};
 	}
 	
 	
-	private Response doit(String query, Representation r, HeaderField[] fields, final HttpUriRequest in) {
-		return translate(execute(translate(query, r, fields, in)));
+	private Response doit(String query, Representation r, HeaderField[] fields, final String method, final String uri) {
+		return translate(execute(translate(method, uri, query, r, fields)));
 	}
 	
 	/**
 	 * This is missing in apache client 4.0
 	 */
-	private final class HttpPatch extends HttpEntityEnclosingRequestBase {
-		private HttpPatch(final String uri) {
+	private final class GenericHttpRequest extends HttpEntityEnclosingRequestBase {
+		private final String method;
+		private GenericHttpRequest(final String method, final String uri) {
+			this.method = method.toUpperCase();
 			setURI(URI.create(uri));
 		}
 
 		@Override
 		public String getMethod() {
-			return "PATCH";
+			return method;
 		}
 	}
 	
@@ -169,13 +165,14 @@ public class ApacheCommons4xHttpClient implements HttpClient {
 		};
 	}
 
-	private org.apache.http.client.methods.HttpUriRequest translate(String query, Representation r, HeaderField[] fields, final HttpUriRequest in) {
+	private org.apache.http.client.methods.HttpUriRequest translate(String method, String uri, String query, Representation r, HeaderField[] fields) {
+		final GenericHttpRequest in = new GenericHttpRequest(method, uri + query);
 		
 		for(HeaderField field: fields){
 			in.addHeader(field.name(), field.value());
 		}
 		
-		if(r!=null){
+		if(r!=null && in instanceof HttpEntityEnclosingRequest){
 			((HttpEntityEnclosingRequest)in).setEntity(translate(r));
 		}
 		

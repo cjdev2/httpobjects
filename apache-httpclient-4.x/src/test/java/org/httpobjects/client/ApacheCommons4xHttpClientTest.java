@@ -1,5 +1,11 @@
 package org.httpobjects.client;
+
+import static org.httpobjects.DSL.Text;
 import static org.junit.Assert.assertEquals;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 
 import org.httpobjects.DSL;
 import org.httpobjects.HttpObject;
@@ -21,25 +27,9 @@ public class ApacheCommons4xHttpClientTest {
 	final int port = 8080;
 
 	@Test
-	public void sendsRequests(){
+	public void sendsRequests() throws Exception{
 		// given
-		final Channel server = HttpobjectsNettySupport.serve(port, 
-				new HttpObject("/echo"){
-					@Override
-					public Response post(Request req) {
-						final StringBuffer text = new StringBuffer(req.path().toString() + req.query().toString());
-						for(HeaderField field : req.header().fields()){
-							if(field.name().startsWith("echo-")){
-								text.append("\n" + field.name() + "=" + field.value());
-							}
-						}
-						final Representation r = req.representation();
-						if(r!=null){
-							text.append("\n" + HttpObjectUtil.toAscii(r));
-						}
-						return OK(Text(text.toString()));
-					}
-				});
+		final Channel server = serve(port, new Echoer("/echo"));
 		try{
 
 			final HttpClient testSubject = new ApacheCommons4xHttpClient();
@@ -52,7 +42,7 @@ public class ApacheCommons4xHttpClientTest {
 												new GenericHeaderField("echo-header-B", "beta"));
 			// then
 			assertEquals(
-					     "/echo\n" +
+					    "POST /echo\n" +
 						"echo-header-A=alpha\n" +
 						"echo-header-B=beta\n" +
 						"this is my content\n" +
@@ -64,9 +54,9 @@ public class ApacheCommons4xHttpClientTest {
 	}
 	
 	@Test
-	public void returnsResponses(){
+	public void returnsResponses() throws Exception{
 		// given
-		final Channel server = HttpobjectsNettySupport.serve(port, 
+		final Channel server = serve(port, 
 				new HttpObject("/some/resource/with/headers"){
 					@Override
 					public Response get(Request req) {
@@ -85,7 +75,7 @@ public class ApacheCommons4xHttpClientTest {
 			// then
 			assertEquals(ResponseCode.OK, response.code());
 			assertEquals("You GET it", HttpObjectAssert.bodyOf(response).asString());
-			HttpObjectAssert.contentTypeOf(response).assertIs("text/plain; charset=utf-8");
+			assertEquals("text/plain; charset=utf-8", response.representation().contentType().toLowerCase());
 			
 			assertEquals(
 					"a-custom-header-value", 
@@ -98,7 +88,7 @@ public class ApacheCommons4xHttpClientTest {
 	@Test
 	public void supportsAllTheMethods() throws Exception{
 		// given
-		final Channel server = HttpobjectsNettySupport.serve(port, new MethodEchoer("/i-have-all-the-methods"));
+		final Channel server = serve(port, new MethodEchoer("/i-have-all-the-methods"));
 		try{
 			for(Method method : Method.values()){
 
@@ -108,7 +98,7 @@ public class ApacheCommons4xHttpClientTest {
 				final RemoteObject o = testSubject.resource("http://localhost:" + port + "/i-have-all-the-methods");
 				
 				// when
-				final Response response = (Response) m.invoke(o, "?foo=bar", (Object) new HeaderField[]{});
+				final Response response = (Response) m.invoke(o, "?foo=bar", (Object) new HeaderField[]{new GenericHeaderField("echo-foo", "bar")});
 				
 				// then
 				assertEquals(ResponseCode.OK, response.code());
@@ -119,11 +109,57 @@ public class ApacheCommons4xHttpClientTest {
 		}
 		
 	}
+	@Test
+	public void supportsAllTheMethodsWithTheQueryOnlyConvenienceVersion() throws Exception{
+		// given
+		final Channel server = serve(port, new Echoer("/i-have-all-the-methods"));
+		try{
+			for(Method method : Method.values()){
+
+				final HttpClient testSubject = new ApacheCommons4xHttpClient();
+				
+				final java.lang.reflect.Method m = RemoteObject.class.getMethod(method.name().toLowerCase(), String.class, HeaderField[].class);
+				final RemoteObject o = testSubject.resource("http://localhost:" + port + "/i-have-all-the-methods");
+				
+				// when
+				final Response response = (Response) m.invoke(o, "?foo=bar", (Object) new HeaderField[]{new GenericHeaderField("echo-foo", "bar")});
+				
+				// then
+				assertEquals(ResponseCode.OK, response.code());
+				assertEquals(method.name().toUpperCase() + " /i-have-all-the-methods?foo=bar\necho-foo=bar\n", bodyInHeader(response));
+			}
+		}finally{
+			server.close();
+		}
+	}
+	@Test
+	public void supportsAllTheMethodsWithTheRepresentationOnlyConvenienceVersion() throws Exception{
+		// given
+		final Channel server = serve(port, new Echoer("/i-have-all-the-methods"));
+		try{
+			for(Method method : Method.values()){
+
+				final HttpClient testSubject = new ApacheCommons4xHttpClient();
+				
+				final java.lang.reflect.Method m = RemoteObject.class.getMethod(method.name().toLowerCase(), Representation.class, HeaderField[].class);
+				final RemoteObject o = testSubject.resource("http://localhost:" + port + "/i-have-all-the-methods");
+				
+				// when
+				final Response response = (Response) m.invoke(o, Text("yo"), (Object) new HeaderField[]{new GenericHeaderField("echo-foo", "bar")});
+				
+				// then
+				assertEquals(ResponseCode.OK, response.code());
+				assertEquals(method.name().toUpperCase() + " /i-have-all-the-methods\necho-foo=bar\nyo", bodyInHeader(response));
+			}
+		}finally{
+			server.close();
+		}
+	}
 	
 	@Test
 	public void supportsAllTheMethodsWithTheNoArgsConvenienceVersion() throws Exception{
 		// given
-		final Channel server = HttpobjectsNettySupport.serve(port, new MethodEchoer("/i-have-all-the-methods"));
+		final Channel server = serve(port, new Echoer("/i-have-all-the-methods"));
 		try{
 			for(Method method : Method.values()){
 
@@ -133,16 +169,31 @@ public class ApacheCommons4xHttpClientTest {
 				final RemoteObject o = testSubject.resource("http://localhost:" + port + "/i-have-all-the-methods");
 				
 				// when
-				final Response response = (Response) m.invoke(o, (Object) new HeaderField[]{});
+				final Response response = (Response) m.invoke(o, (Object) new HeaderField[]{new GenericHeaderField("echo-foo", "bar")});
 				
 				// then
 				assertEquals(ResponseCode.OK, response.code());
-				assertEquals(method.name().toLowerCase(), findByName("method-name", response.header()).value());
+				assertEquals(method.name().toUpperCase() + " /i-have-all-the-methods\necho-foo=bar\n", bodyInHeader(response));
 			}
-		}finally{
+		}catch(Exception e){
+			throw new RuntimeException(e);
+		}
+		finally{
 			server.close();
 		}
 		
+	}
+	
+	private Channel serve(int port, HttpObject ... objects) {
+		return HttpobjectsNettySupport.serve(port, objects);
+	}
+
+	private String bodyInHeader(Response response){
+		try {
+			return URLDecoder.decode(findByName("body", response.header()).value(), "UTF8");
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	private static class MethodEchoer extends HttpObject {
@@ -160,6 +211,40 @@ public class ApacheCommons4xHttpClientTest {
 	    @Override public Response put(Request req){return make("put");}
 	    @Override public Response trace(Request req){return make("trace");}
 	    @Override public Response patch(Request req){return make("patch");}
+	}
+	
+	private static class Echoer extends HttpObject {
+		
+		public Echoer(String pathPattern) {
+			super(pathPattern);
+		}
+
+	    @Override public Response delete(Request req){return make("delete", req);}
+	    @Override public Response get(Request req){return make("get", req);}
+	    @Override public Response head(Request req){return make("head", req);}
+	    @Override public Response options(Request req){return make("options", req);}
+	    @Override public Response post(Request req){return make("post", req);}
+	    @Override public Response put(Request req){return make("put", req);}
+	    @Override public Response trace(Request req){return make("trace", req);}
+	    @Override public Response patch(Request req){return make("patch", req);}
+
+		private Response make(final String method, final Request req) {
+			try {
+				final StringBuffer text = new StringBuffer(method.toUpperCase() + " " + req.path().toString() + req.query().toString());
+				for(HeaderField field : req.header().fields()){
+					if(field.name().startsWith("echo-")){
+						text.append("\n" + field.name() + "=" + field.value());
+					}
+				}
+				final Representation r = req.representation();
+				if(r!=null){
+					text.append("\n" + HttpObjectUtil.toAscii(r));
+				}
+				return OK(Text(text.toString()), new GenericHeaderField("body", URLEncoder.encode(text.toString(), "UTF8")));
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
 	}
 	
 	private HeaderField findByName(String name, HeaderField[] fields){
