@@ -25,7 +25,7 @@ import org.httpobjects.impl.fn.FunctionalJava;
 import org.httpobjects.impl.fn.Seq;
 import org.httpobjects.util.HttpObjectUtil;
 
-public class ApacheCommons4xHttpClient implements HttpClient {
+public final class ApacheCommons4xHttpClient implements HttpClient {
 	private final org.apache.http.client.HttpClient client;
 	
 	public ApacheCommons4xHttpClient() {

@@ -39,17 +39,17 @@ public class GenerateHttpClient {
         out.println("");
         
 		final String convenienceBody = ""
-				+ "        /**\n"
+				+ "        /*\n"
 				+ "         * Convenience methods for 'METHOD'\n"
 				+ "         */\n"
 				+ "\n" 
-    			+ "        public Response method(HeaderField ... fields){\n"
+    			+ "        public final Response method(HeaderField ... fields){\n"
     			+ "            return this.method(null, \"\", fields);\n"
     			+ "        }\n"
-    			+ "        public Response method(String query, HeaderField ... fields){\n"
+    			+ "        public final Response method(String query, HeaderField ... fields){\n"
     			+ "            return this.method(null, query, fields);\n"
     			+ "        }\n"
-    			+ "        public Response method(Representation r, HeaderField ... fields){\n"
+    			+ "        public final Response method(Representation r, HeaderField ... fields){\n"
     			+ "            return this.method(r, \"\", fields);\n"
     			+ "        }\n"
     			;
