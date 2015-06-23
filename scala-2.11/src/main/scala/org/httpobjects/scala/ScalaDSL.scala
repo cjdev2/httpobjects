@@ -38,14 +38,41 @@
 package org.httpobjects.scala
 
 import org.httpobjects.outcome.{OutcomeHandler, OutcomeHandlerExecutor, Outcome}
-import org.httpobjects.{Eventual=>HFuture, Response, DSL}
+import org.httpobjects.{Eventual => HFuture, _}
 
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{ExecutionContext, Promise, Future => SFuture}
-import scala.util.{Failure, Success, Try}
+import _root_.scala.concurrent.duration.Duration
+import _root_.scala.concurrent.{ExecutionContext, Promise, Future => SFuture}
+import _root_.scala.util.{Failure, Success, Try}
 
 object ScalaDSL {
+  private type HttpMethodHandler = (Request)=>HFuture[Response]
+
+  private def returnMethodNotAllowed:HttpMethodHandler = {r=> DSL.METHOD_NOT_ALLOWED().toFuture}
+
+  def httpCompose(
+                   path:String,
+                   GET:HttpMethodHandler = returnMethodNotAllowed,
+                   HEAD:HttpMethodHandler = returnMethodNotAllowed,
+                   OPTIONS:HttpMethodHandler = returnMethodNotAllowed,
+                   POST:HttpMethodHandler = returnMethodNotAllowed,
+                   PUT:HttpMethodHandler = returnMethodNotAllowed,
+                   TRACE:HttpMethodHandler = returnMethodNotAllowed,
+                   PATCH:HttpMethodHandler = returnMethodNotAllowed,
+                   DELETE:HttpMethodHandler = returnMethodNotAllowed
+                   ):HttpObject = {
+    new HttpObject(path){
+      override def get(req: Request) = GET(req)
+      override def head(req: Request) = HEAD(req)
+      override def options(req: Request) = OPTIONS(req)
+      override def post(req: Request) = POST(req)
+      override def put(req: Request) = PUT(req)
+      override def trace(req: Request) = TRACE(req)
+      override def patch(req: Request) = PATCH(req)
+      override def delete(req: Request) = DELETE(req)
+    }
+  }
+
   implicit class RichFuture[T](val future: HFuture[T]) {
 
     def toScala(implicit ec:ExecutionContext):SFuture[T] = SFuture{future.get}
@@ -55,6 +82,14 @@ object ScalaDSL {
       future.onComplete(action, ec)
     }
   }
+
+  /*
+   * Conversions to http method handling functions
+   */
+
+  implicit def toHttpMethodHandler(response:Response):HttpMethodHandler = {_=>response.toFuture}
+  implicit def toHttpMethodHandler(response:HFuture[Response]):HttpMethodHandler = {_=>response}
+  implicit def toHttpMethodHandler(response:SFuture[Response]):HttpMethodHandler = {_=>response}
 
   /*
    * Conversions to org.httpobject.Future

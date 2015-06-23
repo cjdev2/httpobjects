@@ -39,7 +39,37 @@
 					</excludes>
 				</configuration>
 			</plugin>
-		</plugins>
+            <!-- disable surefire -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.7</version>
+                <configuration>
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
+            <!-- enable scalatest -->
+            <plugin>
+                <groupId>org.scalatest</groupId>
+                <artifactId>scalatest-maven-plugin</artifactId>
+                <version>1.0</version>
+                <configuration>
+                    <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+                    <junitxml>.</junitxml>
+                    <filereports>WDF TestSuite.txt</filereports>
+                    <tagsToExclude>com.cj.IntegrationTest</tagsToExclude>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>test</id>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
 	</build>
 	<dependencies>
 		<dependency>
@@ -52,6 +82,21 @@
 		    <artifactId>scala-library</artifactId>
 		    <version>2.11.6</version>
 		</dependency>
-	</dependencies>
+
+        <!-- TEST SCOPE -->
+        <dependency>
+            <groupId>org.httpobjects.netty</groupId>
+            <artifactId>httpobjects-netty-3</artifactId>
+            <version>${pom.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.scalatest</groupId>
+            <artifactId>scalatest_2.11</artifactId>
+            <version>2.2.3</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
 
 </project>

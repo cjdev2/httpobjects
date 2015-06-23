@@ -10,3 +10,4 @@ target
 .classpath
 .bzr
 .bzrignore
+.cache
