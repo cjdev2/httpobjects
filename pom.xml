@@ -26,7 +26,7 @@
                     <target>1.6</target>
                 </configuration>
             </plugin>
-            <plugin>
+            <!--            <plugin>
                 <groupId>com.mycila.maven-license-plugin</groupId>
                 <artifactId>maven-license-plugin</artifactId>
                 <configuration>
@@ -45,7 +45,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>-->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
@@ -96,6 +96,8 @@
         <module>multipart</module>
         <module>scala-2.11</module>
         <module>demos/java-jetty</module>
+        <module>client</module>
+        <module>apache-httpclient-4.x</module>
     </modules>
 
     <dependencies>

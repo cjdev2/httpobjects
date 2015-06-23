@@ -141,7 +141,6 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
                         byte[] buffer = new byte[1024 * 10];
                         int x;
                         while((x = data.read(buffer))!=-1){
-                            System.out.println("read " + x);
                             out.write(buffer, 0, x);
                         }
                         out.close();

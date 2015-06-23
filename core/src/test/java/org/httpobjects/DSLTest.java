@@ -50,7 +50,7 @@ public class DSLTest {
     public void builderHappyPath() throws Exception {
     	// given/when
     	ClasspathResourcesObject object = DSL
-    			.classpathResourcesAt("/org/httpobjects/util/ClasspathResourcesObjectTest")
+    			.classpathResourcesAt("/org/httpobjects/util/ClasspathResourcesObjectTest_resources")
     			.servedAt("/");
     		
     	// then
@@ -63,7 +63,7 @@ public class DSLTest {
     public void builderWithDifferentServiceRoot() throws Exception {
     	// given/when
     	ClasspathResourcesObject object = DSL
-    			.classpathResourcesAt("/org/httpobjects/util/ClasspathResourcesObjectTest")
+    			.classpathResourcesAt("/org/httpobjects/util/ClasspathResourcesObjectTest_resources")
     			.servedAt("/bar");
     		
     	// then
@@ -81,7 +81,7 @@ public class DSLTest {
     		
     	// then
     	assertEquals("/bar/{resource*}", object.pattern().raw());
-    	Eventual<Response> response = object.get(new MockRequest(object, "/bar/util/ClasspathResourcesObjectTest/a.txt"));
+    	Eventual<Response> response = object.get(new MockRequest(object, "/bar/util/ClasspathResourcesObjectTest_resources/a.txt"));
     	assertEquals("hello", HttpObjectUtil.toAscii(response.get().representation()));
     }
 }

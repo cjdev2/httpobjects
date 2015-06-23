@@ -41,16 +41,12 @@ import org.httpobjects.header.request.RequestHeader;
 import org.httpobjects.path.Path;
 
 public interface Request {
-	
+    //TODO: int httpVersion();    
     Query query();
     Path path();
     RequestHeader header();
-    // int httpVersion();    
-     ConnectionInfo connectionInfo();
-    
-	boolean hasRepresentation();
-	Representation representation();
-	
-	Request immutableCopy();
-	
+    ConnectionInfo connectionInfo();
+    boolean hasRepresentation();
+    Representation representation();
+    Request immutableCopy();
 }
