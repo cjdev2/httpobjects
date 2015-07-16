@@ -125,7 +125,11 @@ public class DSL {
      * ## Representation factory methods
      * ########################################################
      */
-    
+
+    public static final Representation Csv(String text){
+        return new BinaryRepresentation("text/csv; charset="+MOST_WIDELY_SUPPORTED_ENCODING.charsetName(), new ByteArrayInputStream(getBytes(text, MOST_WIDELY_SUPPORTED_ENCODING)));
+    }
+
     public static final Representation Html(String text){
         return new BinaryRepresentation("text/html; charset="+MOST_WIDELY_SUPPORTED_ENCODING.charsetName(), new ByteArrayInputStream(getBytes(text, MOST_WIDELY_SUPPORTED_ENCODING)));
     }
