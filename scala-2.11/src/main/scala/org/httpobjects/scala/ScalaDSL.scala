@@ -94,7 +94,6 @@ object ScalaDSL {
   /*
    * Conversions to org.httpobject.Future
    */
-  implicit def toHttpobjectsFuture(response:Response):HFuture[Response] = DSL.now(response)
   implicit def toHttpobjectsFuture(f:Promise[Response]):HFuture[Response] = toHttpobjectsFuture(f.future)
   implicit def toHttpobjectsFuture(f:SFuture[Response]):HFuture[Response] = new FutureWrapper[Response](f)
 
