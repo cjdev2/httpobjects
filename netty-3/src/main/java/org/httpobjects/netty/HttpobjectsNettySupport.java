@@ -49,12 +49,12 @@ public class HttpobjectsNettySupport {
           HttpobjectsNettySupport.serve(executor, port,
         		  new HttpObject("/") {
         				public Eventual<Response> get(Request req) {
-        					return OK(Html("<html><body>Welcome.  Click <a href=\"/yo\">here</a> for a special message.</body></html>")).toFuture();
+        					return OK(Html("<html><body>Welcome.  Click <a href=\"/yo\">here</a> for a special message.</body></html>"));
         				}
         			},
             		new HttpObject("/yo") {
           				public Eventual<Response> get(Request req) {
-          					return OK(Text("Hello world")).toFuture();
+          					return OK(Text("Hello world"));
           				}
           			}
               		);

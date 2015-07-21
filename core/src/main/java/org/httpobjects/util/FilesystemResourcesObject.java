@@ -68,7 +68,7 @@ public class FilesystemResourcesObject  extends HttpObject {
 		}
 		
 		if(path.exists() && path.isFile()){
-			return OK(Bytes(mimeTypeFor(resource), openStream(path))).toFuture();
+			return OK(Bytes(mimeTypeFor(resource), openStream(path)));
 		}else{
 			return null;
 		}

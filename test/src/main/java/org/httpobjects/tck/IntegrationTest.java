@@ -83,22 +83,22 @@ public abstract class IntegrationTest {
         serve(8080,
         new HttpObject("/app/inbox") {
             public Eventual<Response> post(Request req) {
-                return OK(Text("Message Received")).toFuture();
+                return OK(Text("Message Received"));
             }
         },
         new HttpObject("/app/inbox/abc") {
             public Eventual<Response> put(Request req) {
-                return OK(req.representation()).toFuture();
+                return OK(req.representation());
             }
         },
         new HttpObject("/app") {
             public Eventual<Response> get(Request req) {
-                return OK(Text("Welcome to the app")).toFuture();
+                return OK(Text("Welcome to the app"));
             }
         },
         new HttpObject("/app/message") {
             public Eventual<Response> post(Request req) {
-                return SEE_OTHER(Location("/app"), SetCookie("name", "frank")).toFuture();
+                return SEE_OTHER(Location("/app"), SetCookie("name", "frank"));
             }
         },
         new HttpObject("/nothing", null) {
@@ -110,10 +110,10 @@ public abstract class IntegrationTest {
 
                     BasicCredentials creds = authorization.basicCredentials();
                     if (creds.user().equals("Aladdin") && creds.password().equals("open sesame")) {
-                        return OK(Text("You're In!")).toFuture();
+                        return OK(Text("You're In!"));
                     }
                 }
-                return UNAUTHORIZED(BasicAuthentication("secure area"), Text("You must first log-in")).toFuture();
+                return UNAUTHORIZED(BasicAuthentication("secure area"), Text("You must first log-in"));
             }
         },
         new HttpObject("/echoUrl/{id}/{name}") {
@@ -121,10 +121,10 @@ public abstract class IntegrationTest {
             public Eventual<Response> get(Request req) {
                 try {
                     final String query = req.query().toString();
-                    return OK(Text(req.path().toString() + query)).toFuture();
+                    return OK(Text(req.path().toString() + query));
                 } catch (Exception e) {
                     e.printStackTrace();
-                    return INTERNAL_SERVER_ERROR(e).toFuture();
+                    return INTERNAL_SERVER_ERROR(e);
                 }
             }
         },
@@ -139,7 +139,7 @@ public abstract class IntegrationTest {
                     }
                     text.append(name + "=" + query.valueFor(name));
                 }
-                return OK(Text(text.toString())).toFuture();
+                return OK(Text(text.toString()));
             }
         },
         new HttpObject("/echoCookies") {
@@ -158,7 +158,7 @@ public abstract class IntegrationTest {
                     });
                 }
 
-                return OK(Text(text.toString())).toFuture();
+                return OK(Text(text.toString()));
             }
         },
         new HttpObject("/cookieSetter") {
@@ -167,19 +167,19 @@ public abstract class IntegrationTest {
                            Text("Here are some cookies!"),
                            new SetCookieField("name", "cookie monster", "sesamestreet.com"),
                            new SetCookieField("specialGuest", "mr rogers", "mrrogers.com", "/myNeighborhood", "Wed, 13-Jan-2021 22:23:01 GMT", true),
-                           new SetCookieField("oldInsecureCookie", "yes", "the90sIntranet.com", "/images/animatedGifs", "Wed, 13-Jan-1999 22:23:01 GMT", false)).toFuture();
+                           new SetCookieField("oldInsecureCookie", "yes", "the90sIntranet.com", "/images/animatedGifs", "Wed, 13-Jan-1999 22:23:01 GMT", false));
             }
         },
         new HttpObject("/subpathEcho/{subPath*}") {
             @Override
             public Eventual<Response> get(Request req) {
-                return OK(Text(req.path().valueFor("subPath"))).toFuture();
+                return OK(Text(req.path().valueFor("subPath")));
             }
         },
         new HttpObject("/echoHasRepresentation") {
             @Override
             public Eventual<Response> post(Request req) {
-                return OK(Text(req.hasRepresentation() ? "yes" : "no")).toFuture();
+                return OK(Text(req.hasRepresentation() ? "yes" : "no"));
             }
         },
         new HttpObject("/pows/{name}/{rank}/{serialnumber}") {
@@ -189,7 +189,7 @@ public abstract class IntegrationTest {
                 return OK(Text(
                                 path.valueFor("rank") + " " +
                                   path.valueFor("name") + ", " +
-                                  path.valueFor("serialnumber"))).toFuture();
+                                  path.valueFor("serialnumber")));
             }
         },
         new HttpObject("/immutablecopy/{subpath*}") {
@@ -198,7 +198,7 @@ public abstract class IntegrationTest {
                 Request r = req.immutableCopy();
                 final String firstPass = toString(r);
                 final String secondPass = toString(r);
-                return OK(Text(secondPass)).toFuture();
+                return OK(Text(secondPass));
             }
 
             class HeadersByName implements Comparator<HeaderField> {
@@ -232,9 +232,9 @@ public abstract class IntegrationTest {
             public Eventual<Response> patch(org.httpobjects.Request req) {
                 try {
                     final String input = new String(HttpObjectUtil.toByteArray(req.representation()), "UTF-8");
-                    return OK(Text("You told me to patch!" + input)).toFuture();
+                    return OK(Text("You told me to patch!" + input));
                 } catch (UnsupportedEncodingException e) {
-                    return INTERNAL_SERVER_ERROR(e).toFuture();
+                    return INTERNAL_SERVER_ERROR(e);
                 }
             }
         },
@@ -242,19 +242,19 @@ public abstract class IntegrationTest {
             public Eventual<Response> get(Request req) {
                 final ConnectionInfo connection = req.connectionInfo();
                 return OK(Text("Local " + connection.localAddress + ":" + connection.localPort + ", " +
-                                 "Remote " + connection.remoteAddress + ":" + connection.remotePort)).toFuture();
+                                 "Remote " + connection.remoteAddress + ":" + connection.remotePort));
             }
         },
         new HttpObject("/head") {
             @Override
             public Eventual<Response> head(Request req) {
-                return OK(Text(""), new GenericHeaderField("foo", "bar")).toFuture();
+                return OK(Text(""), new GenericHeaderField("foo", "bar"));
             }
         },
         new HttpObject("/options"){
             @Override
             public  Eventual<Response> options(Request req) {
-                return OK(Text(""), new GenericHeaderField("foo", "bar")).toFuture();
+                return OK(Text(""), new GenericHeaderField("foo", "bar"));
             }
         });
     }

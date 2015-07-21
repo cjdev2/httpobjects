@@ -90,12 +90,12 @@ public class Proxy extends HttpObject {
 
 	@Override
 	public Eventual<Response> get(Request req) {
-		return proxyRequest(req, new GetMethod()).toFuture();
+		return proxyRequest(req, new GetMethod());
 	}
 
     @Override
 	public Eventual<Response> delete(Request req){
-		return proxyRequest(req, new DeleteMethod()).toFuture();
+		return proxyRequest(req, new DeleteMethod());
     }
 
 	@Override
@@ -103,7 +103,7 @@ public class Proxy extends HttpObject {
 		PutMethod m = new PutMethod();
 
 		setRequestRepresentation(req, m);
-		return proxyRequest(req, m).toFuture();
+		return proxyRequest(req, m);
 	}
 
 	protected void setRequestRepresentation(Request req, EntityEnclosingMethod method){
@@ -117,7 +117,7 @@ public class Proxy extends HttpObject {
 		PostMethod m = new PostMethod();
 
 		setRequestRepresentation(req, m);
-		return proxyRequest(req, m).toFuture();
+		return proxyRequest(req, m);
 	}
 	
 	protected String getQuery(Request req){

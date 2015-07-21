@@ -59,7 +59,7 @@ public class ClasspathResourceObject extends HttpObject {
 
 	@Override
 	public Eventual<Response> get(Request req) {
-		return OK(FromClasspath(contentType, resourceName, clazz)).toFuture();
+		return OK(FromClasspath(contentType, resourceName, clazz));
 	}
 
 }

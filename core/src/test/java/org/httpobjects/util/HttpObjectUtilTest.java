@@ -67,7 +67,7 @@ public class HttpObjectUtilTest {
         @Override
         public Eventual<Response> patch(Request req) {
             requestsRecieved.add(req);
-            return response.toFuture();
+            return response;
         }
     }
     

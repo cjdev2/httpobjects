@@ -48,7 +48,7 @@ import _root_.scala.util.{Failure, Success, Try}
 object ScalaDSL {
   private type HttpMethodHandler = (Request)=>HFuture[Response]
 
-  private def returnMethodNotAllowed:HttpMethodHandler = {r=> DSL.METHOD_NOT_ALLOWED().toFuture}
+  private def returnMethodNotAllowed:HttpMethodHandler = {r=> DSL.METHOD_NOT_ALLOWED}
 
   def httpCompose(
                    path:String,
@@ -87,7 +87,7 @@ object ScalaDSL {
    * Conversions to http method handling functions
    */
 
-  implicit def toHttpMethodHandler(response:Response):HttpMethodHandler = {_=>response.toFuture}
+  implicit def toHttpMethodHandler(response:Response):HttpMethodHandler = {_=>response}
   implicit def toHttpMethodHandler(response:HFuture[Response]):HttpMethodHandler = {_=>response}
   implicit def toHttpMethodHandler(response:SFuture[Response]):HttpMethodHandler = {_=>response}
 

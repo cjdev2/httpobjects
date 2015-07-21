@@ -69,11 +69,11 @@ public class CMSResources extends HttpObject {
 			String contentType = contentTypeOf(localPath);
 			InputStream data = FileInputStream(localPath);
 			
-			return OK(Bytes(contentType, data)).toFuture();
+			return OK(Bytes(contentType, data));
 		} else if(localPath.isDirectory()){
-			return OK(Html(directoryListing(cid, localPath))).toFuture();
+			return OK(Html(directoryListing(cid, localPath)));
 		} else {
-			return NOT_FOUND().toFuture();
+			return NOT_FOUND();
 		}
 	}
 	

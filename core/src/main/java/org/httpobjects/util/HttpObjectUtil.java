@@ -74,7 +74,7 @@ public class HttpObjectUtil {
             output = object.options(input);
             break;
         default:
-            output = HttpObject.NOT_FOUND().toFuture();
+            output = HttpObject.NOT_FOUND();
         }
         return output;
     }

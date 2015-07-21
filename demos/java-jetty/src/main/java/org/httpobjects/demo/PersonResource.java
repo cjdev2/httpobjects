@@ -53,9 +53,9 @@ public class PersonResource extends HttpObject {
 		String name = req.path().valueFor("name");
 		
 		if(name!=null && name.equals("stu")){
-			return OK(Text(name)).toFuture();
+			return OK(Text(name));
 		}else{
-			return NOT_FOUND(Text("No such person")).toFuture();
+			return NOT_FOUND(Text("No such person"));
 		}
 	}
 	

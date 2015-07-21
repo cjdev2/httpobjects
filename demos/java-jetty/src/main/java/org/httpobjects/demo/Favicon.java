@@ -50,7 +50,7 @@ public class Favicon extends HttpObject {
 	
 	@Override
 	public Eventual<Response> get(Request req) {
-		return OK(File("image/x-icon", new java.io.File("favicon.ico"))).toFuture();
+		return OK(File("image/x-icon", new java.io.File("favicon.ico")));
 	}
 	
 }

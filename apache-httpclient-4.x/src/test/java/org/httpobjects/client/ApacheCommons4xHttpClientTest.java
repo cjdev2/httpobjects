@@ -55,7 +55,7 @@ public class ApacheCommons4xHttpClientTest {
 				new HttpObject("/some/resource/with/headers"){
 					@Override
 					public Eventual<Response> get(Request req) {
-						return OK(Text("You GET it"), new GenericHeaderField("a-custom-header-name", "a-custom-header-value")).toFuture();
+						return OK(Text("You GET it"), new GenericHeaderField("a-custom-header-name", "a-custom-header-value"));
 					}
 				});
 		try{
@@ -196,7 +196,7 @@ public class ApacheCommons4xHttpClientTest {
 			super(pattern);
 		}
 		private Eventual<Response> make(String name){
-			return OK(Text(name), new GenericHeaderField("method-name", name)).toFuture();
+			return OK(Text(name), new GenericHeaderField("method-name", name));
 		}
 	    @Override public Eventual<Response> delete(Request req){return make("delete");}
 	    @Override public Eventual<Response> get(Request req){return make("get");}
@@ -235,7 +235,7 @@ public class ApacheCommons4xHttpClientTest {
 				if(r!=null){
 					text.append("\n" + HttpObjectUtil.toAscii(r));
 				}
-				return OK(Text(text.toString()), new GenericHeaderField("body", URLEncoder.encode(text.toString(), "UTF8"))).toFuture();
+				return OK(Text(text.toString()), new GenericHeaderField("body", URLEncoder.encode(text.toString(), "UTF8")));
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}

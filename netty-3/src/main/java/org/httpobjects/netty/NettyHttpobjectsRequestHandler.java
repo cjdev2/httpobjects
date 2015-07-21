@@ -26,7 +26,7 @@ import org.jboss.netty.handler.codec.http.HttpRequest;
 
 public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.RequestHandler {
 	private final List<HttpObject> objects;
-    private final Eventual<Response> defaultResponse = DSL.NOT_FOUND().toFuture();
+    private final Eventual<Response> defaultResponse = DSL.NOT_FOUND();
 
 	public NettyHttpobjectsRequestHandler(List<HttpObject> objects) {
 		super();

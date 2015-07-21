@@ -85,7 +85,7 @@ public class ClasspathResourcesObject  extends HttpObject {
 		final InputStream data = loader.getResourceAsStream(prefix + resource);
 		
 		if(data!=null){
-			return OK(Bytes(mimeTypeFor(resource), data)).toFuture();
+			return OK(Bytes(mimeTypeFor(resource), data));
 		}else{
 			return null;
 		}

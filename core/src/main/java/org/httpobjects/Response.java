@@ -38,8 +38,10 @@
 package org.httpobjects;
 
 import org.httpobjects.header.HeaderField;
+import org.httpobjects.outcome.OutcomeHandler;
+import org.httpobjects.outcome.OutcomeHandlerExecutor;
 
-public final class Response {
+public final class Response implements Eventual<Response>{
 	
 	private final Representation representation;
 	private final ResponseCode code;
@@ -50,10 +52,6 @@ public final class Response {
 		this.code = code;
 		this.representation = r;
 		this.header = header;
-	}
-
-	public Eventual<Response> toFuture() {
-		return DSL.now(this);
 	}
 	
 	public boolean hasRepresentation(){
@@ -71,4 +69,14 @@ public final class Response {
 	public HeaderField[] header() {
 		return header;
 	}
+	
+	// Eventual Interface
+  @Override
+  public Response get() {
+    return this;
+  }
+  @Override
+  public void onComplete(OutcomeHandler<Response> action, OutcomeHandlerExecutor executor) {
+    executor.execute(action, this);
+  }
 }
