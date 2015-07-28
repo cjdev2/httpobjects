@@ -37,10 +37,42 @@
  */
 package org.httpobjects;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
-public interface Representation {
-    String contentType();
+public class RepresentationUtil {
+    public static Representation createRepresentationUtf8(final String contentType, final String content) {
+        return createRepresentation(contentType, content, StandardCharset.UTF_8);
+    }
 
-    void write(OutputStream out);
+    public static Representation createRepresentation(final String contentType, final String content, final StandardCharset charset) {
+        return new Representation() {
+            @Override
+            public String contentType() {
+                return contentType + "; charset=" + charset.charsetName();
+            }
+
+            @Override
+            public void write(OutputStream outputStream) {
+                try {
+                    outputStream.write(content.getBytes(charset.charsetName()));
+                } catch (IOException e) {
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            }
+        };
+    }
+
+    public static String representationBodyAsUtf8(Representation representation) {
+        return representationBodyAsString(representation, StandardCharset.UTF_8);
+    }
+
+    public static String representationBodyAsString(Representation representation, StandardCharset charset) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        representation.write(byteArrayOutputStream);
+        String representationText = new String(byteArrayOutputStream.toByteArray(), Charset.forName(charset.charsetName()));
+        return representationText;
+    }
 }

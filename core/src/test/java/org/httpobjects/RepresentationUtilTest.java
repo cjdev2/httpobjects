@@ -37,10 +37,26 @@
  */
 package org.httpobjects;
 
-import java.io.OutputStream;
+import org.junit.Test;
 
-public interface Representation {
-    String contentType();
+import static org.hamcrest.CoreMatchers.is;
+import static org.httpobjects.RepresentationUtil.*;
+import static org.junit.Assert.assertThat;
 
-    void write(OutputStream out);
+public class RepresentationUtilTest {
+    @Test
+    public void stringRepresentation() {
+        Representation representation = createRepresentationUtf8("text/plain", "Hello, world!");
+        String actual = representationBodyAsUtf8(representation);
+        assertThat(actual, is("Hello, world!"));
+        assertThat(representation.contentType(), is("text/plain; charset=utf-8"));
+    }
+
+    @Test
+    public void stringRepresentationWithCharset() {
+        Representation representation = createRepresentation("text/plain", "Hello, world!", StandardCharset.ISO_8859_1);
+        String actual = representationBodyAsString(representation, StandardCharset.ISO_8859_1);
+        assertThat(actual, is("Hello, world!"));
+        assertThat(representation.contentType(), is("text/plain; charset=iso-8859-1"));
+    }
 }
