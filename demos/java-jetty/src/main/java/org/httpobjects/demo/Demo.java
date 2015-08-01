@@ -37,6 +37,7 @@
  */
 package org.httpobjects.demo;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 
@@ -48,7 +49,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.httpobjects.DSL;
 import org.httpobjects.HttpObject;
+import org.httpobjects.Representation;
+import org.httpobjects.Representation.Chunk;
+import org.httpobjects.Representation.Stream.Scanner;
+import org.httpobjects.Representation.Stream.Transformer;
 import org.httpobjects.jetty.HttpObjectsJettyHandler;
 import org.httpobjects.servlet.ServletFilter;
 import org.mortbay.jetty.Handler;
@@ -57,6 +63,45 @@ import org.mortbay.jetty.servlet.FilterHolder;
 import org.mortbay.jetty.servlet.ServletHandler;
 
 public class Demo {
+	
+	public static void collectDemo(){
+		Representation r = DSL.Text("foo");
+		
+		final ByteArrayOutputStream out = new ByteArrayOutputStream();
+		
+		r.bytes().scan(new Scanner<Chunk>() {
+			
+			@Override
+			public void collect(Chunk nextChunk) {
+				nextChunk.writeInto(out);
+			}
+		});
+		
+		Demo demo = r.bytes().read(jackson(Demo.class)).get();
+	}
+	
+
+	static <T> Transformer<Chunk, T> jackson(Class<? extends T> clazz){
+		return null;
+	}
+	
+	static class JacksonAccumulator<T> implements Transformer<Chunk, T> {
+		JacksonAccumulator(Class<? extends T> clazz){
+			
+		}
+
+		@Override
+		public void collect(Chunk nextChunk) {
+			throw new RuntimeException("NOT IMLEMENTED");
+		}
+
+		@Override
+		public T finalResult() {
+			throw new RuntimeException("NOT IMLEMENTED");
+		}
+		
+	}
+	
 	public static void main(String[] args) throws Exception {
 		BasicConfigurator.configure();
 		Logger.getRootLogger().setLevel(Level.INFO);

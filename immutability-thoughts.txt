@@ -1,0 +1,18 @@
+
+How should we handle immutability?
+  - don't loose the data
+  - copy reasonably small stuff in memory
+  - switch to disk if it starts to get large
+  - allow for tuning
+     - per path?
+     - per object?
+  - there will need to be some sanity checks
+     - rolling window for really large/infinite streams?
+     - throw Exception when things have taken too long?
+
+Ideal:
+  - things should be fail fast, caught at test-time instead of at runtime
+    - IDEA: force the cacheing strategy to be defined at read time, falling back to no-caching?
+
+
+

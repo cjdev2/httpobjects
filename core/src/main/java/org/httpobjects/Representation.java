@@ -38,8 +38,51 @@
 package org.httpobjects;
 
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.WritableByteChannel;
 
 public interface Representation {
 	String contentType();
 	void write(OutputStream out);
+	
+	Stream<Chunk> bytes();
+	
+	
+	/**
+	 * An nonblocking, immutable stream of T.
+	 */
+	public interface Stream<T> {
+		void scan(Scanner<T> scanner);
+		<R> Stream<R> map(Fn<T, R> function);
+		<F> F reduce(F initialValue, Fn<T, F> fold);
+		<R> Stream<R> flatMap(Fn<T, Stream<R>> function);
+		<R> Stream<R> flatMapIterable(Fn<T, Iterable<R>> function);
+		
+		<F> Eventual<F> read(Transformer<T, F> collector);
+		
+
+		public interface Scanner<T> {
+			void collect(T next);
+		}
+		public interface Transformer<T, F> extends Scanner<T> {
+			F finalResult();
+		}
+		public interface Fn<Input, Output> {
+			Output apply(Input input);
+		}
+	}
+	
+	
+	/**
+	 * An immutable chunk of a byte stream
+	 * Note: we don't allow people access to any underlying byte arrays, since they would be mutable
+	 */
+	public interface Chunk {
+		int size();
+		void writeInto(byte[] buffer, int offset);
+		void writeInto(OutputStream out);
+		void writeInto(WritableByteChannel out);
+		void writeInto(ByteBuffer buffer);
+		byte[] toNewArray();
+	}
 }

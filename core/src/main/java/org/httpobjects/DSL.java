@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.httpobjects.Representation.Stream;
 import org.httpobjects.outcome.Outcome;
 import org.httpobjects.outcome.OutcomeHandlerExecutor;
 import org.httpobjects.outcome.OutcomeHandler;
@@ -216,6 +217,10 @@ public class DSL {
 
     public static final Representation Bytes(String contentType, InputStream data){
         return new BinaryRepresentation(contentType, data);
+    }
+    
+    public static final Representation Bytes(String contentType, Stream<byte[]> data){
+    	return null;
     }
 
     public static final Representation File(String contentType, java.io.File path){

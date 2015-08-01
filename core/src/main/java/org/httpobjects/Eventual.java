@@ -37,6 +37,8 @@
  */
 package org.httpobjects;
 
+import java.util.function.Function;
+
 import org.httpobjects.outcome.OutcomeHandlerExecutor;
 import org.httpobjects.outcome.Outcome;
 import org.httpobjects.outcome.OutcomeHandler;
@@ -62,5 +64,7 @@ public interface Eventual<V> extends Outcome<V> {
      * Executes the callback upon resolution of this Future.  The callback is executed using the specified executor.
      */
     void onComplete(OutcomeHandler<V> callback, OutcomeHandlerExecutor executor);
+    
+//    <T> Eventual<T> then(Function<V, Eventual<T>> fn);
 
 }

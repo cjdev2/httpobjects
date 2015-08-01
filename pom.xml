@@ -98,6 +98,8 @@
         <module>demos/java-jetty</module>
         <module>client</module>
         <module>apache-httpclient-4.x</module>
+        <module>java-8</module>
+        <module>extras/rx-java</module>
     </modules>
 
     <dependencies>
