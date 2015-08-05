@@ -43,35 +43,8 @@ import java.nio.channels.WritableByteChannel;
 
 public interface Representation {
 	String contentType();
-	void write(OutputStream out);
 	
 	Stream<Chunk> bytes();
-	
-	
-	/**
-	 * An nonblocking, immutable stream of T.
-	 */
-	public interface Stream<T> {
-		void scan(Scanner<T> scanner);
-		<R> Stream<R> map(Fn<T, R> function);
-		<F> F reduce(F initialValue, Fn<T, F> fold);
-		<R> Stream<R> flatMap(Fn<T, Stream<R>> function);
-		<R> Stream<R> flatMapIterable(Fn<T, Iterable<R>> function);
-		
-		<F> Eventual<F> read(Transformer<T, F> collector);
-		
-
-		public interface Scanner<T> {
-			void collect(T next);
-		}
-		public interface Transformer<T, F> extends Scanner<T> {
-			F finalResult();
-		}
-		public interface Fn<Input, Output> {
-			Output apply(Input input);
-		}
-	}
-	
 	
 	/**
 	 * An immutable chunk of a byte stream
@@ -84,5 +57,10 @@ public interface Representation {
 		void writeInto(WritableByteChannel out);
 		void writeInto(ByteBuffer buffer);
 		byte[] toNewArray();
+	}
+	
+	public interface ByteStream extends Stream<Chunk> {
+		byte[] readIntoMemory();
+		String readIntoString(String charset);
 	}
 }

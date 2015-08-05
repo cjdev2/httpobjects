@@ -2,9 +2,8 @@ package org.httpobjects.extras.rxjava;
 
 import org.httpobjects.Representation;
 import org.httpobjects.Representation.Chunk;
-import org.httpobjects.Representation.Stream;
-import org.httpobjects.Representation.Stream.Scanner;
 import org.httpobjects.Request;
+import org.httpobjects.Stream;
 
 import rx.Observable;
 import rx.Subscriber;

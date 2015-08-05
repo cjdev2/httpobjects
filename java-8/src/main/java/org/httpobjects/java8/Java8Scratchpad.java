@@ -13,7 +13,6 @@ import org.httpobjects.Eventual;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Representation;
 import org.httpobjects.Representation.Chunk;
-import org.httpobjects.Representation.Stream.Transformer;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
 

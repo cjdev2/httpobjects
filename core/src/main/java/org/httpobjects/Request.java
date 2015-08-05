@@ -48,5 +48,10 @@ public interface Request {
     ConnectionInfo connectionInfo();
     boolean hasRepresentation();
     Representation representation();
-    Request immutableCopy();
+    Representation representation(BufferingStrategy buffers);
+    
+
+	public interface BufferingStrategy {
+		
+	}
 }
