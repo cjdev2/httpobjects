@@ -55,6 +55,7 @@ import org.mortbay.jetty.Server;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.ServerSocket;
 
 import static org.httpobjects.DSL.Bytes;
 import static org.httpobjects.test.HttpObjectAssert.*;
@@ -68,9 +69,25 @@ public class ProxyTest {
         new ProxyTest().launch();
     }
 
+    private int findFreePort() {
+        try {
+            ServerSocket serverSocket = new ServerSocket(0);
+            int port = serverSocket.getLocalPort();
+            serverSocket.close();
+            return port;
+
+        } catch(Exception e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected int port = -1;
+
+
     @Before
     public void launch() {
-        jetty = HttpObjectsJettyHandler.launchServer(8080,
+        port = findFreePort();
+        jetty = HttpObjectsJettyHandler.launchServer(port,
                 new HttpObject("/frog") {
                     public Response get(Request req) {
                         String response = "Kermit";
@@ -192,7 +209,7 @@ public class ProxyTest {
     public void doesntDoubleEncodeTheUrl() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:8080", "http://me.com");
+        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com");
 
         // WHEN: proxying a request for url with an encoded value in the query string
         Response output = subject.get(new MockRequest(subject, "/queryStringEcho", new Query("?name=beforeTab%09afterTab")));
@@ -205,7 +222,7 @@ public class ProxyTest {
     public void sendsNonTextContentTypes() throws Exception {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:8080", "http://me.com");
+        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com");
         Request input = new MockRequest(subject, "/echo", utf8Bytes("hi"));
 
         // when
@@ -225,7 +242,7 @@ public class ProxyTest {
     public void doesntSendBlankContentTypes() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:8080", "http://me.com");
+        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com");
         Request input = new MockRequest(subject, "/contentTypeEcho");
 
         // when
@@ -239,7 +256,7 @@ public class ProxyTest {
     public void sendsCustomHeaders() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:8080", "http://me.com");
+        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com");
         Request input = new MockRequest(subject, "/requirescustomheader") {
             @Override
             public RequestHeader header() {
@@ -258,7 +275,7 @@ public class ProxyTest {
     public void proxiesSetCookieHeaders() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:8080", "http://me.com");
+        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com");
         Request input = new MockRequest(subject, "/setcookies");
 
         // when
@@ -277,7 +294,7 @@ public class ProxyTest {
     public void proxiesOKGets() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:8080", "http://me.com");
+        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com");
         Request input = new MockRequest(subject, "/frog");
 
         // when
@@ -293,7 +310,7 @@ public class ProxyTest {
     public void proxiesQueryStrings() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:8080", "http://me.com");
+        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com");
         Request input = new MockRequest(subject, "/frog", new Query("?name=kermit&property=value"));
 
         // when
@@ -310,7 +327,7 @@ public class ProxyTest {
     public void proxiesOKPosts() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:8080", "http://me.com");
+        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com");
         Request input = new MockRequest(subject, "/characters", HttpObject.Text("Oh, kermie!"));
 
         // when
@@ -327,7 +344,7 @@ public class ProxyTest {
     public void proxiesOKPuts() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:8080", "http://me.com");
+        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com");
         Request input = new MockRequest(subject, "/frog", HttpObject.Text("Kermie"));
 
         // when
@@ -342,7 +359,7 @@ public class ProxyTest {
     @Test
     public void proxiesOKPatches() {
         // given
-        HttpObject subject = new Proxy("http://localhost:8080", "http://me.com");
+        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com");
         Request input = new MockRequest(subject, "/frog", HttpObject.Text("Kermie"));
 
         // when
@@ -358,7 +375,7 @@ public class ProxyTest {
     public void handlesTargetsWithSlashes() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:8080/", "http://me.com");
+        HttpObject subject = new Proxy("http://localhost:" + port + "/", "http://me.com");
         Request input = new MockRequest(subject, "/frog");
 
         // when
@@ -374,7 +391,7 @@ public class ProxyTest {
     public void handlesRedirects() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:8080/", "http://me.com");
+        HttpObject subject = new Proxy("http://localhost:" + port + "/", "http://me.com");
         Request input = new MockRequest(subject, "/notme");
 
         // when
@@ -391,7 +408,7 @@ public class ProxyTest {
     public void handlesNoContent() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:8080", "http://me.com");
+        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com");
         Request input = new MockRequest(subject, "/noresponse", HttpObject.Text("Kermie"));
 
         // when

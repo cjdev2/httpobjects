@@ -39,7 +39,6 @@ package org.httpobjects.tck;
 
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.methods.*;
-import org.apache.commons.httpclient.params.HttpParams;
 import org.httpobjects.ConnectionInfo;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Query;
@@ -56,16 +55,13 @@ import org.httpobjects.header.response.SetCookieField;
 import org.httpobjects.header.response.WWWAuthenticateField.Method;
 import org.httpobjects.path.Path;
 import org.httpobjects.util.HttpObjectUtil;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.util.*;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.httpobjects.util.HttpObjectUtil.toAscii;
@@ -80,11 +76,24 @@ public abstract class IntegrationTest {
     protected abstract void serve(int port, HttpObject ... objects);
     protected abstract void stopServing();
 
+    private int findFreePort() {
+        try {
+            ServerSocket  serverSocket = new ServerSocket(0);
+            int port = serverSocket.getLocalPort();
+            serverSocket.close();
+            return port;
+
+        } catch(Exception e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected int port = -1;
+
     @Before
     public void setup(){
-
-
-        serve(8080,
+        port = findFreePort();
+        serve(port,
         new HttpObject("/app/inbox"){
             public Response post(Request req) {
                 return OK(Text("Message Received"));
@@ -275,7 +284,7 @@ public abstract class IntegrationTest {
     public void supportsHead() throws Exception {
         // given
         HttpClient client = new HttpClient();
-        HeadMethod request = new HeadMethod("http://127.0.0.2:8080/head");
+        HeadMethod request = new HeadMethod("http://127.0.0.2:" + port + "/head");
         
         //when
         int responseCode = client.executeMethod(request);
@@ -290,7 +299,7 @@ public abstract class IntegrationTest {
     public void supportsOptions() throws Exception{
         // given
         HttpClient client = new HttpClient();
-        OptionsMethod request = new OptionsMethod("http://127.0.0.2:8080/options");
+        OptionsMethod request = new OptionsMethod("http://127.0.0.2:" + port + "/options");
 
         //when
         int responseCode = client.executeMethod(request);
@@ -304,13 +313,13 @@ public abstract class IntegrationTest {
     @Test
     public void returnsConnectionInfo() throws Exception {
         // given
-        String url = "http://127.0.0.2:8080/connectionInfo";
+        String url = "http://127.0.0.2:" + port + "/connectionInfo";
         
         //when
         final String result = getFrom("127.0.0.3", url);
         
         // then
-        Pattern expectedPattern = Pattern.compile("Local 127.0.0.2:8080, Remote 127.0.0.3:([0-9].*)");
+        Pattern expectedPattern = Pattern.compile("Local 127.0.0.2:" + port + ", Remote 127.0.0.3:([0-9].*)");
         assertTrue("'" + result + " should match '" + expectedPattern, 
                 expectedPattern.matcher(result).matches());
     }
@@ -318,7 +327,7 @@ public abstract class IntegrationTest {
     @Test
     public void hasRepresentation() throws Exception {
         // given
-        PostMethod request = new PostMethod("http://localhost:8080/echoHasRepresentation");
+        PostMethod request = new PostMethod("http://localhost:" + port + "/echoHasRepresentation");
         request.setRequestEntity(new StringRequestEntity("foo bar", "text/plain", "UTF-8"));
 
         // then/when
@@ -328,7 +337,7 @@ public abstract class IntegrationTest {
     @Test
     public void immutableCopies() throws Exception {
         // given
-        PostMethod request = new PostMethod("http://localhost:8080/immutablecopy/no/mutation/allowed");
+        PostMethod request = new PostMethod("http://localhost:" + port + "/immutablecopy/no/mutation/allowed");
         request.setRequestEntity(new StringRequestEntity("foo bar", "text/plain", "UTF-8"));
 
         // then/when
@@ -336,7 +345,7 @@ public abstract class IntegrationTest {
                 "URI: /immutablecopy/no/mutation/allowed?\n" + 
                 "Content-Length=7\n" + 
                 "Content-Type=text/plain; charset=UTF-8\n" + 
-                "Host=localhost:8080\n" + 
+                "Host=localhost:" + port + "\n" + 
                 "User-Agent=Jakarta Commons-HttpClient/3.1\n" + 
                 "foo bar", 200);
         
@@ -345,7 +354,7 @@ public abstract class IntegrationTest {
     @Test
     public void parsesPathVars() throws Exception {
         // given
-        GetMethod request = new GetMethod("http://localhost:8080/pows/marty/private/abc123");
+        GetMethod request = new GetMethod("http://localhost:" + port + "/pows/marty/private/abc123");
 
         // then/when
         assertResource(request, "private marty, abc123", 200);
@@ -354,7 +363,7 @@ public abstract class IntegrationTest {
     @Test
     public void parsesSubpaths() throws Exception {
         // given
-        GetMethod request = new GetMethod("http://localhost:8080/subpathEcho/i/am/my/own/grandpa");
+        GetMethod request = new GetMethod("http://localhost:" + port + "/subpathEcho/i/am/my/own/grandpa");
 
         // then/when
         assertResource(request, "i/am/my/own/grandpa", 200);
@@ -363,7 +372,7 @@ public abstract class IntegrationTest {
     @Test
     public void supportsPatch() throws Exception {
         // given
-        PatchMethod request = new PatchMethod("http://localhost:8080/patchme");
+        PatchMethod request = new PatchMethod("http://localhost:" + port + "/patchme");
         request.setRequestEntity(new StringRequestEntity(" foo bar", "text/plain", "UTF-8"));
 
         // then/when
@@ -373,7 +382,7 @@ public abstract class IntegrationTest {
     @Test
     public void setCookieHeadersAreTranslated() throws Exception{
         // given
-        GetMethod request = new GetMethod("http://localhost:8080/cookieSetter");
+        GetMethod request = new GetMethod("http://localhost:" + port + "/cookieSetter");
         HttpClient client = new HttpClient();
 
         // when
@@ -428,7 +437,7 @@ public abstract class IntegrationTest {
     @Test
     public void requestCookiesAreTranslated() throws Exception {
         // WHEN
-        GetMethod get = new GetMethod("http://localhost:8080/echoCookies");
+        GetMethod get = new GetMethod("http://localhost:" + port + "/echoCookies");
         get.setRequestHeader("Cookie", "Larry=Moe");
 
         assertResource(get, "Larry=Moe", 200);
@@ -437,60 +446,60 @@ public abstract class IntegrationTest {
     @Test
     public void basicAuthentication(){
         // without authorization header
-        assertResource(new GetMethod("http://localhost:8080/secure"), "You must first log-in", 401,
+        assertResource(new GetMethod("http://localhost:" + port + "/secure"), "You must first log-in", 401,
                 new HeaderSpec("WWW-Authenticate", "Basic realm=secure area"));
 
         // with authorization header
-        GetMethod get = new GetMethod("http://localhost:8080/secure");
+        GetMethod get = new GetMethod("http://localhost:" + port + "/secure");
         get.setRequestHeader("Authorization", "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==");
         assertResource(get, "You're In!", 200);
     }
 
     @Test
     public void nullResponsesAreTreatedAsNotFound(){
-        assertResource(new GetMethod("http://localhost:8080/nothing"), 404);
+        assertResource(new GetMethod("http://localhost:" + port + "/nothing"), 404);
     }
 
     @Test
     public void returnsNotFoundIfThereIsNoMatchingPattern(){
-        assertResource(new GetMethod("http://localhost:8080/bob"), 404);
+        assertResource(new GetMethod("http://localhost:" + port + "/bob"), 404);
     }
 
     @Test
     public void happyPathForGet(){
-        assertResource(new GetMethod("http://localhost:8080/app"), "Welcome to the app", 200);
+        assertResource(new GetMethod("http://localhost:" + port + "/app"), "Welcome to the app", 200);
     }
 
     @Test
     public void happyPathForPost(){
-        assertResource(new PostMethod("http://localhost:8080/app/inbox"), "Message Received", 200);
+        assertResource(new PostMethod("http://localhost:" + port + "/app/inbox"), "Message Received", 200);
     }
 
     @Test
     public void happyPathForPut(){
-        assertResource(withBody(new PutMethod("http://localhost:8080/app/inbox/abc"), "hello world"), "hello world", 200);
+        assertResource(withBody(new PutMethod("http://localhost:" + port + "/app/inbox/abc"), "hello world"), "hello world", 200);
     }
 
     @Test
     public void queryParameters(){
-        assertResource(new GetMethod("http://localhost:8080/echoQuery?a=1&b=2"), "a=1\nb=2", 200);
+        assertResource(new GetMethod("http://localhost:" + port + "/echoQuery?a=1&b=2"), "a=1\nb=2", 200);
     }
 
     @Test
     public void urlToString(){
-        assertResource(new GetMethod("http://localhost:8080/echoUrl/34/marty?a=1&b=2"), "/echoUrl/34/marty?a=1&b=2", 200);
-        assertResource(new GetMethod("http://localhost:8080/echoUrl/44/foo"), "/echoUrl/44/foo", 200);
+        assertResource(new GetMethod("http://localhost:" + port + "/echoUrl/34/marty?a=1&b=2"), "/echoUrl/34/marty?a=1&b=2", 200);
+        assertResource(new GetMethod("http://localhost:" + port + "/echoUrl/44/foo"), "/echoUrl/44/foo", 200);
     }
 
     @Test
     public void methodNotAllowed(){
-        assertResource(new GetMethod("http://localhost:8080/app/inbox"), "405 Client Error: Method Not Allowed", 405);
+        assertResource(new GetMethod("http://localhost:" + port + "/app/inbox"), "405 Client Error: Method Not Allowed", 405);
     }
 
     @Test
     public void redirectsAndSetsCookies(){
 
-        assertResource(new PostMethod("http://localhost:8080/app/message"), 303, 
+        assertResource(new PostMethod("http://localhost:" + port + "/app/message"), 303, 
                 new HeaderSpec("Location", "/app"),
                 new HeaderSpec("Set-Cookie", "name=frank"));
     }

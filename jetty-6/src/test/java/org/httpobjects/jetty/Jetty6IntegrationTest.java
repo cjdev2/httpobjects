@@ -47,7 +47,7 @@ public class Jetty6IntegrationTest extends IntegrationTest {
 	@Override
 	protected void serve(int port, HttpObject... objects) {
 		try {
-			jetty = HttpObjectsJettyHandler.launchServer(8080, objects);
+			jetty = HttpObjectsJettyHandler.launchServer(port, objects);
 			jetty.start();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
