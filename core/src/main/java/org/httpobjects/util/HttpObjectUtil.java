@@ -90,11 +90,18 @@ public class HttpObjectUtil {
     }
 
     public static String toAscii(Representation r){
+        return toString(r, "ascii");
+    }
+
+    public static String toUtf8(Representation r) {
+        return toString(r, "utf-8");
+    }
+
+    public static String toString(Representation r, String charsetName){
         try {
-            return new String(toByteArray(r), "ascii");
+            return new String(toByteArray(r), charsetName);
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
-
     }
 }

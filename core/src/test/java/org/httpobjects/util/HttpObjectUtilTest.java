@@ -37,16 +37,16 @@
  */
 package org.httpobjects.util;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.httpobjects.DSL.OK;
 import static org.httpobjects.DSL.Text;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.httpobjects.HttpObject;
+import org.httpobjects.Representation;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
 import org.httpobjects.test.MockRequest;
@@ -69,23 +69,47 @@ public class HttpObjectUtilTest {
             return response;
         }
     }
-    
+
     @Test
     public void pipesInputsAndOutputsToThePatchMethod() {
         // given
         final Response expectedResponse = OK(Text("Hello WOrld"));
         final PatchTestingObject o = new PatchTestingObject("/foo", expectedResponse);
-        
+
         final Request input = new MockRequest(o, "/foo");
-        
+
         // when
         Response result = HttpObjectUtil.invokeMethod(o, Method.PATCH, input);
-        
+
         // then
         assertNotNull(result);
         assertTrue(expectedResponse == result);
         assertEquals(1, o.requestsRecieved.size());
         assertTrue(input == o.requestsRecieved.get(0));
-        
+
+    }
+
+    @Test
+    public void representationToAscii() {
+        // given
+        Representation body = Text("Hello World!");
+        String actual = HttpObjectUtil.toAscii(body);
+        assertThat(actual, is("Hello World!"));
+    }
+
+    @Test
+    public void representationToUtf8() {
+        // given
+        Representation body = Text("Hello World!");
+        String actual = HttpObjectUtil.toUtf8(body);
+        assertThat(actual, is("Hello World!"));
+    }
+
+    @Test
+    public void representationToString() {
+        // given
+        Representation body = Text("Hello World!");
+        String actual = HttpObjectUtil.toString(body, "UTF-8");
+        assertThat(actual, is("Hello World!"));
     }
 }
