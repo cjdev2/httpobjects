@@ -149,6 +149,8 @@ public class Proxy extends HttpObject {
             method.addRequestHeader("Content-Type", req.representation().contentType());
         }
 
+        method.addRequestHeader("X-Forwarded-For", req.connectionInfo().remoteAddress);
+
         for (Header next : method.getRequestHeaders()) {
             log.debug("Sending header: " + next);
         }
