@@ -57,9 +57,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.ServerSocket;
 
+import static org.hamcrest.core.StringContains.containsString;
 import static org.httpobjects.DSL.Bytes;
 import static org.httpobjects.test.HttpObjectAssert.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class ProxyTest {
@@ -193,7 +195,18 @@ public class ProxyTest {
 
                         return OK(Text(requestContentType == null ? "null" : requestContentType));
                     }
-                });
+                },
+                  new HttpObject("/headerEcho"){
+                      public Response get(Request req) {
+                          StringBuilder sb = new StringBuilder();
+
+                          for (HeaderField field : req.header().fields()) {
+                              sb.append(String.format("%s=%s\n",field.name(),field.value()));
+                          }
+
+                          return OK(Text(sb.toString()));
+                      }
+                  });
     }
 
     @After
@@ -418,4 +431,28 @@ public class ProxyTest {
         assertEquals("", bodyOf(output).asString());
         responseCodeOf(output).assertIs(ResponseCode.NO_CONTENT);
     }
+
+
+    @Test
+    public void proxyShouldRelayTheOriginSourceIPAddress(){
+
+        // given
+        HttpObject subject = new Proxy("http://localhost:8080", "http://me.com");
+        Request input = new MockRequest(
+          new ConnectionInfo("dummy-local-ip-address",8080,"dummy-remote-ip-address",10001),
+          subject,
+          "/headerEcho",
+          new Query(""),
+          HttpObject.Text("does not matter")
+        );
+
+        // when
+        Response output = subject.get(input);
+
+        // then
+        String representation = HttpObjectUtil.toAscii(output.representation());
+        assertThat(representation, containsString("X-Forwarded-For=dummy-remote-ip-address"));
+    }
+
+
 }
