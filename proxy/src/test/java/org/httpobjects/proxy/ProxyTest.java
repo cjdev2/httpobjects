@@ -437,9 +437,7 @@ public class ProxyTest {
     @Test
     public void proxyShouldRelayTheOriginSourceIPAddress(){
 
-        //TODO spec forth coming on X-Forwarded-For?
-
-
+        //given
         HttpObject subject = new Proxy("http://localhost:" + port, "http://me.com");
         Request input = new MockRequest( new ConnectionInfo("dummy-local-ip-address",8080,"dummy-remote-ip-address",10001),
           subject, "/headerEcho", new Query(""), HttpObject.Text("does not matter"));
