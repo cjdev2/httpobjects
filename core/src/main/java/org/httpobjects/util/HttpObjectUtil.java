@@ -39,6 +39,7 @@ package org.httpobjects.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
 import org.httpobjects.HttpObject;
@@ -46,6 +47,8 @@ import org.httpobjects.Representation;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
 import org.httpobjects.Eventual;
+import org.httpobjects.Representation.Chunk;
+import org.httpobjects.Stream.Scanner;
 
 public class HttpObjectUtil {
 
@@ -79,15 +82,24 @@ public class HttpObjectUtil {
         return output;
     }
 
-    public static byte[] toByteArray(Representation r){
+    public static void writeToStream(Representation r, final OutputStream out){
         try {
-            final ByteArrayOutputStream out = new ByteArrayOutputStream();
-            r.write(out);
+            r.bytes().scan(new Scanner<Representation.Chunk>() {
+                @Override
+                public void collect(Chunk next) {
+                    next.writeInto(out);
+                }
+            });
             out.close();
-            return out.toByteArray();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+    
+    public static byte[] toByteArray(Representation r){
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        writeToStream(r, out);
+        return out.toByteArray();
     }
 
     public static String toAscii(Representation r){

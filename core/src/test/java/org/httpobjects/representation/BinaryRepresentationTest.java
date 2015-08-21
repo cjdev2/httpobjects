@@ -37,7 +37,9 @@
  */
 package org.httpobjects.representation;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -47,7 +49,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.httpobjects.DSL;
+import org.httpobjects.Representation;
+import org.httpobjects.Representation.Chunk;
 import org.httpobjects.StandardCharset;
+import org.httpobjects.Stream.Scanner;
+import org.httpobjects.util.HttpObjectUtil;
 import org.junit.Test;
 
 public class BinaryRepresentationTest {
@@ -62,12 +68,12 @@ public class BinaryRepresentationTest {
             }
         };
         BinaryRepresentation r = new BinaryRepresentation("foo/bar", in);
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
         
         // when
         Throwable err = null;
         try {
-            r.write(out);
+            writeToStreamWithThrows(r, out);
         } catch (Exception e) {
             err = e;
         }
@@ -93,7 +99,7 @@ public class BinaryRepresentationTest {
         // when
         Throwable err = null;
         try {
-            r.write(out);
+            writeToStreamWithThrows(r, out);
         } catch (Exception e) {
             err = e;
         }
@@ -105,4 +111,13 @@ public class BinaryRepresentationTest {
         err.printStackTrace();
     }
 
+    public static void writeToStreamWithThrows(Representation r, final OutputStream out) throws Exception{
+            r.bytes().scan(new Scanner<Representation.Chunk>() {
+                @Override
+                public void collect(Chunk next) {
+                    next.writeInto(out);
+                }
+            });
+            out.close();
+    }
 }

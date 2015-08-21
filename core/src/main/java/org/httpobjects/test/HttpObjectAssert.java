@@ -48,6 +48,7 @@ import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.response.LocationField;
 import org.httpobjects.header.response.SetCookieField;
+import org.httpobjects.util.HttpObjectUtil;
 
 public class HttpObjectAssert {
 	
@@ -223,9 +224,7 @@ public class HttpObjectAssert {
 		}
 		
 		private String textOf(org.httpobjects.Representation r){
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			r.write(out);
-			return new String(out.toByteArray());
+			return HttpObjectUtil.toAscii(r);
 		}
 
 		public String asString() {

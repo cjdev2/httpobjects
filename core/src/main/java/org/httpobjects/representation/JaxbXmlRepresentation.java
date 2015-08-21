@@ -38,11 +38,15 @@
 package org.httpobjects.representation;
 
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.WritableByteChannel;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
 import org.httpobjects.Representation;
+import org.httpobjects.Stream;
+import org.httpobjects.impl.StreamImpl;
 
 public class JaxbXmlRepresentation implements Representation {
 	private final Object obj;
@@ -58,14 +62,56 @@ public class JaxbXmlRepresentation implements Representation {
 	public String contentType() {
 		return "text/xml";
 	}
-	
-	@Override
-	public void write(OutputStream out) {
-		try {
-			jaxb.createMarshaller().marshal(obj, out);
-		} catch (JAXBException e) {
-			throw new RuntimeException(e);
-		}
-	}
+
+    @Override
+    public Stream<Chunk> bytes() {
+        return new StreamImpl<Representation.Chunk>(){
+            @Override
+            public void scan(org.httpobjects.Stream.Scanner<Chunk> scanner) {
+                
+                scanner.collect(new Chunk() {
+
+                    @Override
+                    public void writeInto(ByteBuffer buffer) {
+                        throw notImplemented();
+                    }
+                    
+                    @Override
+                    public void writeInto(WritableByteChannel out) {
+                        throw notImplemented();
+                    }
+                    
+                    @Override
+                    public void writeInto(byte[] buffer, int offset) {
+                        throw notImplemented();
+                    }
+                    
+                    @Override
+                    public byte[] toNewArray() {
+                        throw notImplemented();
+                    }
+                    
+                    @Override
+                    public int size() {
+                        throw notImplemented();
+                    }
+                    
+                    @Override
+                    public void writeInto(OutputStream out) {
+                        try {
+                            jaxb.createMarshaller().marshal(obj, out);
+                        } catch (JAXBException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+
+                    private RuntimeException notImplemented() {
+                        return new RuntimeException("NOT IMPLEMENTED");
+                    }
+                });
+                
+            }
+        };
+    }
 	
 }

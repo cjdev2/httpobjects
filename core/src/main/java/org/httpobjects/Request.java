@@ -48,7 +48,7 @@ public interface Request {
     ConnectionInfo connectionInfo();
     boolean hasRepresentation();
     Representation representation();
-    Representation representation(BufferingStrategy buffers);
+//    Representation representation(BufferingStrategy buffers);
     
 
 	public interface BufferingStrategy {

@@ -39,9 +39,11 @@ package org.httpobjects.representation;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 import org.httpobjects.Representation;
+import org.httpobjects.Stream;
+import org.httpobjects.impl.ChunkImpl;
+import org.httpobjects.impl.StreamImpl;
 
 public class BinaryRepresentation implements Representation {
 	private final String contentType;
@@ -58,21 +60,39 @@ public class BinaryRepresentation implements Representation {
 	public String contentType() {
 		return contentType;
 	}
-	
 	@Override
-	public void write(OutputStream out) {
-		try {
-			byte[] buffer = new byte[1024];
-			for(int x=data.read(buffer);x!=-1;x=data.read(buffer)){
-				try{
-				    out.write(buffer, 0, x);
-				}catch(Exception err){
-				    throw new RuntimeException("Error writing representation.  This is probably because the connection to the remote host was closed.", err);
-				}
-			}
-			data.close();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+	public Stream<Chunk> bytes() {
+	    return new StreamImpl<Representation.Chunk>(){
+	        @Override
+	        public void scan(org.httpobjects.Stream.Scanner<Chunk> scanner) {
+                final byte[] buffer = new byte[1024];
+                while(true) {
+                    final int x;
+                    try {
+                        x = data.read(buffer);
+                    } catch (IOException e) {
+                        throw makeRException(e);
+                    }
+                    if(x==-1) {
+                        break;
+                    }else{
+                        scanner.collect(new ChunkImpl(buffer, 0, x){
+                            protected RuntimeException makeException(Exception e){
+                                return makeRException(e);
+                            }
+                        });
+                    }
+                }
+                try {
+                  data.close();
+              } catch (IOException e) {
+                  throw makeRException(e);
+              }
+	        }
+	        protected RuntimeException makeRException(Exception e){
+                return new RuntimeException("Error writing representation.  " + 
+                        "This is probably because the connection to the remote host was closed.",e);
+            }
+	    };
 	}
 }

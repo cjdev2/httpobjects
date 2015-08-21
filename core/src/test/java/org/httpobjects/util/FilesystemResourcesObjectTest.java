@@ -96,8 +96,6 @@ public class FilesystemResourcesObjectTest {
     
 
     private static String toString(Representation representation) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        representation.write(out);
-        return new String(out.toByteArray());
+        return new String(HttpObjectUtil.toByteArray(representation));
     }
 }
