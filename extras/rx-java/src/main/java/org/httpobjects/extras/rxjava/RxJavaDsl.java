@@ -27,8 +27,8 @@ public class RxJavaDsl {
 		        @Override
 		        public void call(Subscriber<? super Chunk> sub) {
 		    		stream.scan(new Scanner<Chunk>() {
-		    			@Override
-		    			public void collect(Chunk next) {
+		    		    @Override
+		    		    public void collect(Chunk next, boolean isLastChunk) {
 		    				if(next==null){
 		    					sub.onCompleted();
 		    				}else{

@@ -114,7 +114,7 @@ public class BinaryRepresentationTest {
     public static void writeToStreamWithThrows(Representation r, final OutputStream out) throws Exception{
             r.bytes().scan(new Scanner<Representation.Chunk>() {
                 @Override
-                public void collect(Chunk next) {
+                public void collect(Chunk next, boolean isLastChunk) {
                     next.writeInto(out);
                 }
             });

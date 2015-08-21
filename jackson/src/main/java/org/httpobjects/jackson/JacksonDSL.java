@@ -41,9 +41,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import org.httpobjects.Representation;
-import org.httpobjects.Stream;
+import org.httpobjects.impl.ByteStreamImpl;
 import org.httpobjects.impl.ChunkImpl;
-import org.httpobjects.impl.StreamImpl;
 import org.httpobjects.util.HttpObjectUtil;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -86,11 +85,11 @@ public class JacksonDSL {
 			}
 
             @Override
-            public Stream<Chunk> bytes() {
-                return new StreamImpl<Representation.Chunk>(){
+            public ByteStream bytes() {
+                return new ByteStreamImpl(){
                     @Override
                     public void scan(org.httpobjects.Stream.Scanner<Chunk> scanner) {
-                        scanner.collect(new ChunkImpl(null, 0, 0) {
+                        final ChunkImpl chunk = new ChunkImpl(null, 0, 0) {
                             
                             @Override
                             public void writeInto(OutputStream out) {
@@ -100,7 +99,8 @@ public class JacksonDSL {
                                     throw new RuntimeException(e);
                                 }
                             }
-                        });
+                        };
+                        scanner.collect(chunk, true);
                     }
                 };
             }

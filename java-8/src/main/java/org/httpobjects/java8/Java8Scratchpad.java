@@ -59,10 +59,10 @@ public class Java8Scratchpad {
 		 *   - immutable, if possible
 		 */
 		WritableByteChannel cout = null;
-		r.bytes().scan(chunk -> chunk.writeInto(cout));
+		r.bytes().scan((chunk, isLast) -> chunk.writeInto(cout));
 
 		OutputStream out = new ByteArrayOutputStream();
-		r.bytes().scan(chunk -> chunk.writeInto(out));
+		r.bytes().scan((chunk, isLast) -> chunk.writeInto(out));
 		
 
 		Eventual<Java8Scratchpad> result = r.bytes().read(asJackson(Java8Scratchpad.class));
@@ -176,7 +176,7 @@ public class Java8Scratchpad {
 		}
 
 		@Override
-		public void collect(Chunk nextChunk) {
+		public void collect(Chunk next, boolean isLastChunk) {
 			throw new RuntimeException("NOT IMLEMENTED");
 		}
 

@@ -42,6 +42,7 @@ import java.io.InputStream;
 
 import org.httpobjects.Representation;
 import org.httpobjects.Stream;
+import org.httpobjects.impl.ByteStreamImpl;
 import org.httpobjects.impl.ChunkImpl;
 import org.httpobjects.impl.StreamImpl;
 
@@ -61,8 +62,8 @@ public class BinaryRepresentation implements Representation {
 		return contentType;
 	}
 	@Override
-	public Stream<Chunk> bytes() {
-	    return new StreamImpl<Representation.Chunk>(){
+	public ByteStream bytes() {
+	    return new ByteStreamImpl(){
 	        @Override
 	        public void scan(org.httpobjects.Stream.Scanner<Chunk> scanner) {
                 final byte[] buffer = new byte[1024];
@@ -74,13 +75,15 @@ public class BinaryRepresentation implements Representation {
                         throw makeRException(e);
                     }
                     if(x==-1) {
+                        scanner.collect(ChunkImpl.NULL_CHUNK, true);
                         break;
                     }else{
-                        scanner.collect(new ChunkImpl(buffer, 0, x){
+                        final Chunk chunk = new ChunkImpl(buffer, 0, x){
                             protected RuntimeException makeException(Exception e){
                                 return makeRException(e);
                             }
-                        });
+                        };
+                        scanner.collect(chunk, false);
                     }
                 }
                 try {

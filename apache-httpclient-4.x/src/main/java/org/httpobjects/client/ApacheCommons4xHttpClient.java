@@ -18,12 +18,10 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.httpobjects.Representation;
 import org.httpobjects.Response;
 import org.httpobjects.ResponseCode;
-import org.httpobjects.Stream;
-import org.httpobjects.Representation.Chunk;
 import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
+import org.httpobjects.impl.ByteStreamImpl;
 import org.httpobjects.impl.ChunkImpl;
-import org.httpobjects.impl.StreamImpl;
 import org.httpobjects.impl.fn.Fn;
 import org.httpobjects.impl.fn.FunctionalJava;
 import org.httpobjects.impl.fn.Seq;
@@ -135,11 +133,11 @@ public final class ApacheCommons4xHttpClient implements HttpClient {
 		return new Representation() {
 
             @Override
-            public Stream<Chunk> bytes() {
-                return new StreamImpl<Representation.Chunk>(){
+            public ByteStream bytes() {
+                return new ByteStreamImpl(){
                     @Override
                     public void scan(org.httpobjects.Stream.Scanner<Chunk> scanner) {
-                        scanner.collect(new ChunkImpl(null, 0, 0) {
+                        final Chunk chunk = new ChunkImpl(null, 0, 0) {
                             
                             @Override
                             public void writeInto(OutputStream out) {
@@ -154,7 +152,8 @@ public final class ApacheCommons4xHttpClient implements HttpClient {
                                     throw new RuntimeException(e);
                                 }
                             }
-                        });
+                        };
+                        scanner.collect(chunk, true);
                     }
                 };
             }

@@ -44,7 +44,7 @@ import java.nio.channels.WritableByteChannel;
 public interface Representation {
 	String contentType();
 	
-	Stream<Chunk> bytes();
+	ByteStream bytes();
 	
 	/**
 	 * An immutable chunk of a byte stream
@@ -62,5 +62,9 @@ public interface Representation {
 	public interface ByteStream extends Stream<Chunk> {
 		byte[] readIntoMemory();
 		String readIntoString(String charset);
+		/**
+		 * blocks the thread
+		 */
+		void writeInto(OutputStream out);
 	}
 }

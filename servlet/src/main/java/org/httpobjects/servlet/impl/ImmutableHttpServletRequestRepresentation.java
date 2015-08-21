@@ -45,9 +45,8 @@ import java.io.OutputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import org.httpobjects.Representation;
-import org.httpobjects.Stream;
+import org.httpobjects.impl.ByteStreamImpl;
 import org.httpobjects.impl.ChunkImpl;
-import org.httpobjects.impl.StreamImpl;
 
 public class ImmutableHttpServletRequestRepresentation implements Representation {
 	private final String contentType;
@@ -93,12 +92,12 @@ public class ImmutableHttpServletRequestRepresentation implements Representation
     }
     
     @Override
-    public Stream<Chunk> bytes() {
-        return new StreamImpl<Representation.Chunk>(){
+    public ByteStream bytes() {
+        return new ByteStreamImpl(){
             @Override
             public void scan(org.httpobjects.Stream.Scanner<Chunk> scanner) {
                 // one big chunk
-                scanner.collect(new ChunkImpl(content, 0, content.length));
+                scanner.collect(new ChunkImpl(content, 0, content.length), true);
             }
         };
     }

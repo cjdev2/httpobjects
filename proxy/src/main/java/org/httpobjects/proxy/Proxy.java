@@ -64,13 +64,12 @@ import org.httpobjects.Representation;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
 import org.httpobjects.ResponseCode;
-import org.httpobjects.Stream;
 import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.response.LocationField;
 import org.httpobjects.header.response.SetCookieField;
+import org.httpobjects.impl.ByteStreamImpl;
 import org.httpobjects.impl.ChunkImpl;
-import org.httpobjects.impl.StreamImpl;
 import org.httpobjects.util.HttpObjectUtil;
 
 public class Proxy extends HttpObject {
@@ -117,7 +116,7 @@ public class Proxy extends HttpObject {
 	protected void setRequestRepresentation(Request req, EntityEnclosingMethod method){
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		// todo: make streaming
-		HttpObjectUtil.writeToStream(req.representation(), out);
+		req.representation().bytes().writeInto(out);
 		method.setRequestEntity(new InputStreamRequestEntity(new ByteArrayInputStream(out.toByteArray())));
 	}
 	
@@ -241,20 +240,23 @@ public class Proxy extends HttpObject {
             }
 
             @Override
-            public Stream<Chunk> bytes() {
-                return new StreamImpl<Representation.Chunk>(){
+            public ByteStream bytes() {
+                return new ByteStreamImpl(){
                     @Override
                     public void scan(org.httpobjects.Stream.Scanner<Chunk> scanner) {
                         try {
                             InputStream data = method.getResponseBodyAsStream();
-                            if(data != null){
+                            if(data==null){
+                                scanner.collect(ChunkImpl.NULL_CHUNK, true);
+                            }else{
                                 final byte[] buffer = new byte[1024];
                                 while(true) {
                                     final int x = data.read(buffer);
                                     if(x==-1) {
+                                        scanner.collect(ChunkImpl.NULL_CHUNK, true);
                                         break;
                                     }else{
-                                        scanner.collect(new ChunkImpl(buffer, 0, x));
+                                        scanner.collect(new ChunkImpl(buffer, 0, x), false);
                                     }
                                 }
                                 data.close();

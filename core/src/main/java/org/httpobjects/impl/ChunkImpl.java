@@ -8,7 +8,8 @@ import java.nio.channels.WritableByteChannel;
 import org.httpobjects.Representation.Chunk;
 
 public class ChunkImpl implements Chunk {
-
+        public static final Chunk NULL_CHUNK = new ChunkImpl(new byte[]{}, 0, 0);
+        
 	    private final byte[] buffer;
 	    private final int offset;
 	    private final int length;

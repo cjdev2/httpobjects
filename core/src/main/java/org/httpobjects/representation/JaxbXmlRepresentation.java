@@ -45,8 +45,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
 import org.httpobjects.Representation;
-import org.httpobjects.Stream;
-import org.httpobjects.impl.StreamImpl;
+import org.httpobjects.impl.ByteStreamImpl;
+import org.httpobjects.impl.ChunkImpl;
 
 public class JaxbXmlRepresentation implements Representation {
 	private final Object obj;
@@ -64,38 +64,12 @@ public class JaxbXmlRepresentation implements Representation {
 	}
 
     @Override
-    public Stream<Chunk> bytes() {
-        return new StreamImpl<Representation.Chunk>(){
+    public ByteStream bytes() {
+        return new ByteStreamImpl(){
             @Override
             public void scan(org.httpobjects.Stream.Scanner<Chunk> scanner) {
                 
-                scanner.collect(new Chunk() {
-
-                    @Override
-                    public void writeInto(ByteBuffer buffer) {
-                        throw notImplemented();
-                    }
-                    
-                    @Override
-                    public void writeInto(WritableByteChannel out) {
-                        throw notImplemented();
-                    }
-                    
-                    @Override
-                    public void writeInto(byte[] buffer, int offset) {
-                        throw notImplemented();
-                    }
-                    
-                    @Override
-                    public byte[] toNewArray() {
-                        throw notImplemented();
-                    }
-                    
-                    @Override
-                    public int size() {
-                        throw notImplemented();
-                    }
-                    
+                final Chunk chunk = new ChunkImpl(null, 0, 0) {
                     @Override
                     public void writeInto(OutputStream out) {
                         try {
@@ -104,11 +78,8 @@ public class JaxbXmlRepresentation implements Representation {
                             throw new RuntimeException(e);
                         }
                     }
-
-                    private RuntimeException notImplemented() {
-                        return new RuntimeException("NOT IMPLEMENTED");
-                    }
-                });
+                };
+                scanner.collect(chunk, true);
                 
             }
         };

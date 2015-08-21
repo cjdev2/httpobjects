@@ -43,9 +43,8 @@ import java.io.InputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import org.httpobjects.Representation;
-import org.httpobjects.Stream;
+import org.httpobjects.impl.ByteStreamImpl;
 import org.httpobjects.impl.ChunkImpl;
-import org.httpobjects.impl.StreamImpl;
 
 public class LazyHttpServletRequestRepresentation implements Representation {
 	private final HttpServletRequest request;
@@ -56,8 +55,8 @@ public class LazyHttpServletRequestRepresentation implements Representation {
 	}
 
     @Override
-    public Stream<Chunk> bytes() {
-        return new StreamImpl<Representation.Chunk>(){
+    public ByteStream bytes() {
+        return new ByteStreamImpl(){
             @Override
             public void scan(org.httpobjects.Stream.Scanner<Chunk> scanner) {
                 try {
@@ -66,9 +65,10 @@ public class LazyHttpServletRequestRepresentation implements Representation {
                 while(true) {
                     final int x = data.read(buffer);
                     if(x==-1) {
+                        scanner.collect(ChunkImpl.NULL_CHUNK, true);
                         break;
                     }else{
-                        scanner.collect(new ChunkImpl(buffer, 0, x));
+                        scanner.collect(new ChunkImpl(buffer, 0, x), false);
                     }
                 }
                 data.close();

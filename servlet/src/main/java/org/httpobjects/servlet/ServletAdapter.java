@@ -66,7 +66,7 @@ public final class ServletAdapter extends HttpServlet {
         resp.setStatus(r.code().value());
 
         if(r.hasRepresentation()){
-            HttpObjectUtil.writeToStream(r.representation(), resp.getOutputStream());
+            r.representation().bytes().writeInto(resp.getOutputStream());
         }
 
 	}

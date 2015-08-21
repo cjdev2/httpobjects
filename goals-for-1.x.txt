@@ -1,5 +1,15 @@
 support for async, nonblocking (nio) request and response handling/streaming
+   - Todo:
+      - [DONE] mockup the streaming api
+      - [DONE] port existing stuff to it
+      - make it actually work async & deal with closing issues 
 make requests immutable "values"
    - re-readable?
 remove impurities in the request model
    - get rid of path().valueFor()?
+   
+   
+   
+ ======== scenarios that we should support well =========
+ lots of fast requests with a really slow datastore
+ lots of slow requests with a reasonably fast datastore

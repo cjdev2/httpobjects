@@ -14,7 +14,7 @@ public interface Stream<T> {
 	
 
 	public interface Scanner<T> {
-		void collect(T next);
+		void collect(T next, boolean isLastChunk);
 	}
 	public interface Transformer<T, F> extends Stream.Scanner<T> {
 		F finalResult();

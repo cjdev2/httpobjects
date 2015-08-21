@@ -15,14 +15,13 @@ import org.httpobjects.Query;
 import org.httpobjects.Representation;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
-import org.httpobjects.Stream;
 import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.request.AuthorizationField;
 import org.httpobjects.header.request.CookieField;
 import org.httpobjects.header.request.RequestHeader;
+import org.httpobjects.impl.ByteStreamImpl;
 import org.httpobjects.impl.ChunkImpl;
-import org.httpobjects.impl.StreamImpl;
 import org.httpobjects.netty.http.ByteAccumulator;
 import org.httpobjects.netty.http.HttpChannelHandler;
 import org.httpobjects.path.Path;
@@ -135,8 +134,8 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 					}
 					
 		            @Override
-		            public Stream<Chunk> bytes() {
-		                return new StreamImpl<Representation.Chunk>(){
+		            public ByteStream bytes() {
+		                return new ByteStreamImpl(){
 		                    @Override
 		                    public void scan(org.httpobjects.Stream.Scanner<Chunk> scanner) {
 		                        try {
@@ -146,9 +145,10 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 		                                while(true) {
 		                                    final int x = data.read(buffer);
 		                                    if(x==-1) {
+		                                        scanner.collect(ChunkImpl.NULL_CHUNK, true);
 		                                        break;
 		                                    }else{
-		                                        scanner.collect(new ChunkImpl(buffer, 0, x));
+		                                        scanner.collect(new ChunkImpl(buffer, 0, x), false);
 		                                    }
 		                                }
 		                                data.close();
@@ -164,7 +164,5 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 			
 		};
 	}
-	
-	
 
 }

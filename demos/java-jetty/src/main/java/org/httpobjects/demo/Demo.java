@@ -70,9 +70,8 @@ public class Demo {
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
 		
 		r.bytes().scan(new Scanner<Chunk>() {
-			
 			@Override
-			public void collect(Chunk nextChunk) {
+			public void collect(Chunk nextChunk, boolean isLastChunk) {
 				nextChunk.writeInto(out);
 			}
 		});
@@ -89,9 +88,8 @@ public class Demo {
 		JacksonAccumulator(Class<? extends T> clazz){
 			
 		}
-
 		@Override
-		public void collect(Chunk nextChunk) {
+		public void collect(Chunk next, boolean isLastChunk) {
 			throw new RuntimeException("NOT IMLEMENTED");
 		}
 

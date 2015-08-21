@@ -82,23 +82,11 @@ public class HttpObjectUtil {
         return output;
     }
 
-    public static void writeToStream(Representation r, final OutputStream out){
-        try {
-            r.bytes().scan(new Scanner<Representation.Chunk>() {
-                @Override
-                public void collect(Chunk next) {
-                    next.writeInto(out);
-                }
-            });
-            out.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    
     
     public static byte[] toByteArray(Representation r){
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        writeToStream(r, out);
+        r.bytes().writeInto(out);
         return out.toByteArray();
     }
 

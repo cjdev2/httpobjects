@@ -42,9 +42,8 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 
 import org.httpobjects.Representation;
-import org.httpobjects.Stream;
+import org.httpobjects.impl.ByteStreamImpl;
 import org.httpobjects.impl.ChunkImpl;
-import org.httpobjects.impl.StreamImpl;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -62,11 +61,12 @@ public final class FreemarkerDSL {
 			}
 			
             @Override
-            public Stream<Chunk> bytes() {
-                return new StreamImpl<Representation.Chunk>(){
+            public ByteStream bytes() {
+                return new ByteStreamImpl(){
                     @Override
                     public void scan(org.httpobjects.Stream.Scanner<Chunk> scanner) {
-                        scanner.collect(new ChunkImpl(null, 0, 0) {
+
+                        final Chunk chunk = new ChunkImpl(null, 0, 0) {
                             @Override
                             public void writeInto(OutputStream out) {
                                 try {
@@ -78,7 +78,8 @@ public final class FreemarkerDSL {
                                     throw new RuntimeException(e);
                                 }
                             }
-                        });
+                        };
+                        scanner.collect(chunk, true);
                     }
                 };
             }
