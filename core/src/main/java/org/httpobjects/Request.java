@@ -49,7 +49,7 @@ public interface Request {
     boolean hasRepresentation();
     Representation representation();
 //    Representation representation(BufferingStrategy buffers);
-    
+    Request immutableCopy();
 
 	public interface BufferingStrategy {
 		

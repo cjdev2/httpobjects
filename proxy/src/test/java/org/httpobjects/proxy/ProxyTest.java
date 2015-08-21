@@ -57,6 +57,7 @@ import org.httpobjects.header.request.RequestHeader;
 import org.httpobjects.jetty.HttpObjectsJettyHandler;
 import org.httpobjects.test.HttpObjectAssert;
 import org.httpobjects.test.MockRequest;
+import org.httpobjects.util.HttpObjectUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -84,10 +85,8 @@ public class ProxyTest {
 					
 					@Override
 					public Eventual<Response> put(Request req) {
-						ByteArrayOutputStream out = new ByteArrayOutputStream();
-						req.representation().write(out);
-						String textualRepresentation = new String(out.toByteArray());
-						return OK(Text(textualRepresentation));
+					    final String requestBodyText = HttpObjectUtil.toAscii(req.representation());
+						return OK(Text(requestBodyText));
 					}
 				},
 				new HttpObject("/requirescustomheader"){
@@ -149,11 +148,9 @@ public class ProxyTest {
 				},
 				new HttpObject("/characters"){
 					public Eventual<Response> post(Request req) {
-						ByteArrayOutputStream out = new ByteArrayOutputStream();
-						req.representation().write(out);
-						String textualRepresentation = new String(out.toByteArray());
-						if(textualRepresentation.equals("Oh, kermie!")){
-							return SEE_OTHER(Location("/piggy"), Text(textualRepresentation));
+                        final String requestBodyText = HttpObjectUtil.toAscii(req.representation());
+						if(requestBodyText.equals("Oh, kermie!")){
+							return SEE_OTHER(Location("/piggy"), Text(requestBodyText));
 						}else{
 							return null;
 						}

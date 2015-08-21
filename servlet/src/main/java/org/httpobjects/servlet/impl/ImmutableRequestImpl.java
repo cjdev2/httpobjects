@@ -91,12 +91,10 @@ public class ImmutableRequestImpl implements Request {
 	public Representation representation() {
 		return representation;		
 	}
-	
-	@Override
 	public Request immutableCopy() {
-		return this;
+	    return this;
 	}
-	
+
 	@Override
 	public ConnectionInfo connectionInfo() {
 	    return connectionInfo;

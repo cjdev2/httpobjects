@@ -4,6 +4,7 @@ import org.httpobjects.Representation;
 import org.httpobjects.Representation.Chunk;
 import org.httpobjects.Request;
 import org.httpobjects.Stream;
+import org.httpobjects.Stream.Scanner;
 
 import rx.Observable;
 import rx.Subscriber;

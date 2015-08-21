@@ -43,6 +43,7 @@ import org.apache.commons.fileupload.ParameterParser;
 import org.apache.commons.fileupload.UsableMultipartStream;
 import org.httpobjects.Representation;
 import org.httpobjects.multipart.header.MimePartHeader;
+import org.httpobjects.util.HttpObjectUtil;
 
 import java.io.*;
 import java.util.Map;
@@ -50,14 +51,7 @@ import java.util.Map;
 public class ApacheCommonsMultipartReader extends MultipartReader {
 
     private static byte[] readRepresentationIntoMemory(Representation r){
-        try {
-            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-            r.write(buffer);
-            buffer.close();
-            return buffer.toByteArray();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return HttpObjectUtil.toByteArray(r);
     }
 
     private final byte[] boundary;

@@ -82,8 +82,7 @@ public class LazyRequestImpl implements Request {
 	public RequestHeader header() {
 		return HttpServletRequestUtil.buildHeader(request);
 	}
-	
-	
+
 	@Override
 	public Representation representation() {
 		return new LazyHttpServletRequestRepresentation(request);
@@ -91,6 +90,6 @@ public class LazyRequestImpl implements Request {
 	
 	@Override
 	public Request immutableCopy() {
-		return new ImmutableRequestImpl(vars, request);
+	    return new ImmutableRequestImpl(vars, request);
 	}
 }

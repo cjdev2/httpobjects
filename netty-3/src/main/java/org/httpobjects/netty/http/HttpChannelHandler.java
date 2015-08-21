@@ -15,6 +15,7 @@
  */
 package org.httpobjects.netty.http;
 
+import static org.httpobjects.util.HttpObjectUtil.toByteArray;
 import static org.jboss.netty.handler.codec.http.HttpHeaders.is100ContinueExpected;
 import static org.jboss.netty.handler.codec.http.HttpHeaders.isKeepAlive;
 import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.CONNECTION;
@@ -34,6 +35,7 @@ import org.httpobjects.*;
 import org.httpobjects.outcome.OutcomeHandlerExecutor;
 import org.httpobjects.outcome.Outcome;
 import org.httpobjects.outcome.OutcomeHandler;
+import org.httpobjects.util.HttpObjectUtil;
 import org.httpobjects.header.HeaderField;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
@@ -124,16 +126,6 @@ public class HttpChannelHandler extends SimpleChannelUpstreamHandler {
     	content.getBytes(0, contentAccumulator.out(), content.capacity());
     }
     
-    private byte[] read(Response out) {
-        try {
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            out.representation().write(stream);
-            stream.close();
-            return stream.toByteArray();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
     private void writeResponse(/*MessageEvent e*/ final Channel sink, final Eventual<Response> futureResponse) {
     	
         // Decide whether to close the connection or not.
@@ -148,7 +140,7 @@ public class HttpChannelHandler extends SimpleChannelUpstreamHandler {
 
                 HttpResponse response = new DefaultHttpResponse(HTTP_1_1, status);
                 if (r.hasRepresentation()) {
-                    response.setContent(ChannelBuffers.copiedBuffer(read(r)));
+                    response.setContent(ChannelBuffers.copiedBuffer(toByteArray(r.representation())));
                     if (r.representation().contentType() != null)
                         response.headers().set(CONTENT_TYPE, r.representation().contentType());
                 }

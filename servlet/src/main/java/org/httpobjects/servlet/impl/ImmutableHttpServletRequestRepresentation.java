@@ -37,10 +37,17 @@
  */
 package org.httpobjects.servlet.impl;
 
-import org.httpobjects.Representation;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.*;
+
+import org.httpobjects.Representation;
+import org.httpobjects.Stream;
+import org.httpobjects.impl.ChunkImpl;
+import org.httpobjects.impl.StreamImpl;
 
 public class ImmutableHttpServletRequestRepresentation implements Representation {
 	private final String contentType;
@@ -84,11 +91,17 @@ public class ImmutableHttpServletRequestRepresentation implements Representation
 			throw new RuntimeException(e);
 		}
     }
-
+    
     @Override
-	public void write(OutputStream out) {
-         copy(new ByteArrayInputStream(content), out);
-	}
+    public Stream<Chunk> bytes() {
+        return new StreamImpl<Representation.Chunk>(){
+            @Override
+            public void scan(org.httpobjects.Stream.Scanner<Chunk> scanner) {
+                // one big chunk
+                scanner.collect(new ChunkImpl(content, 0, content.length));
+            }
+        };
+    }
 	
 	@Override
 	public String contentType() {

@@ -37,12 +37,15 @@
  */
 package org.httpobjects.servlet.impl;
 
-import org.httpobjects.Representation;
-
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.httpobjects.Representation;
+import org.httpobjects.Stream;
+import org.httpobjects.impl.ChunkImpl;
+import org.httpobjects.impl.StreamImpl;
 
 public class LazyHttpServletRequestRepresentation implements Representation {
 	private final HttpServletRequest request;
@@ -52,20 +55,29 @@ public class LazyHttpServletRequestRepresentation implements Representation {
 		this.request = request;
 	}
 
-	@Override
-	public void write(OutputStream out) {
-		try {
-			InputStream in = request.getInputStream();
-			byte[] buffer = new byte[1024 * 10];
-			for(int x=in.read(buffer);x!=-1;x=in.read(buffer)){
-				out.write(buffer, 0, x);
-			}
-			out.close();
-			in.close();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
+    @Override
+    public Stream<Chunk> bytes() {
+        return new StreamImpl<Representation.Chunk>(){
+            @Override
+            public void scan(org.httpobjects.Stream.Scanner<Chunk> scanner) {
+                try {
+                final InputStream data = request.getInputStream();
+                final byte[] buffer = new byte[1024];
+                while(true) {
+                    final int x = data.read(buffer);
+                    if(x==-1) {
+                        break;
+                    }else{
+                        scanner.collect(new ChunkImpl(buffer, 0, x));
+                    }
+                }
+                data.close();
+              } catch (IOException e) {
+                  throw new RuntimeException(e);
+              }
+            }
+        };
+    }
 	
 	@Override
 	public String contentType() {

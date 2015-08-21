@@ -182,8 +182,7 @@ public class ServletMethodInvoker {
 			if(r.hasRepresentation()){
 				resp.setContentType(r.representation().contentType());
 				OutputStream out = resp.getOutputStream();
-				r.representation().write(out);
-				out.close();
+				HttpObjectUtil.writeToStream(r.representation(), out);
 			}
 			
 		} catch (IOException e) {

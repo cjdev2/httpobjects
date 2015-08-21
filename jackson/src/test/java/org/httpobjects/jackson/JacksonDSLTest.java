@@ -43,6 +43,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import org.httpobjects.Representation;
+import org.httpobjects.util.HttpObjectUtil;
 import org.junit.Test;
 
 public class JacksonDSLTest {
@@ -50,14 +51,13 @@ public class JacksonDSLTest {
     @Test
     public void writesJsonRepresentationsOfSimpleBeans() {
         // given
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         RandomBean input = new RandomBean("Hello");
-
+        Representation testSubject = JacksonDSL.JacksonJson(input);
         // when
-        JacksonDSL.JacksonJson(input).write(outputStream);
+        String output = HttpObjectUtil.toAscii(testSubject);
 
         // then
-        assertEquals(outputStream.toString(), "{\"message\":\"Hello\"}");
+        assertEquals(output, "{\"message\":\"Hello\"}");
     }
 
     @Test

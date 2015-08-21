@@ -2,18 +2,27 @@ package org.httpobjects.netty;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.httpobjects.*;
+import org.httpobjects.ConnectionInfo;
+import org.httpobjects.DSL;
+import org.httpobjects.Eventual;
+import org.httpobjects.HttpObject;
+import org.httpobjects.Query;
+import org.httpobjects.Representation;
+import org.httpobjects.Request;
+import org.httpobjects.Response;
+import org.httpobjects.Stream;
 import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.request.AuthorizationField;
 import org.httpobjects.header.request.CookieField;
 import org.httpobjects.header.request.RequestHeader;
+import org.httpobjects.impl.ChunkImpl;
+import org.httpobjects.impl.StreamImpl;
 import org.httpobjects.netty.http.ByteAccumulator;
 import org.httpobjects.netty.http.HttpChannelHandler;
 import org.httpobjects.path.Path;
@@ -66,6 +75,11 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 			    return connectionInfo;
 			}
 			
+		    @Override
+		    public Request immutableCopy() {
+		        return this;
+		    }
+			
 			@Override
 			public RequestHeader header() {
 				List<HeaderField> results = new ArrayList<HeaderField>();
@@ -90,11 +104,6 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 						return value==null?null:AuthorizationField.parse(value);
 					}
 				};
-			}
-			
-			@Override
-			public Request immutableCopy() {
-				return this;
 			}
 			
 			@Override
@@ -125,27 +134,31 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 						return request.headers().get("ContentType");
 					}
 					
-					@Override
-					public void write(OutputStream out) {
-						try {
-							if(body!=null){
-							    InputStream data = body.toStream();
-					            copy(out, data);
-							}
-						} catch (IOException e) {
-							throw new RuntimeException(e);
-						}
-					}
-
-                    private void copy(OutputStream out, InputStream data) throws IOException {
-                        byte[] buffer = new byte[1024 * 10];
-                        int x;
-                        while((x = data.read(buffer))!=-1){
-                            out.write(buffer, 0, x);
-                        }
-                        out.close();
-                        data.close();
-                    }
+		            @Override
+		            public Stream<Chunk> bytes() {
+		                return new StreamImpl<Representation.Chunk>(){
+		                    @Override
+		                    public void scan(org.httpobjects.Stream.Scanner<Chunk> scanner) {
+		                        try {
+		                            if(body != null){
+	                                    final InputStream data = body.toStream();
+		                                final byte[] buffer = new byte[1024];
+		                                while(true) {
+		                                    final int x = data.read(buffer);
+		                                    if(x==-1) {
+		                                        break;
+		                                    }else{
+		                                        scanner.collect(new ChunkImpl(buffer, 0, x));
+		                                    }
+		                                }
+		                                data.close();
+		                            }
+		                        } catch (IOException e) {
+		                            throw new RuntimeException(e);
+		                        }
+		                    }
+		                };
+		            }
 				};
 			}
 			

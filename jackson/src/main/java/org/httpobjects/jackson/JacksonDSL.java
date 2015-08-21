@@ -37,13 +37,16 @@
  */
 package org.httpobjects.jackson;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.httpobjects.Representation;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+
+import org.httpobjects.Representation;
+import org.httpobjects.Stream;
+import org.httpobjects.impl.ChunkImpl;
+import org.httpobjects.impl.StreamImpl;
+import org.httpobjects.util.HttpObjectUtil;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 public class JacksonDSL {
@@ -52,12 +55,10 @@ public class JacksonDSL {
 
         private final Representation representation;
         private ObjectMapper objectMapper;
-        private final ByteArrayOutputStream byteStream;
 
         private RepresentationConverter(Representation representation) {
             this.representation = representation;
             this.objectMapper = new ObjectMapper();
-            this.byteStream = new ByteArrayOutputStream();
         }
 
         public RepresentationConverter using(ObjectMapper objectMapper) {
@@ -66,8 +67,9 @@ public class JacksonDSL {
         }
 
         public <T> T to(Class<T> convertTo) throws IOException {
-            representation.write(byteStream);
-            return objectMapper.readValue(new ByteArrayInputStream(byteStream.toByteArray()), convertTo);
+            return objectMapper.readValue(
+                    HttpObjectUtil.toByteArray(representation), 
+                    convertTo);
         }
     }
 
@@ -77,20 +79,31 @@ public class JacksonDSL {
 
     public static Representation JacksonJson(final Object object, final ObjectMapper jackson) {
     	return new Representation() {
-			
-			@Override
-			public void write(OutputStream out) {
-				try {
-					jackson.writeValue(out, object);
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}
-			
+
 			@Override
 			public String contentType() {
 				return "application/json";
 			}
+
+            @Override
+            public Stream<Chunk> bytes() {
+                return new StreamImpl<Representation.Chunk>(){
+                    @Override
+                    public void scan(org.httpobjects.Stream.Scanner<Chunk> scanner) {
+                        scanner.collect(new ChunkImpl(null, 0, 0) {
+                            
+                            @Override
+                            public void writeInto(OutputStream out) {
+                                try {
+                                    jackson.writeValue(out, object);
+                                } catch (Exception e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        });
+                    }
+                };
+            }
     	};
     }
     public static Representation JacksonJson(final Object object) {

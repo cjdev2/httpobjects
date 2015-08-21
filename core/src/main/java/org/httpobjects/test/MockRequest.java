@@ -112,7 +112,10 @@ public class MockRequest implements Request {
 	public Query query() {
 		return query;
 	}
-	
+	@Override
+	public Request immutableCopy() {
+	    return this;
+	}
     private static Representation nullRepresentation(){
         return Bytes(null, new byte[]{});
     }

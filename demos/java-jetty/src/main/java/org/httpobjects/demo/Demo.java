@@ -53,6 +53,8 @@ import org.httpobjects.DSL;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Representation;
 import org.httpobjects.Representation.Chunk;
+import org.httpobjects.Stream.Scanner;
+import org.httpobjects.Stream.Transformer;
 import org.httpobjects.jetty.HttpObjectsJettyHandler;
 import org.httpobjects.servlet.ServletFilter;
 import org.mortbay.jetty.Handler;

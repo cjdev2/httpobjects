@@ -18,8 +18,12 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.httpobjects.Representation;
 import org.httpobjects.Response;
 import org.httpobjects.ResponseCode;
+import org.httpobjects.Stream;
+import org.httpobjects.Representation.Chunk;
 import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
+import org.httpobjects.impl.ChunkImpl;
+import org.httpobjects.impl.StreamImpl;
 import org.httpobjects.impl.fn.Fn;
 import org.httpobjects.impl.fn.FunctionalJava;
 import org.httpobjects.impl.fn.Seq;
@@ -129,21 +133,31 @@ public final class ApacheCommons4xHttpClient implements HttpClient {
 	private Representation translate(final HttpEntity apache) {
 		
 		return new Representation() {
-			
-			@Override
-			public void write(OutputStream out) {
-				
-				try {
-					InputStream in = apache.getContent(); 
-					try {
-						copy(in, out);
-					}finally{
-						in.close();
-					}
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}
+
+            @Override
+            public Stream<Chunk> bytes() {
+                return new StreamImpl<Representation.Chunk>(){
+                    @Override
+                    public void scan(org.httpobjects.Stream.Scanner<Chunk> scanner) {
+                        scanner.collect(new ChunkImpl(null, 0, 0) {
+                            
+                            @Override
+                            public void writeInto(OutputStream out) {
+                                try {
+                                    InputStream in = apache.getContent(); 
+                                    try {
+                                        copy(in, out);
+                                    }finally{
+                                        in.close();
+                                    }
+                                } catch (Exception e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        });
+                    }
+                };
+            }
 			
 			private void copy(InputStream in, OutputStream out){
 				try {

@@ -42,6 +42,9 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 
 import org.httpobjects.Representation;
+import org.httpobjects.Stream;
+import org.httpobjects.impl.ChunkImpl;
+import org.httpobjects.impl.StreamImpl;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -54,21 +57,31 @@ public final class FreemarkerDSL {
 		return new Representation() {
 			
 			@Override
-			public void write(OutputStream out) {
-				try {
-					Template t = config.getTemplate(template);
-					Writer w = new OutputStreamWriter(out, t.getEncoding());
-					config.getTemplate(template).process(model, w);
-					w.close();
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}
-			
-			@Override
 			public String contentType() {
 				return contentType;
 			}
+			
+            @Override
+            public Stream<Chunk> bytes() {
+                return new StreamImpl<Representation.Chunk>(){
+                    @Override
+                    public void scan(org.httpobjects.Stream.Scanner<Chunk> scanner) {
+                        scanner.collect(new ChunkImpl(null, 0, 0) {
+                            @Override
+                            public void writeInto(OutputStream out) {
+                                try {
+                                    Template t = config.getTemplate(template);
+                                    Writer w = new OutputStreamWriter(out, t.getEncoding());
+                                    config.getTemplate(template).process(model, w);
+                                    w.close();
+                                } catch (Exception e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        });
+                    }
+                };
+            }
 		};
 	}
 }

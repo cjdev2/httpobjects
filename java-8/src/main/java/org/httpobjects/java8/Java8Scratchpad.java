@@ -15,6 +15,7 @@ import org.httpobjects.Representation;
 import org.httpobjects.Representation.Chunk;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
+import org.httpobjects.Stream.Transformer;
 
 public class Java8Scratchpad {
 	

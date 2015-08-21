@@ -37,10 +37,7 @@
  */
 package org.httpobjects.servlet;
 
-import org.httpobjects.Eventual;
-import org.httpobjects.HttpObject;
-import org.httpobjects.Request;
-import org.httpobjects.Response;
+import java.io.IOException;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -48,8 +45,12 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.OutputStream;
+
+import org.httpobjects.Eventual;
+import org.httpobjects.HttpObject;
+import org.httpobjects.Request;
+import org.httpobjects.Response;
+import org.httpobjects.util.HttpObjectUtil;
 
 @SuppressWarnings("serial")
 public final class ServletAdapter extends HttpServlet {
@@ -65,9 +66,7 @@ public final class ServletAdapter extends HttpServlet {
         resp.setStatus(r.code().value());
 
         if(r.hasRepresentation()){
-            OutputStream out = resp.getOutputStream();
-            r.representation().write(out);
-            out.close();
+            HttpObjectUtil.writeToStream(r.representation(), resp.getOutputStream());
         }
 
 	}

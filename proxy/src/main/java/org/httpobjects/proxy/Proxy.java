@@ -41,7 +41,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -59,11 +58,20 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.httpobjects.*;
+import org.httpobjects.Eventual;
+import org.httpobjects.HttpObject;
+import org.httpobjects.Representation;
+import org.httpobjects.Request;
+import org.httpobjects.Response;
+import org.httpobjects.ResponseCode;
+import org.httpobjects.Stream;
 import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.response.LocationField;
 import org.httpobjects.header.response.SetCookieField;
+import org.httpobjects.impl.ChunkImpl;
+import org.httpobjects.impl.StreamImpl;
+import org.httpobjects.util.HttpObjectUtil;
 
 public class Proxy extends HttpObject {
 	private final Log log = LogFactory.getLog(getClass());
@@ -108,7 +116,8 @@ public class Proxy extends HttpObject {
 
 	protected void setRequestRepresentation(Request req, EntityEnclosingMethod method){
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		req.representation().write(out);
+		// todo: make streaming
+		HttpObjectUtil.writeToStream(req.representation(), out);
 		method.setRequestEntity(new InputStreamRequestEntity(new ByteArrayInputStream(out.toByteArray())));
 	}
 	
@@ -232,21 +241,33 @@ public class Proxy extends HttpObject {
             }
 
             @Override
-            public void write(OutputStream out) {
-                try {
-                	if(method.getResponseBodyAsStream() != null){
-                		
-                		byte[] buffer = new byte[1024];
-                		InputStream in = method.getResponseBodyAsStream();
-                		for(int x=in.read(buffer);x!=-1;x=in.read(buffer)){
-                			out.write(buffer, 0, x);
-                		}
-                	}
-                		
-                } catch (IOException e) {
-                	e.printStackTrace();
-                    throw new RuntimeException("Error writing response", e);
-                }
+            public Stream<Chunk> bytes() {
+                return new StreamImpl<Representation.Chunk>(){
+                    @Override
+                    public void scan(org.httpobjects.Stream.Scanner<Chunk> scanner) {
+                        try {
+                            InputStream data = method.getResponseBodyAsStream();
+                            if(data != null){
+                                final byte[] buffer = new byte[1024];
+                                while(true) {
+                                    final int x = data.read(buffer);
+                                    if(x==-1) {
+                                        break;
+                                    }else{
+                                        scanner.collect(new ChunkImpl(buffer, 0, x));
+                                    }
+                                }
+                                data.close();
+                            }
+                        } catch (IOException e) {
+                            throw makeRException(e);
+                        }
+                    }
+                    protected RuntimeException makeRException(Exception e){
+                        return new RuntimeException("Error writing representation.  " + 
+                                "This is probably because the connection to the remote host was closed.",e);
+                    }
+                };
             }
         },
         headersReturned.toArray(new HeaderField[]{}));
