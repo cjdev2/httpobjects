@@ -16,6 +16,9 @@ import org.httpobjects.Representation.Chunk;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
 import org.httpobjects.Stream.Transformer;
+import org.httpobjects.outcome.Outcome;
+import org.httpobjects.outcome.OutcomeHandler;
+import org.httpobjects.outcome.OutcomeHandlerExecutor;
 
 public class Java8Scratchpad {
 	
@@ -35,6 +38,9 @@ public class Java8Scratchpad {
 	}
 	
 	public static void main(String[] args) throws Exception {
+	    
+	    final OutcomeHandlerExecutor threads = DSL.syncronousExecutor();
+        
 		new HttpObject("/toUppercase"){
 
 			@Override
@@ -42,7 +48,7 @@ public class Java8Scratchpad {
 				
 				return OK(Bytes("text/plain", 
 						req.representation()
-						   .bytes()
+						   .bytes(threads)
 						   .map(chunk -> utf8String(chunk.toNewArray()))
 						   .map(text -> utf8Bytes(text.toUpperCase()))));
 			}
@@ -59,17 +65,17 @@ public class Java8Scratchpad {
 		 *   - immutable, if possible
 		 */
 		WritableByteChannel cout = null;
-		r.bytes().scan((chunk, isLast) -> chunk.writeInto(cout));
+		r.bytes(threads).scan((chunk, isLast) -> chunk.writeInto(cout));
 
 		OutputStream out = new ByteArrayOutputStream();
-		r.bytes().scan((chunk, isLast) -> chunk.writeInto(out));
+		r.bytes(threads).scan((chunk, isLast) -> chunk.writeInto(out));
 		
 
-		Eventual<Java8Scratchpad> result = r.bytes().read(asJackson(Java8Scratchpad.class));
+		Eventual<Java8Scratchpad> result = r.bytes(threads).read(asJackson(Java8Scratchpad.class));
 		
-		String textContent = r.bytes().read(asString("UTF-8")).get();
+		String textContent = r.bytes(threads).read(asString("UTF-8")).get();
 
-		r.bytes()
+		r.bytes(threads)
 		 .read(asUtf8())
 		 .onComplete(
            text->System.out.println(text), 

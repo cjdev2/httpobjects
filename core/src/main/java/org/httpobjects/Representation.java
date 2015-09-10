@@ -41,10 +41,21 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.WritableByteChannel;
 
+import org.httpobjects.outcome.OutcomeHandlerExecutor;
+
 public interface Representation {
+    
 	String contentType();
 	
-	ByteStream bytes();
+	ByteStream async(OutcomeHandlerExecutor threads);
+    ByteStream sync(OutcomeHandlerExecutor threads);
+	
+//	/**
+//     * blocking operations
+//     */
+//    byte[] readIntoMemory();
+//    String readIntoString(String charset);
+//    void writeInto(OutputStream out);
 	
 	/**
 	 * An immutable chunk of a byte stream

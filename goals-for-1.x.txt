@@ -2,7 +2,10 @@ support for async, nonblocking (nio) request and response handling/streaming
    - Todo:
       - [DONE] mockup the streaming api
       - [DONE] port existing stuff to it
-      - make it actually work async & deal with closing issues 
+      - make it actually work async 
+                 - [DONE] closing issues
+                 - thread pooling
+                 - testing coverage for the async case?
 make requests immutable "values"
    - re-readable?
 remove impurities in the request model

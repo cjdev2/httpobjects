@@ -50,7 +50,6 @@ import org.httpobjects.Eventual;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
-import org.httpobjects.util.HttpObjectUtil;
 
 @SuppressWarnings("serial")
 public final class ServletAdapter extends HttpServlet {
@@ -78,7 +77,6 @@ public final class ServletAdapter extends HttpServlet {
 
 	@Override
 	protected long getLastModified(HttpServletRequest req) {
-		// TODO Auto-generated method stub
 		return super.getLastModified(req);
 	}
 
