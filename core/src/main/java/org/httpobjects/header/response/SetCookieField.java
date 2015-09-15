@@ -76,18 +76,30 @@ public class SetCookieField extends HeaderField {
 	}
 
 	private static class NameValue {
-		public static NameValue parse(String nameValue){
+		public static NameValue parse(String attributeString){
 			try {
-				int pos = nameValue.indexOf('=');
-				String name = nameValue.substring(0, pos);
-				String value = nameValue.substring(pos + 1);
-				if(value.startsWith("\"") && value.endsWith("\"")){
-				    value = value.substring(1, value.length()-1);
+				final String name, value;
+				
+				final int pos = attributeString.indexOf('=');
+				if(pos == -1){
+					name = attributeString;
+					value = null;
+				}else{
+					name = attributeString.substring(0, pos);
+					value = stripQuotes(attributeString.substring(pos + 1));
 				}
+				
 				return new NameValue(name, value);
 			} catch (Exception e) {
-				throw new RuntimeException("Error parsing " + nameValue);
+				throw new RuntimeException("Error parsing " + attributeString);
 			}
+		}
+
+		private static String stripQuotes(String value) {
+			if(value.startsWith("\"") && value.endsWith("\"")){
+				value = value.substring(1, value.length()-1);
+			}
+			return value;
 		}
 		private final String name, value;
 

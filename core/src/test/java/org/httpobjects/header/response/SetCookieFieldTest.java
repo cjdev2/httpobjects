@@ -77,6 +77,22 @@ public class SetCookieFieldTest {
         }
     }
     
+
+    @Test
+    public void attributeValuesAreOptional(){
+
+        // given
+        String value = "foo=\"bar baz\"; ThisAttributeHasNoValue";
+    
+        // when
+        SetCookieField c = SetCookieField.fromHeaderValue(value);
+
+        // then
+        Assert.assertEquals("foo", c.name);
+        Assert.assertEquals("bar baz", c.value);
+    }
+    
+    
 	@Test
 	public void basicNameValueSetCookieField(){
 		SetCookieField c = SetCookieField.fromHeaderValue("name=value");
