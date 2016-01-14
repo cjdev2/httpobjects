@@ -365,7 +365,10 @@ public class DSL {
     public static final Response EXPECTATION_FAILED(Representation representation){
         return new Response(ResponseCode.EXPECTATION_FAILED, representation);
     }
-
+    public static final Response ACCEPTED(Representation representation, HeaderField ... headers) {
+     return new Response(ResponseCode.ACCEPTED, representation,headers);
+    }
+    
     /* ######################################################## 
      * ## Generated 500 series responses
      * ########################################################
