@@ -67,6 +67,10 @@ public class DSL {
     public static final StandardCharset MOST_WIDELY_SUPPORTED_ENCODING = StandardCharset.UTF_8;
     public static final StandardCharset DEFAULT_HTTP_ENCODING = StandardCharset.ISO_8859_1;
     
+    public static final String CONTENT_TYPE_CSV = "text/csv; charset="+MOST_WIDELY_SUPPORTED_ENCODING.charsetName();
+    public static final String CONTENT_TYPE_HTML = "text/html; charset="+MOST_WIDELY_SUPPORTED_ENCODING.charsetName();
+    public static final String CONTENT_TYPE_TEXT_PLAIN = "text/plain; charset="+MOST_WIDELY_SUPPORTED_ENCODING.charsetName();
+    public static final String CONTENT_TYPE_JSON = "application/json; charset="+MOST_WIDELY_SUPPORTED_ENCODING.charsetName();
     
     /*
      * ########################################################
@@ -127,19 +131,23 @@ public class DSL {
      */
 
     public static final Representation Csv(String text){
-        return new BinaryRepresentation("text/csv; charset="+MOST_WIDELY_SUPPORTED_ENCODING.charsetName(), new ByteArrayInputStream(getBytes(text, MOST_WIDELY_SUPPORTED_ENCODING)));
+        return new BinaryRepresentation(CONTENT_TYPE_CSV, new ByteArrayInputStream(getBytes(text, MOST_WIDELY_SUPPORTED_ENCODING)));
     }
 
     public static final Representation Html(String text){
-        return new BinaryRepresentation("text/html; charset="+MOST_WIDELY_SUPPORTED_ENCODING.charsetName(), new ByteArrayInputStream(getBytes(text, MOST_WIDELY_SUPPORTED_ENCODING)));
+        return new BinaryRepresentation(CONTENT_TYPE_HTML, new ByteArrayInputStream(getBytes(text, MOST_WIDELY_SUPPORTED_ENCODING)));
     }
 
     public static final Representation Text(String text){
-        return new BinaryRepresentation("text/plain; charset="+MOST_WIDELY_SUPPORTED_ENCODING.charsetName(), new ByteArrayInputStream(getBytes(text, MOST_WIDELY_SUPPORTED_ENCODING)));
+        return new BinaryRepresentation(CONTENT_TYPE_TEXT_PLAIN, new ByteArrayInputStream(getBytes(text, MOST_WIDELY_SUPPORTED_ENCODING)));
     }
 
     public static final Representation Json(String text){
-        return new BinaryRepresentation("application/json; charset="+MOST_WIDELY_SUPPORTED_ENCODING.charsetName(), new ByteArrayInputStream(getBytes(text, MOST_WIDELY_SUPPORTED_ENCODING)));
+        return Json(new ByteArrayInputStream(getBytes(text, MOST_WIDELY_SUPPORTED_ENCODING)));
+    }
+    
+    public static final Representation Json(InputStream text){
+        return new BinaryRepresentation(CONTENT_TYPE_JSON, text);
     }
 
     public static final Representation HtmlFromClasspath(String name, Object context){

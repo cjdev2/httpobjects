@@ -5,11 +5,13 @@
             <artifactId>oss-parent</artifactId>
             <version>7</version>
         </parent>
-
+    <properties>
+    	<httpobject-project-version>0.11.4-SNAPSHOT</httpobject-project-version>
+  	</properties>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.httpobjects.pom</groupId>
 	<artifactId>httpobjects-pom</artifactId>
-	<version>0.11.3-SNAPSHOT</version>
+	<version>${httpobject-project-version}</version>
 
 	<packaging>pom</packaging>
   
