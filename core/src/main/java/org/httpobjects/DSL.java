@@ -37,10 +37,18 @@
  */
 package org.httpobjects;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.response.AllowField;
@@ -149,6 +157,39 @@ public class DSL {
     public static final Representation Json(InputStream text){
         return new BinaryRepresentation(CONTENT_TYPE_JSON, text);
     }
+    
+    /**
+     * This sets up a mechanism for streaming Json using an OutputStream.
+     * The response is created and data can begin streaming to clients before
+     * The users of this method have finished writing to the provided outputstream. 
+     * 
+     * The Executors.defaultThreadFactory is used.  
+     * TODO: If it may make sense create a thread pool or allow the user to configure one here.
+     * @param jsonStream
+     * @return
+     */
+    public static final Representation JsonStream(final Consumer<OutputStream> jsonStream){
+    	final PipedOutputStream stream = new PipedOutputStream();
+    	PipedInputStream result;
+    	
+    	try{
+    		result = new PipedInputStream(stream);
+    	}catch(Exception e){
+    		throw new RuntimeException(e);
+    	}
+    	
+    	Executors.defaultThreadFactory().newThread(
+    		new Runnable(){
+    			@Override
+    			public void run() {
+    				jsonStream.accept(stream);
+    			};
+    		}).start();
+    	return Json(result);
+
+    }
+    
+    
 
     public static final Representation HtmlFromClasspath(String name, Object context){
         return HtmlFromClasspath(name, context.getClass());
