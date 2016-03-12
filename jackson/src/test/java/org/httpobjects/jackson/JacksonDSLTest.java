@@ -41,6 +41,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import org.httpobjects.Representation;
 import org.junit.Test;
@@ -58,6 +60,19 @@ public class JacksonDSLTest {
 
         // then
         assertEquals(outputStream.toString(), "{\"message\":\"Hello\"}");
+    }
+    
+    @Test
+    public void writesJsonRepresentationsOfStreamsOfStrings() {
+        // given
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        List<String> strings = Arrays.asList("{\"message\":\"Hello\"}", "{\"message\":\"Goodbye\"}");
+
+        // when
+        JacksonDSL.JsonStream(strings).write(outputStream);
+
+        // then
+        assertEquals(outputStream.toString(), "[{\"message\":\"Hello\"},{\"message\":\"Goodbye\"}]");
     }
 
     @Test

@@ -158,39 +158,6 @@ public class DSL {
         return new BinaryRepresentation(CONTENT_TYPE_JSON, text);
     }
     
-    /**
-     * This sets up a mechanism for streaming Json using an OutputStream.
-     * The response is created and data can begin streaming to clients before
-     * The users of this method have finished writing to the provided outputstream. 
-     * 
-     * The Executors.defaultThreadFactory is used.  
-     * TODO: If it may make sense create a thread pool or allow the user to configure one here.
-     * @param jsonStream
-     * @return
-     */
-    public static final Representation JsonStream(final Consumer<OutputStream> jsonStream){
-    	final PipedOutputStream stream = new PipedOutputStream();
-    	PipedInputStream result;
-    	
-    	try{
-    		result = new PipedInputStream(stream);
-    	}catch(Exception e){
-    		throw new RuntimeException(e);
-    	}
-    	
-    	Executors.defaultThreadFactory().newThread(
-    		new Runnable(){
-    			@Override
-    			public void run() {
-    				jsonStream.accept(stream);
-    			};
-    		}).start();
-    	return Json(result);
-
-    }
-    
-    
-
     public static final Representation HtmlFromClasspath(String name, Object context){
         return HtmlFromClasspath(name, context.getClass());
     }

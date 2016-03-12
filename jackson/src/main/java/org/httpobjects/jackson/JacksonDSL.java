@@ -37,13 +37,17 @@
  */
 package org.httpobjects.jackson;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.httpobjects.Representation;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+
+import org.httpobjects.Representation;
+
+import com.fasterxml.jackson.core.JsonEncoding;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 public class JacksonDSL {
@@ -93,6 +97,38 @@ public class JacksonDSL {
 			}
     	};
     }
+    
+    public static Representation JsonStream(final Iterable<String> stream){
+    	
+    	return new Representation() {
+    		private final ObjectMapper mapper = new ObjectMapper();
+			@Override
+			public void write(OutputStream out) {
+				JsonGenerator generator=null;
+				try{
+					JsonFactory jsonFactory = mapper.getFactory();
+	                generator = jsonFactory.createGenerator(out, JsonEncoding.UTF8);
+	                generator.writeStartArray();
+	                for(String obj:stream){
+	                    generator.writeTree(mapper.readTree(obj));
+	                }
+	                generator.writeEndArray();
+	            }catch(Exception e){
+	                throw new RuntimeException(e);
+	            }finally{
+	                try{
+	                    generator.close();
+	                }catch(Exception e){/*Give Up.*/}
+	            }
+			}
+			
+			@Override
+			public String contentType() {
+				return "application/json";
+			}
+    	};
+    }
+    
     public static Representation JacksonJson(final Object object) {
     	return JacksonJson(object, new ObjectMapper());
     }
