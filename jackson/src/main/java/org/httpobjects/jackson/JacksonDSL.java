@@ -42,6 +42,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.httpobjects.DSL;
 import org.httpobjects.Representation;
 
 import com.fasterxml.jackson.core.JsonEncoding;
@@ -93,7 +94,7 @@ public class JacksonDSL {
 			
 			@Override
 			public String contentType() {
-				return "application/json";
+				return DSL.CONTENT_TYPE_JSON;
 			}
     	};
     }
