@@ -125,7 +125,7 @@ public class JacksonDSL {
 			
 			@Override
 			public String contentType() {
-				return "application/json";
+				return DSL.CONTENT_TYPE_JSON;
 			}
     	};
     }
