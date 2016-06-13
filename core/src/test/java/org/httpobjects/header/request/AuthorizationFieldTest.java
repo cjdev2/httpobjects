@@ -40,9 +40,14 @@ package org.httpobjects.header.request;
 import org.junit.Assert;
 
 import org.httpobjects.header.response.WWWAuthenticateField;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class AuthorizationFieldTest {
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
     @Test
     public void accuratelyImplementsTheContractForTheValuesMethod(){
         // GIVEN:
@@ -53,5 +58,25 @@ public class AuthorizationFieldTest {
 
         // THEN
         Assert.assertEquals("Basic fdsfds", value);
+    }
+
+    @Test
+    public void parsesBasicAuthorizationFields(){
+        AuthorizationField field = AuthorizationField.parse("Basic fdsfds");
+        Assert.assertEquals(new AuthorizationField(WWWAuthenticateField.Method.Basic, "fdsfds"), field);
+    }
+
+    @Test
+    public void failsToParseOtherKindsOfAuthorizationFields(){
+        thrown.expect(AuthorizationField.ParsingException.class);
+        thrown.expectMessage("unsupported authorization scheme");
+        AuthorizationField.parse("Foobar fdsfds");
+    }
+
+    @Test
+    public void failsToParseAuthorizationFieldsWithoutAScheme(){
+        thrown.expect(AuthorizationField.ParsingException.class);
+        thrown.expectMessage("missing authorization scheme");
+        AuthorizationField.parse("fdsfds");
     }
 }

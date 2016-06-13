@@ -48,10 +48,21 @@ import org.httpobjects.impl.Base64;
 
 public class AuthorizationField extends HeaderField {
 
-	public static AuthorizationField parse(String s) {
+	public static AuthorizationField parse(String s) throws ParsingException {
 		String fValue = s.trim();
 		StringTokenizer tokens = new StringTokenizer(fValue);
-		AuthorizationField f = new AuthorizationField(Method.valueOf(tokens.nextToken()), tokens.nextToken());
+
+		if (tokens.countTokens() < 2)
+			throw new ParsingException(ParsingException.Failure.MISSING_SCHEME);
+
+		Method method;
+		try {
+			method = Method.valueOf(tokens.nextToken());
+		} catch (IllegalArgumentException ex) {
+			throw new ParsingException(ParsingException.Failure.UNSUPPORTED_SCHEME);
+		}
+
+		AuthorizationField f = new AuthorizationField(method, tokens.nextToken());
 		return f;
 	}
 	
@@ -88,7 +99,7 @@ public class AuthorizationField extends HeaderField {
 		}
 	}
 
-    @Override
+	@Override
     public String name() {
         return "Authorization";
     }
@@ -97,4 +108,55 @@ public class AuthorizationField extends HeaderField {
     public String value() {
         return method + " " + rawCredentials;
     }
+
+	@Override
+	public String toString() {
+		return "AuthorizationField(\"" + value() + "\")";
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		AuthorizationField that = (AuthorizationField) o;
+
+		if (method != that.method) return false;
+		return rawCredentials != null ? rawCredentials.equals(that.rawCredentials) : that.rawCredentials == null;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = method != null ? method.hashCode() : 0;
+		result = 31 * result + (rawCredentials != null ? rawCredentials.hashCode() : 0);
+		return result;
+	}
+
+	public static class ParsingException extends RuntimeException {
+		public enum Failure {
+			MISSING_SCHEME("missing authorization scheme"),
+			UNSUPPORTED_SCHEME("unsupported authorization scheme");
+
+			private final String message;
+
+			Failure(String message) {
+				this.message = message;
+			}
+
+			public String getMessage() {
+				return message;
+			}
+		}
+
+		private final Failure failure;
+
+		public ParsingException(Failure failure) {
+			super(failure.getMessage());
+			this.failure = failure;
+		}
+
+		public Failure getFailure() {
+			return failure;
+		}
+	}
 }

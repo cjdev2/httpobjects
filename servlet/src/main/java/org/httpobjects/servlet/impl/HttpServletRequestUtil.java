@@ -93,8 +93,10 @@ public class HttpServletRequestUtil {
 			String name = names.nextElement();
 			if(name.equals("Authorization")){
 				String s = request.getHeader(name);
-				AuthorizationField f = AuthorizationField.parse(s); 
-				fields.add(f);
+				try {
+					AuthorizationField f = AuthorizationField.parse(s);
+					fields.add(f);
+				} catch (AuthorizationField.ParsingException ex) {}
 			}else if(name.equals("Cookie")){
 				String fValue = request.getHeader(name);
 				fields.add(new CookieField(fValue));
