@@ -284,7 +284,7 @@ public abstract class IntegrationTest {
     public void supportsHead() throws Exception {
         // given
         HttpClient client = new HttpClient();
-        HeadMethod request = new HeadMethod("http://127.0.0.2:" + port + "/head");
+        HeadMethod request = new HeadMethod("http://localhost:" + port + "/head");
         
         //when
         int responseCode = client.executeMethod(request);
@@ -299,7 +299,7 @@ public abstract class IntegrationTest {
     public void supportsOptions() throws Exception{
         // given
         HttpClient client = new HttpClient();
-        OptionsMethod request = new OptionsMethod("http://127.0.0.2:" + port + "/options");
+        OptionsMethod request = new OptionsMethod("http://localhost:" + port + "/options");
 
         //when
         int responseCode = client.executeMethod(request);
@@ -313,13 +313,13 @@ public abstract class IntegrationTest {
     @Test
     public void returnsConnectionInfo() throws Exception {
         // given
-        String url = "http://127.0.0.2:" + port + "/connectionInfo";
+        String url = "http://localhost:" + port + "/connectionInfo";
         
         //when
-        final String result = getFrom("127.0.0.3", url);
+        final String result = getFrom("127.0.0.1", url);
         
         // then
-        Pattern expectedPattern = Pattern.compile("Local 127.0.0.2:" + port + ", Remote 127.0.0.3:([0-9].*)");
+        Pattern expectedPattern = Pattern.compile("Local 127.0.0.1:" + port + ", Remote 127.0.0.1:([0-9].*)");
         assertTrue("'" + result + " should match '" + expectedPattern, 
                 expectedPattern.matcher(result).matches());
     }
