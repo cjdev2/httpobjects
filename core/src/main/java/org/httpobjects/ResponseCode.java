@@ -78,6 +78,7 @@ public class ResponseCode {
         UNSUPPORTED_MEDIA_TYPE = new StandardResponseCode(415, "UNSUPPORTED_MEDIA_TYPE"),
         REQUESTED_RANGE_NOT_SATISFIABLE = new StandardResponseCode(416, "REQUESTED_RANGE_NOT_SATISFIABLE"),
         EXPECTATION_FAILED = new StandardResponseCode(417, "EXPECTATION_FAILED"),
+        UNPROCESSABLE_ENTITY = new StandardResponseCode(422, "UNPROCESSABLE_ENTITY"),
         INTERNAL_SERVER_ERROR = new StandardResponseCode(500, "INTERNAL_SERVER_ERROR"),
         NOT_IMPLEMENTED = new StandardResponseCode(501, "NOT_IMPLEMENTED"),
         BAD_GATEWAY = new StandardResponseCode(502, "BAD_GATEWAY"),

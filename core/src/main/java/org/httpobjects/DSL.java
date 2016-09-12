@@ -382,7 +382,13 @@ public class DSL {
         return new Response(ResponseCode.EXPECTATION_FAILED, representation);
     }
     public static final Response ACCEPTED(Representation representation, HeaderField ... headers) {
-     return new Response(ResponseCode.ACCEPTED, representation,headers);
+        return new Response(ResponseCode.ACCEPTED, representation,headers);
+    }
+    public static final Response UNPROCESSABLE_ENTITY(HeaderField... headers){
+        return new Response(ResponseCode.UNPROCESSABLE_ENTITY, Text("422 Client Error: Unprocessable Entity"), headers);
+    }
+    public static final Response UNPROCESSABLE_ENTITY(Representation representation, HeaderField... headers){
+        return new Response(ResponseCode.UNPROCESSABLE_ENTITY, representation, headers);
     }
     
     /* ######################################################## 
