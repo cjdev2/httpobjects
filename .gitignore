@@ -10,3 +10,5 @@ target
 .classpath
 .bzr
 .bzrignore
+pom.xml.versionsBackup
+
