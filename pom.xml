@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.httpobjects.pom</groupId>
   <artifactId>httpobjects-pom</artifactId>
-  <version>0.11.7-SNAPSHOT</version>
+  <version>0.12.0</version>
   <packaging>pom</packaging>
   <name>HTTP Objects :: Root POM</name>
   <build>
@@ -24,7 +24,7 @@
         <configuration>
           <serverId>ossrh</serverId>
           <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-          <autoReleaseAfterClose>false</autoReleaseAfterClose>
+          <autoReleaseAfterClose>true</autoReleaseAfterClose>
         </configuration>
       </plugin>
     </plugins>
