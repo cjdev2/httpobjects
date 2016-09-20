@@ -20,7 +20,7 @@ for help.
 
 You'll need a GPG key. Basically, run ```gpg --gen-key``` then
 publish your key with 
-```gpg --send-keys <keyname> --keyserver hkp://pool.sks-keyservers.net:80```
+```gpg --keyserver hkp://pool.sks-keyservers.net:80 --send-keys <keyname>```
 The link above points to more detail if you need it.
 
 You'll need a *settings.xml* file in your *~/.m2* directory.
