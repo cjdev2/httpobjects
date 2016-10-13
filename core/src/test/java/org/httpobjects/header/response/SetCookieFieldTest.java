@@ -105,7 +105,7 @@ public class SetCookieFieldTest {
     @Test
     public void basicNameValueSetCookieField() {
         SetCookieField c = SetCookieField.fromHeaderValue("name=value");
-        assertSame(
+        assertSetCookieFieldSame(
                 new SetCookieField("name", "value", null),
                 c
         );
@@ -116,7 +116,7 @@ public class SetCookieFieldTest {
     @Test
     public void basicSetCookieFieldWithDomain() {
         SetCookieField c = SetCookieField.fromHeaderValue("LSID=DQAAAK…Eaem_vYg; Domain=docs.foo.com");
-        assertSame(
+        assertSetCookieFieldSame(
                 new SetCookieField("LSID", "DQAAAK…Eaem_vYg", "docs.foo.com"),
                 c
         );
@@ -127,13 +127,14 @@ public class SetCookieFieldTest {
 
     @Test
     public void full() {
-        SetCookieField c = SetCookieField.fromHeaderValue("SSID=Ap4P….GTEq; Domain=.foo.com; Path=/; Expires=Wed, 13-Jan-2021 22:23:01 GMT; Secure;");
-        assertSame(
-                new SetCookieField("SSID", "Ap4P….GTEq", ".foo.com", "/", "Wed, 13-Jan-2021 22:23:01 GMT", true),
+        SetCookieField c = SetCookieField.fromHeaderValue("SSID=Ap4P….GTEq; Domain=.foo.com; Path=/; Expires=Wed, 13-Jan-2021 22:23:01 GMT; Secure; HttpOnly;");
+        boolean secure = true;
+        boolean httpOnly = true;
+        assertSetCookieFieldSame(
+                new SetCookieField("SSID", "Ap4P….GTEq", ".foo.com", "/", "Wed, 13-Jan-2021 22:23:01 GMT", secure, httpOnly),
                 c
         );
-        System.out.println(c);
-        assertEquals("SSID=Ap4P….GTEq; Domain=.foo.com; Path=/; Expires=Wed, 13-Jan-2021 22:23:01 GMT; Secure;", c.toString());
+        assertEquals("SSID=Ap4P….GTEq; Domain=.foo.com; Path=/; Expires=Wed, 13-Jan-2021 22:23:01 GMT; Secure; HttpOnly;", c.toString());
 
     }
 
@@ -215,12 +216,13 @@ public class SetCookieFieldTest {
         assertFalse(cookieField.isSecure());
     }
 
-    private void assertSame(SetCookieField expected, SetCookieField actual) {
+    private void assertSetCookieFieldSame(SetCookieField expected, SetCookieField actual) {
         assertEquals(expected.name, actual.name);
         assertEquals(expected.value, actual.value);
         assertEquals(expected.domain, actual.domain);
         assertEquals(expected.path, actual.path);
         assertEquals(expected.expiration, actual.expiration);
         assertEquals(expected.secure, actual.secure);
+        assertEquals(expected.httpOnly, actual.httpOnly);
     }
 }
