@@ -79,4 +79,10 @@ public class AuthorizationFieldTest {
         thrown.expectMessage("missing authorization scheme");
         AuthorizationField.parse("fdsfds");
     }
+
+    @Test
+    public void parsesBearerAuthorizationFields(){
+        AuthorizationField field = AuthorizationField.parse("Bearer qwerty");
+        Assert.assertEquals(new AuthorizationField(WWWAuthenticateField.Method.Bearer, "qwerty"), field);
+    }
 }

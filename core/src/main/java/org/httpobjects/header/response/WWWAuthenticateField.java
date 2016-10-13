@@ -41,7 +41,7 @@ import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.HeaderFieldVisitor;
 
 public class WWWAuthenticateField extends HeaderField {
-	public enum Method{Basic}
+	public enum Method{Basic, Bearer}
 	
 	private final Method method;
 	private final String realmName;
