@@ -90,6 +90,11 @@ public class ProxyTest {
     public void launch() {
         port = findFreePort();
         jetty = HttpObjectsJettyHandler.launchServer(port,
+        			new HttpObject("/") {
+		            public Response get(Request req) {
+		                return OK(Text("this is the root page"));
+		            }
+        			},
                 new HttpObject("/frog") {
                     public Response get(Request req) {
                         String response = "Kermit";
@@ -452,6 +457,22 @@ public class ProxyTest {
         assertThat(representation, containsString("X-Forwarded-For=dummy-remote-ip-address"));
 
 
+    }
+    
+    @Test
+    public void handlesRootRequests(){
+        //given
+        HttpObject subject = new Proxy("http://localhost:" + port, "http://me.com");
+        Request input = new MockRequest(subject, "/");
+
+        // when
+        Response output = subject.get(input);
+
+        // then
+        String representation = HttpObjectUtil.toAscii(output.representation());
+        System.out.println("representation = " + representation);
+
+        assertEquals(representation, "this is the root page");
     }
 
 

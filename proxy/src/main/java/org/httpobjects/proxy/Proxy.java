@@ -46,6 +46,8 @@ import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.response.LocationField;
 import org.httpobjects.header.response.SetCookieField;
+import org.httpobjects.path.PathPattern;
+import org.httpobjects.path.RegexPathPattern;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -56,15 +58,23 @@ public class Proxy extends HttpObject {
     private final Log log = LogFactory.getLog(getClass());
     private String base;
     private final String me;
-
+    
     public Proxy(final String localPath, final String base, final String me) {
-        super(localPath + "/{path*}", null);
+        super(
+        		makePathPattern(localPath), 
+        		null);
         setBase(base);
         this.me = me;
+        
+        
     }
 
     public Proxy(final String base, final String me) {
         this("", base, me);
+    }
+    
+    private static PathPattern makePathPattern(String localPath){
+    		return new RegexPathPattern(Pattern.compile(Pattern.quote(localPath) + "/?(.*)"), "path");
     }
 
     public void setBase(String base) {
@@ -127,6 +137,7 @@ public class Proxy extends HttpObject {
         method.setFollowRedirects(false);
 
         String path = req.path().valueFor("path");
+        if(path == null) path = "";
         if (!path.startsWith("/")) path = "/" + path;
         String query = getQuery(req);
         if (query == null) {
