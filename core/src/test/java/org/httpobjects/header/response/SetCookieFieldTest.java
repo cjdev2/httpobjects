@@ -86,6 +86,37 @@ public class SetCookieFieldTest {
         }
     }
 
+    @Test
+    public void flagsAreCaseInsensitive() {
+
+        // given
+        String[] httpCaseVariations = {"HTTPOnly", "httpONLY", "HttpOnly"};
+
+        for (String httpOnlyFlag : httpCaseVariations) {
+
+            // when
+            SetCookieField c = SetCookieField.fromHeaderValue("foo=bar; " + httpOnlyFlag);
+
+            // then
+            assertEquals("foo", c.name);
+            assertEquals("bar", c.value);
+            assertEquals(true, c.httpOnly);
+        }
+
+        String[] secureCaseVariations = {"Secure", "secure", "SECURE"};
+
+        for (String secureFlag : secureCaseVariations ) {
+
+            // when
+            SetCookieField c = SetCookieField.fromHeaderValue("foo=bar; " + secureFlag);
+
+            // then
+            assertEquals("foo", c.name);
+            assertEquals("bar", c.value);
+            assertEquals(true, c.secure);
+        }
+    }
+
 
     @Test
     public void attributeValuesAreOptional() {

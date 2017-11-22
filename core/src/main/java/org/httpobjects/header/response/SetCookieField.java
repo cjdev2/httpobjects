@@ -65,9 +65,9 @@ public class SetCookieField extends HeaderField {
             String next = s.nextToken(";");
             if (next != null) {
                 next = next.trim();
-                if (next.equals("Secure")) {
+                if (next.equalsIgnoreCase("Secure")) {
                     secure = true;
-                } else if (next.equals("HttpOnly")) {
+                } else if (next.equalsIgnoreCase("HttpOnly")) {
                     httpOnly = true;
                 } else {
                     NameValue property = NameValue.parse(next.trim());
