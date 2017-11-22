@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>httpobjects-pom</artifactId>
 		<groupId>org.httpobjects.pom</groupId>
-		<version>0.13.1-SNAPSHOT</version>
+		<version>0.14</version>
 	</parent>
 
 	<groupId>org.httpobjects.apache-httpclient-4.x</groupId>
