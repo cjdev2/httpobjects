@@ -51,7 +51,7 @@ public class HttpObjectUtil {
     public static Response invokeMethod(HttpObject object, final Method m, final Request input) {
         final Response output;
         switch(m){
-        case GET: 
+        case GET:
             output = object.get(input);
             break;
         case DELETE:
@@ -72,8 +72,11 @@ public class HttpObjectUtil {
         case OPTIONS:
             output = object.options(input);
             break;
+        case TRACE:
+            output = object.trace(input);
+            break;
         default:
-            output = HttpObject.NOT_FOUND();
+            output = HttpObject.NOT_IMPLEMENTED();
         }
         return output;
     }

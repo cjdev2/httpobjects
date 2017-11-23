@@ -37,8 +37,15 @@
  */
 package org.httpobjects;
 
+import org.httpobjects.path.Path;
+import org.httpobjects.path.PathParamName;
 import org.httpobjects.path.PathPattern;
 import org.httpobjects.path.SimplePathPattern;
+import org.httpobjects.util.HttpObjectUtil;
+import org.httpobjects.util.Method;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class HttpObject extends DSL{
 
@@ -50,7 +57,7 @@ public class HttpObject extends DSL{
         this.pathPattern = pathPattern;
         this.defaultResponse = defaultResponse;
     }
-    
+
     public HttpObject(String pathPattern, Response defaultResponse) {
         this(new SimplePathPattern(pathPattern), defaultResponse);
     }
@@ -63,9 +70,6 @@ public class HttpObject extends DSL{
         this(new SimplePathPattern(pathPattern));
     }
 
-    
-    
-    
     public PathPattern pattern() {
         return pathPattern;
     }
@@ -79,4 +83,169 @@ public class HttpObject extends DSL{
     public Response trace(Request req){return defaultResponse;}
     public Response patch(Request req){return defaultResponse;}
 
+    public final HttpObject mask(HttpObject that) {
+        return maskResources(this, that, NOT_FOUND());
+    }
+
+    public final HttpObject mask(HttpObject that, Representation notFound) {
+        return maskResources(this, that, NOT_FOUND(notFound));
+    }
+
+    public interface Decorator<Id> {
+        Id onRequest(Request request);
+        void onResponse(Id id, Response response);
+        void onError(Throwable error);
+    }
+
+    public final <Id> HttpObject decorate(Decorator<Id> decorator) {
+        return decorateResource(this, decorator);
+    }
+
+    private static HttpObject maskResources(final HttpObject left,
+                                            final HttpObject right,
+                                            final Response notFound) {
+        return new HttpObject(maskPatterns(left.pattern(), right.pattern())) {
+
+            private HttpObject find(Request req) {
+                if (left.pattern().matches(req.path().toString())) {
+                    return left;
+                } else if (right.pattern().matches(req.path().toString())) {
+                    return right;
+                } else {
+                    return new HttpObject("", notFound);
+                }
+            }
+
+            @Override
+            public Response delete(Request req) {
+                return find(req).delete(req);
+            }
+
+            @Override
+            public Response get(Request req) {
+                return find(req).get(req);
+            }
+
+            @Override
+            public Response head(Request req) {
+                return find(req).head(req);
+            }
+
+            @Override
+            public Response options(Request req) {
+                return find(req).options(req);
+            }
+
+            @Override
+            public Response post(Request req) {
+                return find(req).post(req);
+            }
+
+            @Override
+            public Response put(Request req) {
+                return find(req).put(req);
+            }
+
+            @Override
+            public Response trace(Request req) {
+                return find(req).trace(req);
+            }
+
+            @Override
+            public Response patch(Request req) {
+                return find(req).patch(req);
+            }
+        };
+    }
+
+    private static PathPattern maskPatterns(final PathPattern left,
+                                            final PathPattern right) {
+        return new PathPattern() {
+
+            @Override
+            public List<PathParamName> varNames() {
+                List<PathParamName> result = new ArrayList<PathParamName>();
+                result.addAll(left.varNames());
+                result.addAll(right.varNames());
+                return result;
+            }
+
+            @Override
+            public boolean matches(String path) {
+                return left.matches(path) || right.matches(path);
+            }
+
+            @Override
+            public Path match(String path) {
+                if (left.matches(path)) {
+                    return left.match(path);
+                } else {
+                    return right.match(path);
+                }
+            }
+
+            @Override
+            public String raw() {
+                return left.raw() + ":" + right.raw();
+            }
+        };
+    }
+
+    private static <Id> HttpObject decorateResource(final HttpObject resource,
+                                                    final Decorator<Id> decorator) {
+        return new HttpObject(resource.pattern()) {
+
+            private Response dec(Method method, Request req) {
+                try {
+                    Id id = decorator.onRequest(req);
+                    Response res = HttpObjectUtil.invokeMethod(resource, method, req);
+                    decorator.onResponse(id, res);
+                    return res;
+                } catch (Throwable err) {
+                    decorator.onError(err);
+                    throw new RuntimeException(err);
+                }
+            }
+
+            @Override
+            public Response delete(Request req) {
+                return dec(Method.DELETE, req);
+            }
+
+            @Override
+            public Response get(Request req) {
+                return dec(Method.GET, req);
+            }
+
+            @Override
+            public Response head(Request req) {
+                return dec(Method.HEAD, req);
+            }
+
+            @Override
+            public Response options(Request req) {
+                return dec(Method.OPTIONS, req);
+            }
+
+            @Override
+            public Response post(Request req) {
+                return dec(Method.POST, req);
+            }
+
+            @Override
+            public Response put(Request req) {
+                return dec(Method.PUT, req);
+            }
+
+            @Override
+            public Response trace(Request req) {
+                return dec(Method.TRACE, req);
+            }
+
+            @Override
+            public Response patch(Request req) {
+                return dec(Method.PATCH, req);
+            }
+        };
+    }
 }

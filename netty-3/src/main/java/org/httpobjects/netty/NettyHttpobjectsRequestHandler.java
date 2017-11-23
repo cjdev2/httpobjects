@@ -33,17 +33,17 @@ import org.jboss.netty.handler.codec.http.HttpRequest;
 public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.RequestHandler {
 	private final List<HttpObject> objects;
     private final Response defaultResponse = DSL.NOT_FOUND();
-    
+
 	public NettyHttpobjectsRequestHandler(List<HttpObject> objects) {
 		super();
 		this.objects = objects;
 	}
-	
+
 	@Override
 	public Response respond(HttpRequest request, HttpChunkTrailer lastChunk, ByteAccumulator body, ConnectionInfo connectionInfo) {
-		
+
 		final String uri = request.getUri();
-		
+
 		for(HttpObject next : objects){
 		    final PathPattern pattern = next.pattern();
 			if(pattern.matches(uri)){
@@ -55,27 +55,32 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 				if(out!=null) return out;
 			}
 		}
-		
+
         return defaultResponse;
 	}
-	
+
 	private Request readRequest(final PathPattern pathPattern, final HttpRequest request, final HttpChunkTrailer lastChunk, final ByteAccumulator body, final ConnectionInfo connectionInfo) {
 		return new Request(){
-			
+
+			@Override
+			public Method method() {
+				return Method.fromString(request.getMethod().toString().toUpperCase());
+			}
+
 			@Override
 			public boolean hasRepresentation() {
 			    return body!=null;
 			}
-			
+
 			@Override
 			public ConnectionInfo connectionInfo() {
 			    return connectionInfo;
 			}
-			
+
 			@Override
 			public RequestHeader header() {
 				List<HeaderField> results = new ArrayList<HeaderField>();
-				final HttpHeaders headers = request.headers(); 
+				final HttpHeaders headers = request.headers();
 				for(String name: headers.names()){
 					for(String value: headers.getAll(name)){
 						final HeaderField field;
@@ -102,40 +107,40 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 					}
 				};
 			}
-			
+
 			@Override
 			public Request immutableCopy() {
 				return this;
 			}
-			
+
 			@Override
 			public Path path() {
 			    return pathPattern.match(jdkURL().getPath());
 			}
-			
+
 			private URL jdkURL(){
                 try {
                     return new URL("http://foo" + request.getUri());
                 } catch (MalformedURLException e) {
                     throw new RuntimeException(e);
                 }
-			    
+
 			}
-			
+
 			@Override
 			public Query query() {
 			    return new Query(jdkURL().getQuery());
 			}
-			
+
 			@Override
 			public Representation representation() {
-				
+
 				return new Representation(){
 					@Override
 					public String contentType() {
 						return request.headers().get("ContentType");
 					}
-					
+
 					@Override
 					public void write(OutputStream out) {
 						try {
@@ -159,10 +164,10 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
                     }
 				};
 			}
-			
+
 		};
 	}
-	
-	
+
+
 
 }

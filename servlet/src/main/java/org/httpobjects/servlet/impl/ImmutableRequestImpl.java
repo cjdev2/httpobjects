@@ -45,6 +45,7 @@ import org.httpobjects.Representation;
 import org.httpobjects.Request;
 import org.httpobjects.header.request.RequestHeader;
 import org.httpobjects.path.Path;
+import org.httpobjects.util.Method;
 
 public class ImmutableRequestImpl implements Request {
 	private final Path vars;
@@ -53,7 +54,8 @@ public class ImmutableRequestImpl implements Request {
 	private final RequestHeader header;
 	private final Representation representation;
 	private final ConnectionInfo connectionInfo;
-	
+	private final Method method;
+
 	public ImmutableRequestImpl(Path vars, HttpServletRequest request) {
 		this.vars = vars;
 		this.contentType = request.getContentType();
@@ -61,42 +63,48 @@ public class ImmutableRequestImpl implements Request {
 		this.connectionInfo = HttpServletRequestUtil.connectionInfo(request);
         this.header = HttpServletRequestUtil.buildHeader(request);
 		this.representation = new ImmutableHttpServletRequestRepresentation(request);
+		this.method = Method.fromString(request.getMethod().toUpperCase());
+	}
+
+	@Override
+	public Method method() {
+		return method;
 	}
 
 	@Override
 	public Path path() {
 		return vars;
 	}
-	
+
 	public String contentType(){
 		return contentType;
 	}
-	
+
 	@Override
 	public boolean hasRepresentation() {
 		return true;
 	}
-	
+
 	@Override
 	public Query query(){
 		return new Query(query);
 	}
-	
+
 	@Override
 	public RequestHeader header() {
 		return header;
 	}
-	
+
 	@Override
 	public Representation representation() {
-		return representation;		
+		return representation;
 	}
-	
+
 	@Override
 	public Request immutableCopy() {
 		return this;
 	}
-	
+
 	@Override
 	public ConnectionInfo connectionInfo() {
 	    return connectionInfo;

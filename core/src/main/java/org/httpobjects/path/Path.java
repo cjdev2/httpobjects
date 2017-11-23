@@ -38,11 +38,12 @@
 package org.httpobjects.path;
 
 import java.util.HashMap;
+import java.util.Optional;
 
 public class Path {
     private final String rawPath;
 	private final HashMap<String, String> params = new HashMap<String, String>();
-	
+
 	public Path(String rawPath, PathParam ... params) {
 	    this.rawPath = rawPath;
 		if(params!=null){
@@ -51,23 +52,26 @@ public class Path {
 			}
 		}
 	}
-	
+
 	public String valueFor(String key){
 		return params.get(key);
 	}
-	
+
 	public String valueFor(String key, String defaultValue){
 		final String value = valueFor(key);
 		return value==null?defaultValue:value;
 	}
-	
+
 	public int size(){
 		return params.size();
 	}
-	
+
 	@Override
 	public String toString() {
 	    return rawPath==null?"":rawPath;
 	}
-	
+
+    public Optional<String> get(String key) {
+        return Optional.ofNullable(valueFor(key));
+    }
 }

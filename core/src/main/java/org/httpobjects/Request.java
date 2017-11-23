@@ -39,9 +39,15 @@ package org.httpobjects;
 
 import org.httpobjects.header.request.RequestHeader;
 import org.httpobjects.path.Path;
+import org.httpobjects.util.HttpObjectUtil;
+import org.httpobjects.util.Method;
+
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 public interface Request {
-    //TODO: int httpVersion();    
+    //TODO: int httpVersion();
     Query query();
     Path path();
     RequestHeader header();
@@ -49,4 +55,14 @@ public interface Request {
     boolean hasRepresentation();
     Representation representation();
     Request immutableCopy();
+    Method method();
+
+    default Optional<String> body() {
+        return body(StandardCharsets.UTF_8);
+    }
+
+    default Optional<String> body(Charset charset) {
+        if (!hasRepresentation()) return Optional.empty();
+        else return Optional.of(HttpObjectUtil.toString(representation(), charset.name()));
+    }
 }

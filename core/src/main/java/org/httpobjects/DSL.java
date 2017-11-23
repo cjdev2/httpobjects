@@ -41,14 +41,10 @@ import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Executors;
 
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.response.AllowField;
@@ -74,23 +70,23 @@ public class DSL {
     //ISO-8859-1 is used on 12.0% of all websites
     public static final StandardCharset MOST_WIDELY_SUPPORTED_ENCODING = StandardCharset.UTF_8;
     public static final StandardCharset DEFAULT_HTTP_ENCODING = StandardCharset.ISO_8859_1;
-    
+
     public static final String CONTENT_TYPE_CSV = "text/csv; charset="+MOST_WIDELY_SUPPORTED_ENCODING.charsetName();
     public static final String CONTENT_TYPE_HTML = "text/html; charset="+MOST_WIDELY_SUPPORTED_ENCODING.charsetName();
     public static final String CONTENT_TYPE_TEXT_PLAIN = "text/plain; charset="+MOST_WIDELY_SUPPORTED_ENCODING.charsetName();
     public static final String CONTENT_TYPE_JSON = "application/json; charset="+MOST_WIDELY_SUPPORTED_ENCODING.charsetName();
-    
+
     /*
      * ########################################################
      * ## Convenience builders
      * ########################################################
      */
-    
+
     public static ClasspathResourcesObject.Builder classpathResourcesAt(String pattern){
         return new ClasspathResourcesObject.Builder(DSL.class, pattern);
     }
-	
-    /* ######################################################## 
+
+    /* ########################################################
      * ## Hand-coded response factory methods
      * ########################################################
      */
@@ -114,12 +110,12 @@ public class DSL {
     public static final Response SEE_OTHER(LocationField location, HeaderField ... header){
         return new Response(ResponseCode.SEE_OTHER, null, makeHeader(location, header));
     }
-    
+
     public static final Response SEE_OTHER(LocationField location, Representation representation, HeaderField ... header){
         return new Response(ResponseCode.SEE_OTHER, representation, makeHeader(location, header));
     }
 
-    /* ######################################################## 
+    /* ########################################################
      * ## Header factory methods
      * ########################################################
      */
@@ -132,8 +128,8 @@ public class DSL {
     public static final LocationField Location(String uri){
         return new LocationField(uri);
     }
-    
-    /* ######################################################## 
+
+    /* ########################################################
      * ## Representation factory methods
      * ########################################################
      */
@@ -153,11 +149,11 @@ public class DSL {
     public static final Representation Json(String text){
         return Json(new ByteArrayInputStream(getBytes(text, MOST_WIDELY_SUPPORTED_ENCODING)));
     }
-    
+
     public static final Representation Json(InputStream text){
         return new BinaryRepresentation(CONTENT_TYPE_JSON, text);
     }
-    
+
     public static final Representation HtmlFromClasspath(String name, Object context){
         return HtmlFromClasspath(name, context.getClass());
     }
@@ -169,7 +165,7 @@ public class DSL {
     public static final Representation FromClasspath(String contentType, String name, final Class<?> clazz){
         return FromClasspath(contentType, name, new WrapperForInsecureClassloader(new ClassResourceLoader(clazz)));
     }
-    
+
     private static final Representation FromClasspath(String contentType, String name, ResourceLoader loader){
         final InputStream stream = loader.getResourceAsStream(name);
         if(stream==null) throw new RuntimeException("No such resource on classpath: " + name);
@@ -240,7 +236,7 @@ public class DSL {
     }
 
 
-    /* ######################################################## 
+    /* ########################################################
      * ## Generated 100 series responses
      * ########################################################
      */
@@ -252,7 +248,7 @@ public class DSL {
         return new Response(ResponseCode.SWITCHING_PROTOCOLS, null);
     }
 
-    /* ######################################################## 
+    /* ########################################################
      * ## Generated 400 series responses
      * ########################################################
      */
@@ -290,7 +286,7 @@ public class DSL {
     @Deprecated
     /**
      * @deprecated This response code must include an Allow header. http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.6
-     * @see DSL#METHOD_NOT_ALLOWED(org.httpobjects.util.Method...) 
+     * @see DSL#METHOD_NOT_ALLOWED(org.httpobjects.util.Method...)
      */
     public static final Response METHOD_NOT_ALLOWED(){
         return new Response(ResponseCode.METHOD_NOT_ALLOWED, Text("405 Client Error: Method Not Allowed"));
@@ -308,6 +304,9 @@ public class DSL {
     }
     public static final Response METHOD_NOT_ALLOWED(Method... allowed) {
         return METHOD_NOT_ALLOWED(Text("405 Client Error: Method Not Allowed"), allowed);
+    }
+    public static final Response allowed(Method... allowed) {
+        return METHOD_NOT_ALLOWED(allowed);
     }
     public static final Response NOT_ACCEPTABLE(){
         return new Response(ResponseCode.NOT_ACCEPTABLE, Text("406 Client Error: Not Acceptable"));
@@ -390,8 +389,8 @@ public class DSL {
     public static final Response UNPROCESSABLE_ENTITY(Representation representation, HeaderField... headers){
         return new Response(ResponseCode.UNPROCESSABLE_ENTITY, representation, headers);
     }
-    
-    /* ######################################################## 
+
+    /* ########################################################
      * ## Generated 500 series responses
      * ########################################################
      */
