@@ -106,54 +106,54 @@ public class HttpObject extends DSL{
                                             final Response notFound) {
         return new HttpObject(maskPatterns(left.pattern(), right.pattern())) {
 
-            private HttpObject find(Request req) {
+            private Response match(Method method, Request req) {
                 if (left.pattern().matches(req.path().toString())) {
-                    return left;
+                    return HttpObjectUtil.invokeMethod(left, method, req);
                 } else if (right.pattern().matches(req.path().toString())) {
-                    return right;
+                    return HttpObjectUtil.invokeMethod(right, method, req);
                 } else {
-                    return new HttpObject("", notFound);
+                    return notFound;
                 }
             }
 
             @Override
             public Response delete(Request req) {
-                return find(req).delete(req);
+                return match(Method.DELETE, req);
             }
 
             @Override
             public Response get(Request req) {
-                return find(req).get(req);
+                return match(Method.GET, req);
             }
 
             @Override
             public Response head(Request req) {
-                return find(req).head(req);
+                return match(Method.HEAD, req);
             }
 
             @Override
             public Response options(Request req) {
-                return find(req).options(req);
+                return match(Method.OPTIONS, req);
             }
 
             @Override
             public Response post(Request req) {
-                return find(req).post(req);
+                return match(Method.POST, req);
             }
 
             @Override
             public Response put(Request req) {
-                return find(req).put(req);
+                return match(Method.PUT, req);
             }
 
             @Override
             public Response trace(Request req) {
-                return find(req).trace(req);
+                return match(Method.TRACE, req);
             }
 
             @Override
             public Response patch(Request req) {
-                return find(req).patch(req);
+                return match(Method.PATCH, req);
             }
         };
     }
