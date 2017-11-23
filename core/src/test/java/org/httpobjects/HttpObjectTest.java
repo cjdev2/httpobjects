@@ -58,12 +58,12 @@ public class HttpObjectTest {
     @Test
     public void decorateShouldApplyDecoratorOnEvents() throws Exception {
         // given
-        SampleDecorator decorator = new SampleDecorator();
+        SampleEvents decorator = new SampleEvents();
         HttpObject resource = new HttpObject("/", allowed(Method.GET, Method.POST)) {
             @Override public Response get(Request req) { return OK(Text("You Got!")); }
             @Override public Response post(Request req) { return OK(Text("You Post!")); }
         };
-        HttpObject decorated = resource.decorate(decorator);
+        HttpObject decorated = resource.onEvents(decorator);
         Request getReq = request("/", Method.GET);
         Request postReq = request("/", Method.POST);
 
@@ -81,12 +81,12 @@ public class HttpObjectTest {
     @Test
     public void decorateShouldRethrowErrors() throws Exception {
         // given
-        SampleDecorator decorator = new SampleDecorator();
+        SampleEvents decorator = new SampleEvents();
         RuntimeException error = new RuntimeException();
         HttpObject resource = new HttpObject("/", allowed(Method.GET)) {
             @Override public Response get(Request req) { throw error; }
         };
-        HttpObject decorated = resource.decorate(decorator);
+        HttpObject decorated = resource.onEvents(decorator);
         Object result;
 
         // when
@@ -113,7 +113,7 @@ public class HttpObjectTest {
         };
     }
 
-    private class SampleDecorator implements HttpObject.Decorator<Integer> {
+    private class SampleEvents implements HttpObject.Events<Integer> {
 
         AtomicInteger atomicEventId = new AtomicInteger();
 

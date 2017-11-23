@@ -91,14 +91,14 @@ public class HttpObject extends DSL{
         return maskResources(this, that, NOT_FOUND(notFound));
     }
 
-    public interface Decorator<Id> {
+    public interface Events<Id> {
         Id onRequest(Request request);
         void onResponse(Id id, Response response);
         void onError(Throwable error);
     }
 
-    public final <Id> HttpObject decorate(Decorator<Id> decorator) {
-        return decorateResource(this, decorator);
+    public final <Id> HttpObject onEvents(Events<Id> events) {
+        return eventsResource(this, events);
     }
 
     private static HttpObject maskResources(final HttpObject left,
@@ -191,18 +191,18 @@ public class HttpObject extends DSL{
         };
     }
 
-    private static <Id> HttpObject decorateResource(final HttpObject resource,
-                                                    final Decorator<Id> decorator) {
+    private static <Id> HttpObject eventsResource(final HttpObject resource,
+                                                  final Events<Id> events) {
         return new HttpObject(resource.pattern()) {
 
             private Response dec(Method method, Request req) {
                 try {
-                    Id id = decorator.onRequest(req);
+                    Id id = events.onRequest(req);
                     Response res = HttpObjectUtil.invokeMethod(resource, method, req);
-                    decorator.onResponse(id, res);
+                    events.onResponse(id, res);
                     return res;
                 } catch (Throwable err) {
-                    decorator.onError(err);
+                    events.onError(err);
                     throw new RuntimeException(err);
                 }
             }
