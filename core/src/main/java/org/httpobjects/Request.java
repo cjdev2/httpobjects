@@ -48,14 +48,14 @@ import java.util.Optional;
 
 public interface Request {
     //TODO: int httpVersion();
-    Query query();
-    Path path();
+    Method method();
     RequestHeader header();
+    Path path();
+    Query query();
+    Representation representation();
     ConnectionInfo connectionInfo();
     boolean hasRepresentation();
-    Representation representation();
     Request immutableCopy();
-    Method method();
 
     default Optional<String> body() {
         return body(StandardCharsets.UTF_8);
@@ -64,5 +64,25 @@ public interface Request {
     default Optional<String> body(Charset charset) {
         if (!hasRepresentation()) return Optional.empty();
         else return Optional.of(HttpObjectUtil.toString(representation(), charset.name()));
+    }
+
+    default String show() {
+        String rep = representation() == null ? "" : representation().show();
+        return  "Request(" +
+                method().show() + "," +
+                header().show() + "," +
+                path().show() + "," +
+                query().show() + "," +
+                rep + "," +
+                connectionInfo().show() + ")";
+    }
+
+    default boolean eq(Request that) {
+        return  this.query().eq(that.query()) &&
+                this.path().eq(that.path()) &&
+                this.header().eq(that.header()) &&
+                this.connectionInfo().eq(that.connectionInfo()) &&
+                this.representation().eq(that.representation()) &&
+                this.method().eq(that.method());
     }
 }

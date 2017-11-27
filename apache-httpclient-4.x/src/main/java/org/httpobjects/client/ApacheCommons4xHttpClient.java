@@ -4,7 +4,6 @@ import static java.util.Arrays.asList;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 
 import org.apache.http.HttpEntity;
@@ -23,6 +22,7 @@ import org.httpobjects.header.HeaderField;
 import org.httpobjects.impl.fn.Fn;
 import org.httpobjects.impl.fn.FunctionalJava;
 import org.httpobjects.impl.fn.Seq;
+import org.httpobjects.representation.LazyImmutableRep;
 import org.httpobjects.util.HttpObjectUtil;
 
 public final class ApacheCommons4xHttpClient implements HttpClient {
@@ -90,7 +90,6 @@ public final class ApacheCommons4xHttpClient implements HttpClient {
 		};
 	}
 
-
 	private Response doit(String query, Representation r, HeaderField[] fields, final String method, final String uri) {
 		return translate(execute(translate(method, uri, query, r, fields)));
 	}
@@ -125,49 +124,22 @@ public final class ApacheCommons4xHttpClient implements HttpClient {
 		if(apacheBody==null){
 			representation = null;
 		}else{
-			representation = translate(apacheBody);
+			representation = translate(apacheBody, 0);
 		}
 
 		return new Response(code, representation, headerFields.toList().toArray(new HeaderField[]{}));
 	}
 
-	private Representation translate(final HttpEntity apache) {
-
-		return new Representation() {
-
-			@Override
-			public void write(OutputStream out) {
-
-				try {
-					InputStream in = apache.getContent();
-					try {
-						copy(in, out);
-					}finally{
-						in.close();
-					}
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}
-
-			private void copy(InputStream in, OutputStream out){
-				try {
-					byte[] buffer = new byte[1024 * 100];
-					int x;
-					while((x=in.read(buffer)) !=-1){
-						out.write(buffer, 0, x);
-					}
-				} catch (IOException e) {
-					throw new RuntimeException(e);
-				}
-			}
-
-			@Override
-			public String contentType() {
-				org.apache.http.Header header = apache.getContentType();
-				return header==null?null:header.getValue();
-			}
-		};
+	private Representation translate(final HttpEntity apache, int tries) {
+		try {
+			String contentType = apache.getContentType() == null ? null :
+					apache.getContentType().getValue();
+			InputStream content = apache.getContent();
+			return new LazyImmutableRep(contentType, content);
+		} catch (IOException err) {
+			if (tries > 10) throw new RuntimeException(err);
+			else return translate(apache, tries + 1);
+		}
 	}
 
 	private org.apache.http.client.methods.HttpUriRequest translate(String method, String uri, String query, Representation r, HeaderField[] fields) {
@@ -191,5 +163,4 @@ public final class ApacheCommons4xHttpClient implements HttpClient {
 
 		return entity;
 	}
-
 }

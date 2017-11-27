@@ -1,5 +1,6 @@
 package org.httpobjects.netty;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -24,6 +25,7 @@ import org.httpobjects.netty.http.ByteAccumulator;
 import org.httpobjects.netty.http.HttpChannelHandler;
 import org.httpobjects.path.Path;
 import org.httpobjects.path.PathPattern;
+import org.httpobjects.representation.LazyImmutableRep;
 import org.httpobjects.util.HttpObjectUtil;
 import org.httpobjects.util.Method;
 import org.jboss.netty.handler.codec.http.HttpChunkTrailer;
@@ -134,40 +136,11 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 
 			@Override
 			public Representation representation() {
-
-				return new Representation(){
-					@Override
-					public String contentType() {
-						return request.headers().get("ContentType");
-					}
-
-					@Override
-					public void write(OutputStream out) {
-						try {
-							if(body!=null){
-							    InputStream data = body.toStream();
-					            copy(out, data);
-							}
-						} catch (IOException e) {
-							throw new RuntimeException(e);
-						}
-					}
-
-                    private void copy(OutputStream out, InputStream data) throws IOException {
-                        byte[] buffer = new byte[1024 * 10];
-                        int x;
-                        while((x = data.read(buffer))!=-1){
-                            out.write(buffer, 0, x);
-                        }
-                        out.close();
-                        data.close();
-                    }
-				};
+				String contentType = request.headers().get("ContentType");
+				InputStream data = body != null ? body.toStream() :
+						new ByteArrayInputStream("".getBytes());
+				return new LazyImmutableRep(contentType, data);
 			}
-
 		};
 	}
-
-
-
 }

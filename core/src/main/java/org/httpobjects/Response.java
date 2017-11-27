@@ -39,32 +39,59 @@ package org.httpobjects;
 
 import org.httpobjects.header.HeaderField;
 
+import java.util.stream.Collectors;
+
+import static java.util.Arrays.stream;
+
 public final class Response {
-	
+
 	private final Representation representation;
 	private final ResponseCode code;
 	private final HeaderField[] header;
-	
+
 	public Response(ResponseCode code, Representation r, HeaderField ... header) {
 		super();
 		this.code = code;
 		this.representation = r;
 		this.header = header;
 	}
-	
+
 	public boolean hasRepresentation(){
 		return representation!=null;
 	}
-	
+
 	public Representation representation() {
 		return representation;
 	}
-	
+
 	public ResponseCode code() {
 		return code;
 	}
-	
+
 	public HeaderField[] header() {
 		return header;
+	}
+
+	public String show() {
+		return  "Response(" +
+				code.show() + "," +
+				showHeader(header) + "," +
+				representation.show() + ")";
+	}
+
+	public boolean eq(Response that) {
+		return  this.code.eq(that.code) &&
+				eqHeader(this.header, that.header) &&
+				this.representation.eq(that.representation);
+	}
+
+	private static String showHeader(HeaderField[] header) {
+		String fields = stream(header).map(HeaderField::show)
+				.sorted().collect(Collectors.joining(","));
+		return "{" + fields + "}";
+	}
+
+	private static boolean eqHeader(HeaderField[] left, HeaderField[] right) {
+		return showHeader(left).equals(showHeader(right));
 	}
 }

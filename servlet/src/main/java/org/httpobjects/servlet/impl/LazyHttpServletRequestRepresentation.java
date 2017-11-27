@@ -39,37 +39,22 @@ package org.httpobjects.servlet.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.httpobjects.Representation;
+import org.httpobjects.representation.LazyImmutableRep;
 
-public class LazyHttpServletRequestRepresentation implements Representation {
-	private final HttpServletRequest request;
-	
-	public LazyHttpServletRequestRepresentation(HttpServletRequest request) {
-		super();
-		this.request = request;
-	}
+public class LazyHttpServletRequestRepresentation {
 
-	@Override
-	public void write(OutputStream out) {
+	public static Representation of(HttpServletRequest request, int tries) {
 		try {
-			InputStream in = request.getInputStream();
-			byte[] buffer = new byte[1024 * 10];
-			for(int x=in.read(buffer);x!=-1;x=in.read(buffer)){
-				out.write(buffer, 0, x);
-			}
-			out.close();
-			in.close();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+			String contentType = request.getContentType();
+			InputStream input = request.getInputStream();
+			return new LazyImmutableRep(contentType, input);
+		} catch (IOException err) {
+			if (tries > 10) throw new RuntimeException(err);
+			else return of(request, tries + 1);
 		}
-	}
-	
-	@Override
-	public String contentType() {
-		return request.getContentType();
 	}
 }

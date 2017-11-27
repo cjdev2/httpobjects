@@ -42,7 +42,7 @@ import java.util.List;
 
 public class ResponseCode {
 	private static final List<ResponseCode> standardResponseCodes = new ArrayList<ResponseCode>();
-	public static final ResponseCode 
+	public static final ResponseCode
 	    // GENERATED FROM http://www.w3.org/Protocols/rfc2616/rfc2616.txt
         CONTINUE = new StandardResponseCode(100, "CONTINUE"),
         SWITCHING_PROTOCOLS = new StandardResponseCode(101, "SWITCHING_PROTOCOLS"),
@@ -85,7 +85,7 @@ public class ResponseCode {
         SERVICE_UNAVAILABLE = new StandardResponseCode(503, "SERVICE_UNAVAILABLE"),
         GATEWAY_TIMEOUT = new StandardResponseCode(504, "GATEWAY_TIMEOUT"),
         HTTP_VERSION_NOT_SUPPORTED = new StandardResponseCode(505, "HTTP_VERSION_NOT_SUPPORTED");
-	
+
 	public static ResponseCode forCode(int a){
 		ResponseCode code = null;
 		for(ResponseCode n : standardResponseCodes){
@@ -93,21 +93,21 @@ public class ResponseCode {
 				code = n;
 			}
 		}
-		
+
 		if(code==null){
 			synchronized(standardResponseCodes){
 				code = new ResponseCode(a, "Code " + a);
 				standardResponseCodes.add(code);
 			}
-			
+
 		}
-		
+
 		return code;
 	}
-	
+
 	private final Integer value;
 	private final String name;
-	
+
 	private ResponseCode(int value, String name) {
 		super();
 		this.value = value;
@@ -117,9 +117,9 @@ public class ResponseCode {
 	public int value() {
 		return value;
 	}
-	
-	
-	
+
+
+
 	public boolean is300Series(){
 		return value >= 300 && value < 400;
 	}
@@ -127,23 +127,31 @@ public class ResponseCode {
 	public String name(){
 		return name;
 	}
-	
+
 	@Override
 	public String toString() {
 	    return name + "(" + value + ")";
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return other == this;
 	}
-	
+
 	private static class StandardResponseCode extends ResponseCode {
 
 		public StandardResponseCode(int value, String name) {
 			super(value, name);
 			standardResponseCodes.add(this);
 		}
-		
+
+	}
+
+	public String show() {
+		return toString();
+	}
+
+	public boolean eq(ResponseCode that) {
+		return this.show().equals(that.show());
 	}
 }

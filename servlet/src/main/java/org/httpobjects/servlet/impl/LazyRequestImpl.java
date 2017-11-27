@@ -91,7 +91,7 @@ public class LazyRequestImpl implements Request {
 
 	@Override
 	public Representation representation() {
-		return new LazyHttpServletRequestRepresentation(request);
+		return LazyHttpServletRequestRepresentation.of(request, 0);
 	}
 
 	@Override

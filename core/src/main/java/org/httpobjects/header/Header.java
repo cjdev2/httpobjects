@@ -40,6 +40,7 @@ package org.httpobjects.header;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class Header {
 	private final List<HeaderField> fields;
@@ -69,4 +70,14 @@ public class Header {
     public Optional<String> get(String key) {
         return Optional.ofNullable(field(key)).map(HeaderField::value);
     }
+
+    public String show() {
+		String pairs = fields.stream().map(HeaderField::show)
+				.sorted().collect(Collectors.joining(","));
+		return "{" + pairs + "}";
+	}
+
+	public boolean eq(Header that) {
+		return this.show().equals(that.show());
+	}
 }

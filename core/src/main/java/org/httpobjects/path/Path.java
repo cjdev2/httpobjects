@@ -68,10 +68,18 @@ public class Path {
 
 	@Override
 	public String toString() {
-	    return rawPath==null?"":rawPath;
+	    return rawPath == null ? "" : rawPath;
 	}
 
     public Optional<String> get(String key) {
         return Optional.ofNullable(valueFor(key));
     }
+
+    public String show() {
+		return toString();
+	}
+
+	public boolean eq(Path that) {
+		return this.show().equals(that.show());
+	}
 }

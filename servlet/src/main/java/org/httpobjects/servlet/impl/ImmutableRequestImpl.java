@@ -62,7 +62,7 @@ public class ImmutableRequestImpl implements Request {
 		this.query = request.getQueryString();
 		this.connectionInfo = HttpServletRequestUtil.connectionInfo(request);
         this.header = HttpServletRequestUtil.buildHeader(request);
-		this.representation = new ImmutableHttpServletRequestRepresentation(request);
+		this.representation = ImmutableHttpServletRequestRepresentation.of(request, 0);
 		this.method = Method.fromString(request.getMethod().toUpperCase());
 	}
 

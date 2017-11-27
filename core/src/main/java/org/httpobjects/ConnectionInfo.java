@@ -40,7 +40,7 @@ package org.httpobjects;
 public class ConnectionInfo {
 //  String protocolVersion
 //  String protocol;
-    
+
     public final String localAddress;
     public final Integer localPort;
 
@@ -54,9 +54,21 @@ public class ConnectionInfo {
         this.remoteAddress = notNull(remoteAddress);
         this.remotePort = notNull(remotePort);
     }
-    
+
     private static <T> T notNull(T value){
         if(value==null) throw new IllegalArgumentException("Null not allowed");
         return value;
+    }
+
+    public String show() {
+        return  "ConnectionInfo(" +
+                localAddress + "," +
+                localPort + "," +
+                remoteAddress + "," +
+                remotePort + ")";
+    }
+
+    public boolean eq(ConnectionInfo that) {
+        return this.show().equals(that.show());
     }
 }

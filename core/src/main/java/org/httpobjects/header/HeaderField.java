@@ -41,4 +41,13 @@ public abstract class HeaderField {
 	public abstract <T> T accept(HeaderFieldVisitor<T> visitor);
 	public abstract String name();
 	public abstract String value();
+
+	public final String show() {
+		return name() + ":\"" + value() + "\"";
+	}
+
+	public final boolean eq(HeaderField that) {
+		return  this.name().equals(that.name()) &&
+				this.value().equals(that.value());
+	}
 }

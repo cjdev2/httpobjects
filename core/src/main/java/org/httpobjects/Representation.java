@@ -43,4 +43,12 @@ public interface Representation {
     String contentType();
 
     void write(OutputStream out);
+
+    default String show() {
+        return this.toString();
+    }
+
+    default boolean eq(Representation that) {
+        return this.equals(that);
+    }
 }
