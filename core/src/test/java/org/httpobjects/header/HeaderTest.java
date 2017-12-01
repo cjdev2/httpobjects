@@ -38,8 +38,11 @@
 package org.httpobjects.header;
 
 import static java.util.Arrays.asList;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+
+import java.util.Optional;
 
 public class HeaderTest {
 
@@ -47,27 +50,45 @@ public class HeaderTest {
     public void getOrElseReturnsValueWhenPresent() {
         //given
         final Header h = new Header(asList(header("name", "larry")));
-        
+
         // when
         final String value = h.getOrElse("name", "John Doe");
-        
+
         // then
-        org.junit.Assert.assertEquals("larry", value);
+        assertEquals("larry", value);
     }
-    
+
     @Test
     public void getOrElseReturnsDefaultValueAsNeeded() {
         //given
         final Header h = new Header(asList(header("name", "larry")));
-        
+
         // when
         final String value = h.getOrElse("age", "29");
-        
+
         // then
-        org.junit.Assert.assertEquals("29", value);
+        assertEquals("29", value);
     }
 
     private static HeaderField header(String name, String value){
         return new GenericHeaderField(name, value);
+    }
+
+    @Test
+    public void getShouldReturnHeaderFieldsWhenPresent() {
+        // given
+        Header header = new Header(asList(
+                header("name", "larry"),
+                header("age", "29")));
+
+        // when
+        Optional<String> name = header.get("name");
+        Optional<String> age = header.get("age");
+        Optional<String> qux = header.get("qux");
+
+        // then
+        assertEquals(Optional.of("larry"), name);
+        assertEquals(Optional.of("29"), age);
+        assertEquals(Optional.<String>empty(), qux);
     }
 }

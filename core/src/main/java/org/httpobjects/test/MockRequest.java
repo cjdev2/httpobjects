@@ -47,6 +47,7 @@ import org.httpobjects.Request;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.request.RequestHeader;
 import org.httpobjects.path.Path;
+import org.httpobjects.util.Method;
 
 public class MockRequest implements Request {
 	private final Path path;
@@ -54,28 +55,34 @@ public class MockRequest implements Request {
 	private final Query query;
     private final RequestHeader header;
     private final ConnectionInfo connectionInfo;
-	
-    public MockRequest(ConnectionInfo connectionInfo, HttpObject object, String path, Query query, Representation representation, HeaderField ... fields) {
+    private final Method method;
+
+    public MockRequest(ConnectionInfo connectionInfo, HttpObject object, String path, Query query, Representation representation, Method method, HeaderField... fields) {
         super();
         assertNoQueryInPath(path);
+        this.method = method;
         this.connectionInfo = connectionInfo;
         this.representation = representation;
         this.query = query;
         this.path = object.pattern().match(path);
-        if(this.path==null){
+        if (this.path == null) {
             throw new RuntimeException(object.pattern().raw() + " does not match " + path);
         }
         this.header = new RequestHeader(fields);
     }
-    
+
+    public MockRequest(ConnectionInfo connectionInfo, HttpObject object, String path, Query query, Representation representation, HeaderField... fields) {
+        this(connectionInfo, object, path, query, representation, Method.GET, fields);
+    }
+
     public MockRequest(HttpObject object, String path, Query query, Representation representation, HeaderField ... fields) {
         this(new ConnectionInfo("1.2.3.4", 8080, "4.3.2.1", 4332), object, path, query, representation, fields);
     }
-    
+
 	public MockRequest(HttpObject object, String path, Query query, HeaderField ... fields) {
 		this(object, path, query, nullRepresentation(), fields);
 	}
-	
+
 	public MockRequest(HttpObject object, String path, HeaderField ... fields) {
         this(object, path, new Query(null), nullRepresentation(), fields);
 	}
@@ -83,12 +90,12 @@ public class MockRequest implements Request {
 	public MockRequest(HttpObject object, String path, Representation representation, HeaderField ... fields) {
         this(object, path, new Query(""), representation, fields);
 	}
-	
+
 	@Override
 	public ConnectionInfo connectionInfo() {
 	    return connectionInfo;
 	}
-	
+
 	@Override
 	public RequestHeader header() {
 		return header;
@@ -107,22 +114,27 @@ public class MockRequest implements Request {
 	public Representation representation() {
 		return representation;
 	}
-	
+
 	@Override
 	public Query query() {
 		return query;
 	}
-	
+
+	@Override
+    public Method method() {
+        return method;
+    }
+
 	@Override
 	public Request immutableCopy() {
 		return this;
 	}
-	
+
 
     private static Representation nullRepresentation(){
         return Bytes(null, new byte[]{});
     }
-    
+
     private static void assertNoQueryInPath(String path){
         if(path.indexOf('?')!=-1)
             throw new RuntimeException("The query is in the path, but I wasn't expecting that; try using a constructor that takes a " + Query.class.getName() + " argument.");

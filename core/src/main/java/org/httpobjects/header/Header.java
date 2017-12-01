@@ -39,18 +39,20 @@ package org.httpobjects.header;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class Header {
 	private final List<HeaderField> fields;
-	
+
 	public Header(List<HeaderField> fields){
 		this.fields = Collections.unmodifiableList(fields);
 	}
-	
+
 	public List<HeaderField> fields() {
 		return fields;
 	}
-	
+
 	public HeaderField field(String name){
 		for(HeaderField next : fields){
 			if(next.name().equals(name)){
@@ -65,4 +67,17 @@ public class Header {
         return field==null?defaultValue:field.value();
     }
 
+    public Optional<String> get(String key) {
+        return Optional.ofNullable(field(key)).map(HeaderField::value);
+    }
+
+    public String show() {
+		String pairs = fields.stream().map(HeaderField::show)
+				.sorted().collect(Collectors.joining(","));
+		return "{" + pairs + "}";
+	}
+
+	public boolean eq(Header that) {
+		return this.show().equals(that.show());
+	}
 }

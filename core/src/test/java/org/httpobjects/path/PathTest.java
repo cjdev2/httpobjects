@@ -41,29 +41,49 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import java.util.Optional;
+
 public class PathTest {
+
     @Test
     public void toStringDoesWhatYouWouldExpect(){
         // given
         Path testSubject = new Path("/foo/bar");
-        
+
         // when
         String result = testSubject.toString();
-        
+
         // then
         assertEquals("/foo/bar", result);
     }
-    
+
     @Test
     public void toStringIsNullSafe(){
         // given
         Path testSubject = new Path(null);
-        
+
         // when
         String result = testSubject.toString();
-        
+
         // then
         assertEquals("", result);
-        
+    }
+
+    @Test
+    public void getShouldReturnThePathValuesWhenPresent() {
+        // given
+        Path path = new Path("/foo/bar/",
+                new PathParam(new PathParamName("fst"), "foo"),
+                new PathParam(new PathParamName("snd"), "bar"));
+
+        // when
+        Optional<String> fst = path.get("fst");
+        Optional<String> snd = path.get("snd");
+        Optional<String> qux = path.get("qux");
+
+        // then
+        assertEquals(Optional.of("foo"), fst);
+        assertEquals(Optional.of("bar"), snd);
+        assertEquals(Optional.<String>empty(), qux);
     }
 }

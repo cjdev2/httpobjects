@@ -46,28 +46,27 @@ import org.httpobjects.util.RequestQueryUtil;
 
 public final class Query {
     private final String string;
-    
+
     public Query(String string) {
         super();
         final boolean needsQuestionMark = string!=null && !string.startsWith("?");
         this.string = needsQuestionMark ? "?" + string : string;
     }
-    
+
     @Override
     public String toString() {
-        return string==null?"":string;
+        return string == null ? "" : string;
     }
 
-    
     public String valueFor(String name) {
         return parse().get(name);
     }
-    
+
     private Map<String, String> memoizedParams = null;
     private Map<String, String>  parse() {
         try {
             if(memoizedParams==null){
-                memoizedParams = RequestQueryUtil.getUrlParameters(string); 
+                memoizedParams = RequestQueryUtil.getUrlParameters(string);
             }
             return memoizedParams;
         } catch (UnsupportedEncodingException e) {
@@ -78,5 +77,13 @@ public final class Query {
     public List<String> paramNames() {
 //        return Collections.emptyList();
         return new ArrayList<String>(parse().keySet());
+    }
+
+    public String show() {
+        return toString();
+    }
+
+    public boolean eq(Query that) {
+        return this.show().equals(that.show());
     }
 }

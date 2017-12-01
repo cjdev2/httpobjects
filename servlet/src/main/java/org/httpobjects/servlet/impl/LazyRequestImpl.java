@@ -44,51 +44,56 @@ import org.httpobjects.Representation;
 import org.httpobjects.Request;
 import org.httpobjects.header.request.RequestHeader;
 import org.httpobjects.path.Path;
+import org.httpobjects.util.Method;
 
 public class LazyRequestImpl implements Request {
 	private final HttpServletRequest request;
 	private final Path vars;
-	
+
 	public LazyRequestImpl(Path vars, HttpServletRequest request) {
 		super();
 		this.vars = vars;
 		this.request = request;
 	}
-	
+
 	public org.httpobjects.ConnectionInfo connectionInfo() {
 	    return HttpServletRequestUtil.connectionInfo(request);
 	}
-	
+
+	@Override
+	public Method method() {
+		return Method.fromString(request.getMethod().toUpperCase());
+	}
+
 	@Override
 	public Path path() {
 		return vars;
 	}
-	
+
 	public String contentType(){
 		return request.getContentType();
 	}
-	
+
 	@Override
 	public boolean hasRepresentation() {
 		return true;
 	}
-	
+
 	@Override
 	public Query query(){
 		return new Query(request.getQueryString());
 	}
-	
+
 	@Override
 	public RequestHeader header() {
 		return HttpServletRequestUtil.buildHeader(request);
 	}
-	
-	
+
 	@Override
 	public Representation representation() {
-		return new LazyHttpServletRequestRepresentation(request);
+		return LazyHttpServletRequestRepresentation.of(request, 0);
 	}
-	
+
 	@Override
 	public Request immutableCopy() {
 		return new ImmutableRequestImpl(vars, request);

@@ -42,6 +42,7 @@ import static org.junit.Assert.*;
 import org.httpobjects.test.MockRequest;
 import org.httpobjects.util.ClasspathResourcesObject;
 import org.httpobjects.util.HttpObjectUtil;
+import org.httpobjects.util.Method;
 import org.junit.Test;
 
 public class DSLTest {
@@ -52,36 +53,49 @@ public class DSLTest {
     	ClasspathResourcesObject object = DSL
     			.classpathResourcesAt("/org/httpobjects/util/ClasspathResourcesObjectTest_resources")
     			.servedAt("/");
-    		
+
     	// then
     	assertEquals("/{resource*}", object.pattern().raw());
     	Response response = object.get(new MockRequest(object, "/a.txt"));
     	assertEquals("hello", HttpObjectUtil.toAscii(response.representation()));
     }
-    
+
     @Test
     public void builderWithDifferentServiceRoot(){
     	// given/when
     	ClasspathResourcesObject object = DSL
     			.classpathResourcesAt("/org/httpobjects/util/ClasspathResourcesObjectTest_resources")
     			.servedAt("/bar");
-    		
+
     	// then
     	assertEquals("/bar/{resource*}", object.pattern().raw());
     	Response response = object.get(new MockRequest(object, "/bar/a.txt"));
     	assertEquals("hello", HttpObjectUtil.toAscii(response.representation()));
     }
-    
+
     @Test
     public void builderHappyPath_withDifferentClasspathPattern(){
     	// given/when
     	ClasspathResourcesObject object = DSL
     			.classpathResourcesAt("/org/httpobjects")
     			.servedAt("/bar");
-    		
+
     	// then
     	assertEquals("/bar/{resource*}", object.pattern().raw());
     	Response response = object.get(new MockRequest(object, "/bar/util/ClasspathResourcesObjectTest_resources/a.txt"));
     	assertEquals("hello", HttpObjectUtil.toAscii(response.representation()));
     }
+
+    @Test
+	public void allowedShouldBeAnAliasForNOT_ALLOWED() {
+    	// given
+		Response test = DSL.allowed(Method.GET, Method.POST);
+		Response ctrl = DSL.METHOD_NOT_ALLOWED(Method.GET, Method.POST);
+
+		// then
+		assertEquals(ctrl.code(), test.code());
+		assertEquals(ctrl.hasRepresentation(), test.hasRepresentation());
+		assertEquals(ctrl.header().length, test.header().length);
+		assertEquals(ctrl.representation().contentType(), test.representation().contentType());
+	}
 }

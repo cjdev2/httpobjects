@@ -38,7 +38,7 @@
 package org.httpobjects.util;
 
 public enum Method {
-    GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS;
+    GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS, TRACE;
 
     public static Method fromString(String text){
         try {
@@ -46,5 +46,13 @@ public enum Method {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public String show() {
+        return toString();
+    }
+
+    public boolean eq(Method that) {
+        return this.show().equals(that.show());
     }
 }

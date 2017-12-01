@@ -19,7 +19,7 @@ public interface HttpClient {
         public abstract Response patch(Representation r, String query, HeaderField ... fields);
         public abstract Response head(Representation r, String query, HeaderField ... fields);
         public abstract Response options(Representation r, String query, HeaderField ... fields);
-
+        public abstract Response trace(Representation r, String query, HeaderField ... fields);
 
         /*
          * Convenience methods for 'GET'
@@ -117,6 +117,20 @@ public interface HttpClient {
         }
         public final Response options(Representation r, HeaderField ... fields){
             return this.options(r, "", fields);
+        }
+
+        /*
+         * Convenience methods for 'TRACE'
+         */
+
+        public final Response trace(HeaderField ... fields) {
+            return this.trace(null, "", fields);
+        }
+        public final Response trace(String query, HeaderField ... fields) {
+            return this.trace(null, query, fields);
+        }
+        public final Response trace(Representation r, HeaderField ... fields) {
+            return this.trace(r, "", fields);
         }
 
     }

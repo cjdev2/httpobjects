@@ -38,65 +38,26 @@
 package org.httpobjects.servlet.impl;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.httpobjects.Representation;
+import org.httpobjects.representation.LazyImmutableRep;
 
-public class ImmutableHttpServletRequestRepresentation implements Representation {
-	private final String contentType;
-    private final byte[] content;
+public class ImmutableHttpServletRequestRepresentation {
 
-	public ImmutableHttpServletRequestRepresentation(HttpServletRequest request) {
-		super();
-
-        try{
-            InputStream in = request.getInputStream();
-            if(in!=null){
-               ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-                copy(in, out);
-
-                content = out.toByteArray();
-            }else{
-                content = new byte[]{};
-            }
-
-        } catch(Exception e){
-            throw new RuntimeException(e);
+	public static Representation of(HttpServletRequest request, int tries) {
+	    try {
+            String contentType = request.getContentType();
+            InputStream input = request.getInputStream();
+            InputStream data = input != null ? input :
+                    new ByteArrayInputStream("".getBytes());
+            return new LazyImmutableRep(contentType, data);
+        } catch (IOException err) {
+	        if (tries > 10) throw new RuntimeException(err);
+	        else return of(request, tries + 1);
         }
-        contentType = request.getContentType();
-
-	}
-
-
-    private static void copy(InputStream in, OutputStream out) {
-        try {
-
-			byte[] buffer = new byte[1024 * 10];
-
-			for(int x=in.read(buffer);x!=-1;x=in.read(buffer)){
-				out.write(buffer, 0, x);
-			}
-			out.close();
-			in.close();
-
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
     }
-
-    @Override
-	public void write(OutputStream out) {
-         copy(new ByteArrayInputStream(content), out);
-	}
-	
-	@Override
-	public String contentType() {
-		return contentType;
-	}
 }
