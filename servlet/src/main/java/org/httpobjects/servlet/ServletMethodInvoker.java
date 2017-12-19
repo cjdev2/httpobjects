@@ -58,7 +58,7 @@ import org.httpobjects.header.response.AllowField;
 import org.httpobjects.header.response.LocationField;
 import org.httpobjects.header.response.SetCookieField;
 import org.httpobjects.header.response.WWWAuthenticateField;
-import org.httpobjects.servlet.impl.ImmutableRequestImpl;
+import org.httpobjects.servlet.impl.LazyRequestImpl;
 import org.httpobjects.util.HttpObjectUtil;
 import org.httpobjects.util.Method;
 
@@ -112,7 +112,7 @@ public class ServletMethodInvoker {
 
     private Response invoke(HttpServletRequest r, HttpServletResponse httpResponse, HttpObject object) {
 		final Method m = Method.fromString(r.getMethod());
-		final Request input = new ImmutableRequestImpl(object.pattern().match(r.getRequestURI()), r);
+		final Request input = new LazyRequestImpl(object.pattern().match(r.getRequestURI()), r);
 
 		return HttpObjectUtil.invokeMethod(object, m, input);
 	}

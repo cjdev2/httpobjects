@@ -69,12 +69,12 @@ public interface Request {
     default String show() {
         String rep = representation() == null ? "" : representation().show();
         return  "Request(" +
-                "method = " + method().show() + "," +
-                "header = " + header().show() + "," +
-                "path = " + path().show() + "," +
-                "query = " + query().show() + "," +
-                "representation = " + rep + "," +
-                "connectionInfo = " + connectionInfo().show() + ")";
+                method().show() + "," +
+                header().show() + "," +
+                path().show() + "," +
+                query().show() + "," +
+                rep + "," +
+                connectionInfo().show() + ")";
     }
 
     default boolean eq(Request that) {

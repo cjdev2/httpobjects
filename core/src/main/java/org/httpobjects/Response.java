@@ -74,9 +74,9 @@ public final class Response {
 
 	public String show() {
 		return  "Response(" +
-				"code = " + code.show() + "," +
-				"header = " + showHeader(header) + "," +
-				"representation = " + representation.show() + ")";
+				code.show() + "," +
+				showHeader(header) + "," +
+				representation.show() + ")";
 	}
 
 	public boolean eq(Response that) {
