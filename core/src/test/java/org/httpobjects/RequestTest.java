@@ -36,20 +36,22 @@ public class RequestTest {
         Request req1 = fooRequest();
         Request req2 = barRequest();
         String exp1 = "Request(" +
-                "POST," +
-                "{bariness:\"bar\",foocience:\"foo\"}," +
-                "/foo/bar/," +
-                "?foo=bar," +
-                "foo bar," +
-                "ConnectionInfo(10.10.10.10,40,20.20.20.20,80)" +
+                "method = POST," +
+                "header = {bariness:\"bar\",foocience:\"foo\"}," +
+                "path = /foo/bar/," +
+                "query = ?foo=bar," +
+                "representation = foo bar," +
+                "connectionInfo = ConnectionInfo(" +
+                "localAddress = 10.10.10.10,localPort = 40,remoteAddress = 20.20.20.20,remotePort = 80)" +
                 ")";
         String exp2 = "Request(" +
-                "GET," +
-                "{bariness:\"bar\",foocience:\"foo\"}," +
-                "/foo/bar/," +
-                "?foo=bar," +
-                "," +
-                "ConnectionInfo(10.10.10.10,40,20.20.20.20,80)" +
+                "method = GET," +
+                "header = {bariness:\"bar\",foocience:\"foo\"}," +
+                "path = /foo/bar/," +
+                "query = ?foo=bar," +
+                "representation = ," +
+                "connectionInfo = ConnectionInfo(" +
+                "localAddress = 10.10.10.10,localPort = 40,remoteAddress = 20.20.20.20,remotePort = 80)" +
                 ")";
 
         System.out.println(req1.show());
