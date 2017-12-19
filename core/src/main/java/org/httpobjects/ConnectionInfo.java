@@ -62,10 +62,10 @@ public class ConnectionInfo {
 
     public String show() {
         return  "ConnectionInfo(" +
-                localAddress + "," +
-                localPort + "," +
-                remoteAddress + "," +
-                remotePort + ")";
+                "localAddress = " + localAddress + "," +
+                "localPort = " + localPort + "," +
+                "remoteAddress = " + remoteAddress + "," +
+                "remotePort = " + remotePort + ")";
     }
 
     public boolean eq(ConnectionInfo that) {
