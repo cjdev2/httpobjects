@@ -16,7 +16,7 @@ public class ResponseTest {
                 new GenericHeaderField("foocience", "foo"),
                 new GenericHeaderField("bariness", "bar"));
         String expected =
-                "Response(OK(200),{bariness:\"bar\",foocience:\"foo\"},body)";
+                "Response(code = OK(200),header = {bariness:\"bar\",foocience:\"foo\"},representation = body)";
 
         // when
         String result1 = res.show();

@@ -127,8 +127,8 @@ public class HttpObjectTest {
         }
 
         @Override
-        public void onResponse(Integer integer, Response response) {
-            log.add("Response: " + integer + ", " + response);
+        public void onResponse(Integer eventId, Response response) {
+            log.add("Response: " + eventId + ", " + response);
         }
 
         @Override
