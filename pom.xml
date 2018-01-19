@@ -119,6 +119,7 @@
         <module>servlet</module>
         <module>jetty-6</module>
         <module>jetty-7-and-8</module>
+        <module>jetty-9</module>
         <module>demo</module>
         <module>freemarker</module>
         <module>jackson</module>
