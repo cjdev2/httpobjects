@@ -51,7 +51,7 @@ import org.httpobjects.header.response.AllowField;
 import org.httpobjects.header.response.LocationField;
 import org.httpobjects.header.response.SetCookieField;
 import org.httpobjects.header.response.WWWAuthenticateField;
-import org.httpobjects.representation.LazyImmutableRep;
+import org.httpobjects.representation.ImmutableRep;
 import org.httpobjects.util.ClasspathResourcesObject;
 import org.httpobjects.util.Method;
 import org.httpobjects.util.impl.ClassResourceLoader;
@@ -135,15 +135,15 @@ public class DSL {
      */
 
     public static final Representation Csv(String text){
-        return new LazyImmutableRep(CONTENT_TYPE_CSV, new ByteArrayInputStream(getBytes(text, MOST_WIDELY_SUPPORTED_ENCODING)));
+        return new ImmutableRep(CONTENT_TYPE_CSV, new ByteArrayInputStream(getBytes(text, MOST_WIDELY_SUPPORTED_ENCODING)));
     }
 
     public static final Representation Html(String text){
-        return new LazyImmutableRep(CONTENT_TYPE_HTML, new ByteArrayInputStream(getBytes(text, MOST_WIDELY_SUPPORTED_ENCODING)));
+        return new ImmutableRep(CONTENT_TYPE_HTML, new ByteArrayInputStream(getBytes(text, MOST_WIDELY_SUPPORTED_ENCODING)));
     }
 
     public static final Representation Text(String text){
-        return new LazyImmutableRep(CONTENT_TYPE_TEXT_PLAIN, new ByteArrayInputStream(getBytes(text, MOST_WIDELY_SUPPORTED_ENCODING)));
+        return new ImmutableRep(CONTENT_TYPE_TEXT_PLAIN, new ByteArrayInputStream(getBytes(text, MOST_WIDELY_SUPPORTED_ENCODING)));
     }
 
     public static final Representation Json(String text){
@@ -151,7 +151,7 @@ public class DSL {
     }
 
     public static final Representation Json(InputStream text){
-        return new LazyImmutableRep(CONTENT_TYPE_JSON, text);
+        return new ImmutableRep(CONTENT_TYPE_JSON, text);
     }
 
     public static final Representation HtmlFromClasspath(String name, Object context){
@@ -177,11 +177,11 @@ public class DSL {
     }
 
     public static final Representation Bytes(String contentType, byte[] data){
-        return new LazyImmutableRep(contentType, new ByteArrayInputStream(data));
+        return new ImmutableRep(contentType, new ByteArrayInputStream(data));
     }
 
     public static final Representation Bytes(String contentType, InputStream data){
-        return new LazyImmutableRep(contentType, data);
+        return new ImmutableRep(contentType, data);
     }
 
     public static final Representation File(String contentType, java.io.File path){
