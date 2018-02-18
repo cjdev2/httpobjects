@@ -44,7 +44,7 @@ import java.io.InputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import org.httpobjects.Representation;
-import org.httpobjects.representation.LazyImmutableRep;
+import org.httpobjects.representation.ImmutableRep;
 
 public class ImmutableHttpServletRequestRepresentation {
 
@@ -54,7 +54,7 @@ public class ImmutableHttpServletRequestRepresentation {
             InputStream input = request.getInputStream();
             InputStream data = input != null ? input :
                     new ByteArrayInputStream("".getBytes());
-            return new LazyImmutableRep(contentType, data);
+            return new ImmutableRep(contentType, data);
         } catch (IOException err) {
 	        if (tries > 10) throw new RuntimeException(err);
 	        else return of(request, tries + 1);

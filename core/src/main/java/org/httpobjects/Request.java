@@ -78,11 +78,6 @@ public interface Request {
     }
 
     default boolean eq(Request that) {
-        return  this.query().eq(that.query()) &&
-                this.path().eq(that.path()) &&
-                this.header().eq(that.header()) &&
-                this.connectionInfo().eq(that.connectionInfo()) &&
-                this.representation().eq(that.representation()) &&
-                this.method().eq(that.method());
+        return  this.show().equals(that.show());
     }
 }

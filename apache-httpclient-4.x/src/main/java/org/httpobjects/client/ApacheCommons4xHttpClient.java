@@ -22,7 +22,7 @@ import org.httpobjects.header.HeaderField;
 import org.httpobjects.impl.fn.Fn;
 import org.httpobjects.impl.fn.FunctionalJava;
 import org.httpobjects.impl.fn.Seq;
-import org.httpobjects.representation.LazyImmutableRep;
+import org.httpobjects.representation.ImmutableRep;
 import org.httpobjects.util.HttpObjectUtil;
 
 public final class ApacheCommons4xHttpClient implements HttpClient {
@@ -135,7 +135,7 @@ public final class ApacheCommons4xHttpClient implements HttpClient {
 			String contentType = apache.getContentType() == null ? null :
 					apache.getContentType().getValue();
 			InputStream content = apache.getContent();
-			return new LazyImmutableRep(contentType, content);
+			return new ImmutableRep(contentType, content);
 		} catch (IOException err) {
 			if (tries > 10) throw new RuntimeException(err);
 			else return translate(apache, tries + 1);
