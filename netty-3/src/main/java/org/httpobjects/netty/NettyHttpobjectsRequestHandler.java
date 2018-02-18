@@ -25,7 +25,7 @@ import org.httpobjects.netty.http.ByteAccumulator;
 import org.httpobjects.netty.http.HttpChannelHandler;
 import org.httpobjects.path.Path;
 import org.httpobjects.path.PathPattern;
-import org.httpobjects.representation.LazyImmutableRep;
+import org.httpobjects.representation.ImmutableRep;
 import org.httpobjects.util.HttpObjectUtil;
 import org.httpobjects.util.Method;
 import org.jboss.netty.handler.codec.http.HttpChunkTrailer;
@@ -139,7 +139,7 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 				String contentType = request.headers().get("ContentType");
 				InputStream data = body != null ? body.toStream() :
 						new ByteArrayInputStream("".getBytes());
-				return new LazyImmutableRep(contentType, data);
+				return new ImmutableRep(contentType, data);
 			}
 		};
 	}
