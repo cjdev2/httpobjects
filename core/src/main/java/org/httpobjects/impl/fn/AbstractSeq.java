@@ -88,18 +88,17 @@ public abstract class AbstractSeq<T> implements Seq<T>{
         return list;
     }
     
-    @SuppressWarnings("unused")
-    private class CompositeIterator<T> implements Iterator<T> {
-        private final Iterator<? extends T> first;
-        private final Iterator<? extends T> last;
+    private class CompositeIterator<V> implements Iterator<V> {
+        private final Iterator<? extends V> first;
+        private final Iterator<? extends V> last;
         
-        public CompositeIterator(Iterator<? extends T> first, Iterator<? extends T> last) {
+        public CompositeIterator(Iterator<? extends V> first, Iterator<? extends V> last) {
             super();
             this.first = first;
             this.last = last;
         }
 
-        private Iterator<? extends T> nextIterator(){
+        private Iterator<? extends V> nextIterator(){
             if(first.hasNext()){
                 return first;
             }else{
@@ -112,7 +111,7 @@ public abstract class AbstractSeq<T> implements Seq<T>{
             return nextIterator().hasNext();
         }
         @Override
-        public T next() {
+        public V next() {
             return nextIterator().next();
         }
         

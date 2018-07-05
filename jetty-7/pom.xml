@@ -9,11 +9,16 @@
     </parent>
 
     <groupId>org.httpobjects.jetty</groupId>
-    <artifactId>httpobjects-jetty-6</artifactId>
+    <artifactId>httpobjects-jetty-7</artifactId>
 
     <name>${artifactId}</name>
 
     <dependencies>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>7.6.10.v20130312</version>
+        </dependency>
         <dependency>
             <groupId>org.httpobjects</groupId>
             <artifactId>httpobjects</artifactId>
@@ -23,12 +28,6 @@
             <groupId>org.httpobjects.servlet</groupId>
             <artifactId>httpobjects-servlet</artifactId>
             <version>${pom.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jetty</artifactId>
-            <version>6.1.26</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -52,6 +51,18 @@
             <groupId>org.httpobjects.test</groupId>
             <artifactId>httpobjects-test</artifactId>
             <version>${pom.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.httpobjects.apache-httpclient-4.x</groupId>
+            <artifactId>httpobjects-apache-httpclient-4.x</artifactId>
+            <version>${pom.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.3</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
