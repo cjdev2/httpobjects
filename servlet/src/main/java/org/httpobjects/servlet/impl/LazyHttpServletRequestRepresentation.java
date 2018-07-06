@@ -37,6 +37,7 @@
  */
 package org.httpobjects.servlet.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -51,7 +52,8 @@ public class LazyHttpServletRequestRepresentation {
 		try {
 			String contentType = request.getContentType();
 			InputStream input = request.getInputStream();
-			return new ImmutableRep(contentType, input);
+			InputStream data = input != null ? input : new ByteArrayInputStream(new byte[0]);
+			return new ImmutableRep(contentType, data);
 		} catch (IOException err) {
 			if (tries > 10) throw new RuntimeException(err);
 			else return of(request, tries + 1);
