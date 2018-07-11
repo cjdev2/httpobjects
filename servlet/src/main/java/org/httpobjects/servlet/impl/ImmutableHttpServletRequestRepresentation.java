@@ -37,24 +37,18 @@
  */
 package org.httpobjects.servlet.impl;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.httpobjects.Representation;
-import org.httpobjects.representation.ImmutableRep;
 
 public class ImmutableHttpServletRequestRepresentation {
 
 	public static Representation of(HttpServletRequest request, int tries) {
 	    try {
             String contentType = request.getContentType();
-            InputStream input = request.getInputStream();
-            InputStream data = input != null ? input :
-                    new ByteArrayInputStream("".getBytes());
-            return new ImmutableRep(contentType, data);
+            return new LazyRep(contentType, request.getInputStream());
         } catch (IOException err) {
 	        if (tries > 10) throw new RuntimeException(err);
 	        else return of(request, tries + 1);

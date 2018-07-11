@@ -3,6 +3,7 @@ package org.httpobjects.representation;
 import org.httpobjects.Representation;
 import org.httpobjects.util.HttpObjectUtil;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -11,17 +12,18 @@ import java.util.ArrayList;
 public class ImmutableRep implements Representation {
 
     private final String contentType;
-    private final ArrayList<Byte> representation;
+    private final byte[] representation;
 
     public ImmutableRep(String contentType, InputStream data) {
         try {
             this.contentType = contentType;
-            this.representation = new ArrayList<>();
-            int b = data.read();
-            while (b != -1) {
-                representation.add((byte) b);
-                b = data.read();
+            java.io.ByteArrayOutputStream buf = new ByteArrayOutputStream();
+            byte[] b = new byte[256];
+            int n;
+            while ((n = data.read(b)) != -1) {
+                buf.write(b, 0, n);
             }
+            this.representation = buf.toByteArray();
         } catch (IOException err) {
             throw new RuntimeException(err);
         }
@@ -34,10 +36,11 @@ public class ImmutableRep implements Representation {
 
     @Override
     public void write(OutputStream out) {
-        representation.forEach(b -> {
-            try { out.write(b); }
-            catch (IOException err) { throw new RuntimeException(err); }
-        });
+        try {
+            out.write(representation);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
