@@ -119,6 +119,12 @@ public class ProxyTest {
                         return OK(Text(textualRepresentation));
                     }
                 },
+                new HttpObject("/superOptions") {
+                    @Override
+                    public Response options(Request req) {
+                        return OK(Json(""));
+                    }
+                },
                 new HttpObject("/requirescustomheader") {
                     @Override
                     public Response get(Request req) {
@@ -387,6 +393,19 @@ public class ProxyTest {
         responseCodeOf(output).assertIs(ResponseCode.OK);
         assertTrue(contentTypeOf(output).isPlainTextWithEncoding("utf-8"));
         assertEquals("Kermie patched", bodyOf(output).asString());
+    }
+
+    @Test
+    public void proxiesOKOptions() {
+        // given
+        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com");
+        Request input = new MockRequest(subject, "/superOptions", HttpObject.Text(""));
+
+        // when
+        Response output = subject.options(input);
+
+        // then
+        responseCodeOf(output).assertIs(ResponseCode.OK);
     }
 
     @Test

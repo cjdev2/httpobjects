@@ -111,6 +111,11 @@ public class Proxy extends HttpObject {
         return proxyRequest(req, m);
     }
 
+    @Override
+    public Response options(Request req) {
+        return proxyRequest(req, new OptionsMethod());
+    }
+
     protected void setRequestRepresentation(Request req, EntityEnclosingMethod method) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         req.representation().write(out);
