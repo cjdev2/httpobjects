@@ -19,6 +19,24 @@ public class LazyRep implements Representation {
         this.data = null;
     }
 
+    private byte[] getData() throws Exception {
+        if (data == null) {
+            if (input == null) {
+                data = new byte[0];
+            } else {
+                byte[] b = new byte[256];
+                ByteArrayOutputStream buf = new ByteArrayOutputStream();
+                int n;
+                while ((n = input.read(b)) != -1) {
+                    buf.write(b, 0, n);
+                }
+                input.close();
+                data = buf.toByteArray();
+            }
+        }
+        return data;
+    }
+
     @Override
     public String contentType() {
         return contentType;
@@ -27,20 +45,7 @@ public class LazyRep implements Representation {
     @Override
     public void write(OutputStream out) {
         try {
-            if (data == null) {
-                if (input == null) {
-                    data = new byte[0];
-                } else {
-                    byte[] b = new byte[256];
-                    ByteArrayOutputStream buf = new ByteArrayOutputStream();
-                    int n;
-                    while ((n = input.read(b)) != -1) {
-                        buf.write(b, 0, n);
-                    }
-                    data = buf.toByteArray();
-                }
-            }
-            out.write(data);
+            out.write(getData());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
