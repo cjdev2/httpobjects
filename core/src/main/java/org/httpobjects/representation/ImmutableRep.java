@@ -24,6 +24,7 @@ public class ImmutableRep implements Representation {
                 buf.write(b, 0, n);
             }
             this.representation = buf.toByteArray();
+            data.close();
         } catch (IOException err) {
             throw new RuntimeException(err);
         }
