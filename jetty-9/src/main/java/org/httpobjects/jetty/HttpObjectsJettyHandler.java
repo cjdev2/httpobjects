@@ -37,8 +37,10 @@
  */
 package org.httpobjects.jetty;
 
+import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.httpobjects.HttpObject;
 import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
@@ -95,6 +97,26 @@ public class HttpObjectsJettyHandler extends org.eclipse.jetty.server.handler.Ab
             return s;
         } catch (Exception e) {
             throw new RuntimeException("" + e.getMessage() + " (port = " + port + ")", e);
+        }
+    }
+
+    public static Server launchServer(int port, int idleTimeout, HttpObject... objects) {
+        try {
+            Server s = new Server();
+
+            ServerConnector connector = new ServerConnector(s);
+            connector.setPort(port);
+            connector.setIdleTimeout(idleTimeout);
+            s.setConnectors(new Connector[]{connector});
+
+            s.setHandler(new HttpObjectsJettyHandler(Collections.singletonList(new GenericHeaderField("Cache-Control", "no-cache")), objects));
+
+            s.start();
+
+            return s;
+        } catch (Exception e) {
+            throw new RuntimeException("" + e.getMessage() + " (port = " + port + ")", e);
+
         }
     }
 
