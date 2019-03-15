@@ -92,9 +92,13 @@ public class CookieField extends HeaderField {
 		public static NameValue parse(String nameValue){
 			try {
 				int pos = nameValue.indexOf('=');
-				String name = nameValue.substring(0, pos);
-				String value = nameValue.substring(pos + 1);
-				return new NameValue(name, value);
+				if (pos < 0) {
+					return new NameValue(nameValue, null);
+				} else {
+					String name = nameValue.substring(0, pos);
+					String value = nameValue.substring(pos + 1);
+					return new NameValue(name, value);
+				}
 			} catch (Exception e) {
 				throw new RuntimeException("Error parsing " + nameValue);
 			}

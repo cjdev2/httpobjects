@@ -148,4 +148,20 @@ public class CookieFieldTest {
 		// THEN:
 		Assert.assertEquals("haircolor=brown;height=10ft", text);
 	}
+
+	@Test
+	public void nameOnly(){
+		// GIVEN:
+		String cookieHeader = "__test; name=Bob";
+
+		// WHEN:
+		CookieField field = new CookieField(cookieHeader);
+
+		// THEN:
+		Assert.assertNotNull(field.cookies().get(0));
+		Assert.assertEquals("__test", field.cookies().get(0).name);
+		Assert.assertNull(field.cookies().get(0).value);
+		Assert.assertEquals("Bob", field.cookies().get(1).value);
+	}
+
 }
