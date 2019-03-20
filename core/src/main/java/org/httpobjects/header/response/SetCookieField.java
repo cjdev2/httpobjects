@@ -131,6 +131,13 @@ public class SetCookieField extends HeaderField {
     public final String domain;
     public final String path;
     public final String expiration;
+    /*
+     * TODO: parse cookie dates instead of just passing that responsibility on to the user?
+     *   https://tools.ietf.org/html/rfc6265#section-5.1.1
+     *
+     * TODO: support Max-Age??
+     *   https://mrcoles.com/blog/cookies-max-age-vs-expires/
+     */
     public final Boolean secure;
     public final Boolean httpOnly;
 

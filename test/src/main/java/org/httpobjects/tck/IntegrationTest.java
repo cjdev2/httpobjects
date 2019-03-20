@@ -163,6 +163,7 @@ public abstract class IntegrationTest {
                         @Override
                         public Void visit(CookieField cookieField) {
                             for(Cookie cookie : cookieField.cookies()){
+
                                 text.append(cookie.name + "=" + cookie.value);
                             }
                             return null;
@@ -408,6 +409,7 @@ public abstract class IntegrationTest {
             assertEquals("yes", cookie.value);
             assertEquals("the90sintranet.com", cookie.domain.toLowerCase());
             assertEquals("/images/animatedGifs", cookie.path);
+            assertEquals("Wed, 13-Jan-1999 22:23:01 GMT", cookie.expiration);
             assertEquals(null, cookie.secure);
         }
 
@@ -418,6 +420,7 @@ public abstract class IntegrationTest {
             assertEquals("mr rogers", cookie.value);
             assertEquals("mrrogers.com", cookie.domain);
             assertEquals("/myNeighborhood", cookie.path);
+            assertEquals("Wed, 13-Jan-2021 22:23:01 GMT", cookie.expiration);
             assertEquals(Boolean.TRUE, cookie.secure);
         }
     }
