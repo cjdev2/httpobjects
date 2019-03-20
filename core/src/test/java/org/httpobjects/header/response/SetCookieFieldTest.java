@@ -45,12 +45,29 @@
  */
 package org.httpobjects.header.response;
 
+import org.httpobjects.DateTimeRFC6265;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 //https://tools.ietf.org/html/rfc6265
 public class SetCookieFieldTest {
+
+
+
+    @Test
+    public void acceptsParsedExpirations() {
+
+        // given
+        DateTimeRFC6265 when = new DateTimeRFC6265("Wed, 13-Jan-2021 22:23:01 GMT");
+
+        // when
+        SetCookieField c = new SetCookieField("SSID", "Ap4P….GTEq", ".foo.com", "/", when, true, true);
+
+        // then
+        assertEquals("Wed, 13-Jan-2021 22:23:01 GMT", c.expiration);
+    }
+
 
     @Test
     public void valuesMayBeQuoted() {
@@ -196,7 +213,7 @@ public class SetCookieFieldTest {
     @Test
     public void getterForHttpOnlyTrue() {
         // given
-        SetCookieField cookieField = new SetCookieField(null, null, null, null, null, null, Boolean.TRUE);
+        SetCookieField cookieField = new SetCookieField(null, null, null, null, (String) null, null, Boolean.TRUE);
 
         // then
         assertTrue(cookieField.isHttpOnly());
@@ -205,7 +222,7 @@ public class SetCookieFieldTest {
     @Test
     public void getterForHttpOnlyFalse() {
         // given
-        SetCookieField cookieField = new SetCookieField(null, null, null, null, null, null, Boolean.FALSE);
+        SetCookieField cookieField = new SetCookieField(null, null, null, null, (String) null, null, Boolean.FALSE);
 
         // then
         assertFalse(cookieField.isHttpOnly());
@@ -214,7 +231,7 @@ public class SetCookieFieldTest {
     @Test
     public void getterForHttpOnlyNull() {
         // given
-        SetCookieField cookieField = new SetCookieField(null, null, null, null, null, null, null);
+        SetCookieField cookieField = new SetCookieField(null, null, null, null, (String) null, null, null);
 
         // then
         assertFalse(cookieField.isHttpOnly());
@@ -223,7 +240,7 @@ public class SetCookieFieldTest {
     @Test
     public void getterForSecureTrue() {
         // given
-        SetCookieField cookieField = new SetCookieField(null, null, null, null, null, Boolean.TRUE, null);
+        SetCookieField cookieField = new SetCookieField(null, null, null, null, (String) null, Boolean.TRUE, null);
 
         // then
         assertTrue(cookieField.isSecure());
@@ -232,7 +249,7 @@ public class SetCookieFieldTest {
     @Test
     public void getterForSecureFalse() {
         // given
-        SetCookieField cookieField = new SetCookieField(null, null, null, null, null, Boolean.FALSE, null);
+        SetCookieField cookieField = new SetCookieField(null, null, null, null, (String) null, Boolean.FALSE, null);
 
         // then
         assertFalse(cookieField.isSecure());
@@ -241,7 +258,7 @@ public class SetCookieFieldTest {
     @Test
     public void getterForSecureNull() {
         // given
-        SetCookieField cookieField = new SetCookieField(null, null, null, null, null, null, null);
+        SetCookieField cookieField = new SetCookieField(null, null, null, null, (String) null, null, null);
 
         // then
         assertFalse(cookieField.isSecure());

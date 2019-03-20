@@ -45,6 +45,7 @@
  */
 package org.httpobjects.header.response;
 
+import org.httpobjects.DateTimeRFC6265;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.HeaderFieldVisitor;
 
@@ -142,6 +143,17 @@ public class SetCookieField extends HeaderField {
     public final Boolean httpOnly;
 
     public SetCookieField(String name, String value, String domain, String path,
+                          DateTimeRFC6265 expiration, Boolean secure, Boolean httpOnly) {
+        this.name = name;
+        this.value = value;
+        this.domain = domain;
+        this.path = path;
+        this.expiration = expiration.toString();
+        this.secure = secure;
+        this.httpOnly = httpOnly;
+    }
+
+    public SetCookieField(String name, String value, String domain, String path,
                           String expiration, Boolean secure, Boolean httpOnly) {
         this.name = name;
         this.value = value;
@@ -159,6 +171,11 @@ public class SetCookieField extends HeaderField {
 
     public SetCookieField(String name, String value, String domain) {
         this(name, value, domain, null, null, null);
+    }
+
+
+    public DateTimeRFC6265 parsedExpiration(){
+        return new DateTimeRFC6265(expiration);
     }
 
     @Override
