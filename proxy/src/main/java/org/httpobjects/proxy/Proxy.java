@@ -165,7 +165,15 @@ public class Proxy extends HttpObject {
             method.addRequestHeader("Content-Type", req.representation().contentType());
         }
 
+
         method.addRequestHeader("X-Forwarded-For", req.connectionInfo().remoteAddress);
+
+        // Support for the de-facto standard "X-Forwarded-Host" header
+        //   https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Host
+        HeaderField maybeHostHeader = req.header().field("Host");
+        if(maybeHostHeader!=null){
+            method.addRequestHeader("X-Forwarded-Host", maybeHostHeader.value());
+        }
 
         for (Header next : method.getRequestHeaders()) {
             log.debug("Sending header: " + next);
