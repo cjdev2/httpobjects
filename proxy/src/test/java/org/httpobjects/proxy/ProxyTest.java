@@ -230,6 +230,22 @@ public class ProxyTest {
     }
 
     @Test
+    public void relaysTheOriginalHostField() {
+
+        // given
+        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com");
+
+        // WHEN:
+        Response output = subject.get(new MockRequest(subject, "/headerEcho", new Query("?name=beforeTab%09afterTab"), new GenericHeaderField("Host", "dummy-remote-host-value")));
+
+        // THEN:
+        String representation = HttpObjectUtil.toAscii(output.representation());
+        System.out.println("representation = " + representation);
+
+        assertThat(representation, containsString("X-Forwarded-Host=dummy-remote-host-value"));
+    }
+
+    @Test
     public void doesntDoubleEncodeTheUrl() {
 
         // given

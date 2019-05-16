@@ -45,6 +45,7 @@
  */
 package org.httpobjects.header.response;
 
+import org.httpobjects.DateTimeRFC6265;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.HeaderFieldVisitor;
 
@@ -131,8 +132,26 @@ public class SetCookieField extends HeaderField {
     public final String domain;
     public final String path;
     public final String expiration;
+    /*
+     * TODO: parse cookie dates instead of just passing that responsibility on to the user?
+     *   https://tools.ietf.org/html/rfc6265#section-5.1.1
+     *
+     * TODO: support Max-Age??
+     *   https://mrcoles.com/blog/cookies-max-age-vs-expires/
+     */
     public final Boolean secure;
     public final Boolean httpOnly;
+
+    public SetCookieField(String name, String value, String domain, String path,
+                          DateTimeRFC6265 expiration, Boolean secure, Boolean httpOnly) {
+        this.name = name;
+        this.value = value;
+        this.domain = domain;
+        this.path = path;
+        this.expiration = expiration.toString();
+        this.secure = secure;
+        this.httpOnly = httpOnly;
+    }
 
     public SetCookieField(String name, String value, String domain, String path,
                           String expiration, Boolean secure, Boolean httpOnly) {
@@ -152,6 +171,11 @@ public class SetCookieField extends HeaderField {
 
     public SetCookieField(String name, String value, String domain) {
         this(name, value, domain, null, null, null);
+    }
+
+
+    public DateTimeRFC6265 parsedExpiration(){
+        return new DateTimeRFC6265(expiration);
     }
 
     @Override

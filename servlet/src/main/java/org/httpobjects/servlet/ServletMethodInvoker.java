@@ -42,7 +42,6 @@ import java.io.OutputStream;
 import java.util.Collections;
 import java.util.List;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -124,16 +123,17 @@ public class ServletMethodInvoker {
 			resp.setStatus(r.code().value());
 			
 			for(HeaderField next : r.header()){
-				next.accept(new HeaderFieldVisitor<Void>() {
-					
+				next.accept(new HeaderFieldVisitor() {
+
 					@Override
 					public Void visit(CookieField cookieField) {
 						resp.setHeader(cookieField.name(), cookieField.value());
 						return null;
 					}
-					
+
 					@Override
 					public Void visit(GenericHeaderField other) {
+                        // TODO: This might not work right with multiple headers of the same name
 						resp.setHeader(other.name(), other.value());
 						return null;
 					}
@@ -149,13 +149,13 @@ public class ServletMethodInvoker {
 						resp.setHeader(location.name(), location.value());
 						return null;
 					}
-					
+
 					@Override
 					public Void visit(SetCookieField setCookieField) {
-						resp.addCookie(translate(setCookieField));
+						resp.addHeader(setCookieField.name(), setCookieField.value());
 						return null;
 					}
-					
+
 					@Override
 					public Void visit(WWWAuthenticateField wwwAuthorizationField) {
 						resp.setHeader(wwwAuthorizationField.name(), wwwAuthorizationField.value());
@@ -165,7 +165,7 @@ public class ServletMethodInvoker {
 					public Void visit(AuthorizationField authorizationField) {
 						throw new RuntimeException("Illegal header for request: " + authorizationField.getClass());
 					}
-					
+
 				});
 			}
 			
@@ -197,23 +197,6 @@ public class ServletMethodInvoker {
       }
     }
   }
-  
-	private Cookie translate(SetCookieField cookie) {
-	    Cookie c = new Cookie(cookie.name, cookie.value);
-	    
-	    if(cookie.domain!=null){
-	        c.setDomain(cookie.domain);
-	    }
-//	    if(cookie.expiration!=null){
-//	        c.setMaxAge(Integer.parseInt(cookie.expiration));
-//	    }
-	    if(cookie.path!=null){
-	        c.setPath(cookie.path);
-	    }
-	    if(cookie.secure!=null) {
-	        c.setSecure(cookie.secure);
-	    }
-	    
-	    return c;
-	}
+
+
 }
