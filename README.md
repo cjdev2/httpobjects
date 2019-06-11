@@ -1,2 +1,2 @@
 
-Go to http://httpobjects.org
+Go to http://httpobjects.org for info
